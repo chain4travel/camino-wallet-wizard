@@ -48,7 +48,10 @@
                     required
                 />
                 <div class="input_box">
-                    <label>Country:</label>
+                    <label>
+                        Country
+                        <sup>&#42;</sup>
+                    </label>
                     <country-select
                         v-model="user.country"
                         :country="user.country"
@@ -75,33 +78,42 @@
                     required
                 />
                 <div class="multisig-box">
-                    <b>MultiSignature Funds</b>
+                    <b>MultiSignature Option</b>
                     <small>
-                        Camino supports multi sugnature tokens for shared control over your funds
+                        Camino supports MultiSignature tokens for shared control.
                         <br />
-                        If you have funds to be transferred to a multisig wallet, please tick the
-                        box bellow
+                        If you want your Camino tokens to be transferred to a MultiSignature wallet,
+                        please tick the box below.
                     </small>
                     <MultiSigCheckbox v-model="user.multisig" :explain="$t('wizard.multisig')" />
                 </div>
-                <SaftCheckbox v-model="user.agree" :explain="$t('wizard.agree')" required />
-                <v-btn
-                    type="submit"
-                    :disabled="submitUserDataDisabled"
-                    class="ava_button button_secondary"
-                    depressed
-                >
-                    {{ $t('wizard.send') }}
-                </v-btn>
+                <div class="form_actions">
+                    <SaftCheckbox v-model="user.agree" :explain="$t('wizard.agree')" required />
+                    <v-btn
+                        type="submit"
+                        :disabled="submitUserDataDisabled"
+                        class="ava_button button_secondary"
+                        depressed
+                    >
+                        {{ $t('wizard.send') }}
+                    </v-btn>
+                    <small class="required_text">
+                        <sup>*&nbsp;</sup>
+                        Required fields
+                    </small>
+                </div>
             </form>
         </template>
         <template v-else>
             <div class="success_body">
                 <img src="@/assets/success.svg" alt />
                 <div class="success_content">
-                    <h1>{{ $t('wizard.success.title') }}</h1>
-                    <span>{{ $t('wizard.success.dear') }} {{ user.name }} {{ user.surname }},</span>
-                    <p>{{ $t('wizard.success.thank_you_note') }}</p>
+                    <span>{{ $t('wizard.success.dear') }}, {{ user.name }}</span>
+                    <p>
+                        {{ $t('wizard.success.thank_you_note') }}
+                        <br />
+                        {{ $t('wizard.success.thank_you_note2') }}
+                    </p>
                     <v-btn @click="completeSaftStep" class="button_secondary">
                         {{ $t('wizard.success.start') }}
                     </v-btn>
@@ -146,7 +158,7 @@ function strip0x(input: string) {
 export default class Saft extends Vue {
     nameRegex = /^[a-zA-Z ]{2,30}$/
     emailRegex = /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/
-    phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{4,9}$/
+    phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
     isLoading = false
     background = ''
     error: {

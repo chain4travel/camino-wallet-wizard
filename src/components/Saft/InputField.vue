@@ -1,7 +1,7 @@
 <template>
     <div class="input_box">
         <label>
-            {{ label }} :
+            {{ label }}
             <sup v-if="required">&#42;</sup>
         </label>
         <input

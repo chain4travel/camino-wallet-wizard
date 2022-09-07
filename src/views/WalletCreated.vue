@@ -4,8 +4,8 @@
         <div class="success_content">
             <h1>Congratulation!</h1>
             <span>
-                You have successfully created your account and verified it. You can now use head out
-                to the wallet.
+                You have successfully created your account and verified it. You can now head out to
+                the wallet.
             </span>
         </div>
         <v-btn @click="goToWallet" class="button_secondary">Access Wallet</v-btn>

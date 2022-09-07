@@ -39,32 +39,22 @@
             </div>
             <div class="content">
                 <h1 class="content--desc">
-                    <!-- The Camino Pre-Sale Wizard guides you through all naccesary steps for you to
-                    receive your Camino Tokens. -->
-                    In the first step of the wizard, we will create an access key phrasee to your
-                    wallet for you.
+                    In the first step, we will create an access key phrase for you.
                     <br />
                     <br />
                     The key phrase consists of 24 random words. These words in their specific order
-                    represent the key to your wallet and Camino tokens.
+                    represent the unique key to your wallet and Camino tokens.
                     <br />
                     <br />
-                    Chain4travel will not save your key phrase and will never ask you for your key
+                    Chain4Travel will never save your key phrase and will never ask you for your key
                     phrase.
                     <br />
                     <br />
-                    Anyone, who knows these words in their specifix orderhas full control over your
-                    tokens.
-                    <br />
-                    <br />
-                    <strong>
-                        Keep the key phrase in one or more secure locations that only you have
-                        access to.
-                    </strong>
+                    Anyone who knows your key phrase has full, unlimited control over your tokens,
+                    so please keep the key phrase in one or more secure locations that only you have
+                    access to.
                 </h1>
-                <div class="content--access-create">
-                    Click on next to create your key phrase and your personal wallet.
-                </div>
+                <div class="content--access-create">Click next to create your personal wallet.</div>
             </div>
             <div class="buttons-wrapper">
                 <v-btn @click="goToStepper" class="ava_button button_secondary submit_but">

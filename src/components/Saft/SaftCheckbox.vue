@@ -1,8 +1,5 @@
 <template>
-    <div>
-        <v-checkbox :label="explain" v-model="value" @change="change" class="checkbox"></v-checkbox>
-        <sup v-if="required">&#42;</sup>
-    </div>
+    <v-checkbox :label="explain" v-model="value" @change="change" class="checkbox"></v-checkbox>
 </template>
 <script>
 export default {
@@ -34,10 +31,6 @@ export default {
 @use "../../styles/main";
 
 .checkbox {
-    sup {
-        top: 0.5em;
-        color: var(--error);
-    }
     .v-input__slot {
         background-color: transparent !important;
     }

@@ -210,11 +210,8 @@
     },
     "wizard": {
         "title": "To prepare your SAFT aggrement, please fill out the below form :",
-        "name": "Name :",
-        "surname": "Surname :",
-        "email": "Email :",
         "send": "Send & Next",
-        "agree": "I agree that Chain4Travel AG may use my info only for creation of SAFT agreement.",
+        "agree": "I agree that Chain4Travel AG may use my info only for creation of SAFT agreement. *",
         "multisig": "Please contact me for the MultiSignature option",
         "errors": {
             "name": "Name must contain two or more letters",
@@ -224,9 +221,9 @@
             "phone": "Please enter a correct phone number"
         },
         "success": {
-            "title": "Whoohoo!",
             "dear": "Dear",
-            "thank_you_note": "Thank you for enabeling us to prepare your SAFT agreement. Next, we will guide you through the verification process.",
+            "thank_you_note": "Thank you for enabling us to prepare your SAFT agreement.",
+            "thank_you_note2": "Next, we will guide you through the verification process.",
             "next": "Please have your id document at hand.",
             "start": "Start Verification Process"
         }

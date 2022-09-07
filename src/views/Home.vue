@@ -39,25 +39,31 @@
             </div>
             <div class="content">
                 <h1 class="content--desc">
-                    <!-- The Camino Pre-Sale Wizard guides you through all naccesary steps for you to
-                    receive your Camino Tokens. -->
                     Welcome to the Camino Pre-Sale Wizard!
                     <br />
                     <br />
-                    In this wizard you will create your wallet, enter information that we need to
-                    your SAFT aggrement and then verify yourself according to EU finicial
-                    regulations.
+                    This wizard guides you through the process of
+                    <ul>
+                        <li>Creating your wallet</li>
+                        <li>Enabling us to prepare your SAFT agreement</li>
+                        <li>
+                            Verifying yourself to ensure you are eligible to purchase tokens under
+                            EU regulations
+                        </li>
+                    </ul>
+                    <br />
+                    For security reasons, this wizard does not save any data.
                     <br />
                     <br />
-                    For security reasons, this wizard will save any data or login.
+                    Therefore, please complete the wizard in one session which will take no longer
+                    than 15 minutes.
                     <br />
                     <br />
-                    Therfore, please complete the wizard in one session, Completion of the wizard
-                    takes aproximately 15 minutes, please have your id document ready.
+                    Please have your ID document ready.
                     <br />
                     <br />
-                    If you have any questions or remarks, please send us an email to:
-                    <div class="email">presale@chain4travel.com</div>
+                    If you have any questions or remarks, please send an email to
+                    presale@chain4travel.com
                 </h1>
                 <div class="content--access-create">Click Start to start the Presale Wizard</div>
             </div>
