@@ -1,0 +1,62 @@
+<template>
+    <div>
+        <v-checkbox :label="explain" v-model="value" @change="change" class="checkbox"></v-checkbox>
+        <sup v-if="required">&#42;</sup>
+    </div>
+</template>
+<script>
+export default {
+    props: {
+        value: Boolean,
+        explain: {
+            type: String,
+            default:
+                'I agree that Chain4Travel AG may use my info only for creation of SAFT aggrement',
+        },
+        required: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    model: {
+        prop: 'value',
+        event: 'change',
+    },
+    methods: {
+        change() {
+            this.$emit('change', this.value)
+        },
+    },
+}
+</script>
+
+<style lang="scss">
+@use "../../styles/main";
+
+.checkbox {
+    sup {
+        top: 0.5em;
+        color: var(--error);
+    }
+    .v-input__slot {
+        background-color: transparent !important;
+    }
+    .v-messages {
+        display: none;
+    }
+    .v-label {
+        font-size: 12px;
+        color: var(--primary-color);
+    }
+
+    .v-input--selection-controls__input {
+        > * {
+            color: var(--primary-color) !important;
+        }
+    }
+
+    .v-input--selection-controls__ripple {
+        color: var(--secondary-color) !important;
+    }
+}
+</style>
