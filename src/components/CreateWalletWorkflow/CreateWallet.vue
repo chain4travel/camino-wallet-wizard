@@ -505,6 +505,7 @@ a {
     margin: 0 auto;
     text-align: left;
     align-items: flex-start;
+    max-width: 100%;
 }
 
 .cols {
@@ -609,12 +610,6 @@ a {
             flex-direction: row;
             margin-top: 14px;
             text-align: left;
-            //flex-direction: column;
-            //align-items: flex-start;
-            //justify-content: space-between;
-
-            .access {
-            }
 
             .link {
                 margin-left: 40px;

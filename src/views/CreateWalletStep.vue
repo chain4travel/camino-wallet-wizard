@@ -101,8 +101,6 @@
                         </transition>
                     </div>
                 </div>
-                <!-- <div class="kyc" v-if="isVerified && kycStep">toto d zeb</div> -->
-                <!-- STEP 3c - kyc -->
             </div>
         </div>
     </div>
@@ -116,13 +114,11 @@ import * as bip39 from 'bip39'
 import PaperWallet from '@/components/modals/PaperWallet/PaperWallet.vue'
 import VerifyMnemonic from '@/components/modals/VerifyMnemonic.vue'
 import MnemonicCopied from '@/components/CreateWalletWorkflow/MnemonicCopied.vue'
-import ToS from '@/components/misc/ToS.vue'
 import MnemonicPhrase from '@/js/wallets/MnemonicPhrase'
 import { WalletNameType, WalletType } from '@/js/wallets/types'
 
 @Component({
     components: {
-        ToS,
         Spinner,
         VerifyMnemonic,
         MnemonicCopied,
@@ -365,6 +361,17 @@ export default class CreateWalletStep extends Vue {
 
     .remember_wallet {
         margin: 20px 0;
+    }
+}
+
+@include main.mobile-device {
+    .mneumonic_disp_col {
+        display: flex;
+        justify-content: center;
+    }
+    .mneumonic_button_container {
+        display: flex;
+        justify-content: center;
     }
 }
 </style>

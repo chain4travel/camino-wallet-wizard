@@ -150,7 +150,7 @@ export default class Home extends Vue {
                 border-radius: var(--border-radius-sm);
                 margin-bottom: 30px;
                 font-size: 20px;
-                padding: 15px;
+                padding: 25px;
                 font-weight: 500;
             }
             &--access-create {
@@ -190,7 +190,7 @@ export default class Home extends Vue {
         }
         .header {
             &--title {
-                font-size: main.$l-size-mobile;
+                font-size: 18px;
             }
         }
         .content {

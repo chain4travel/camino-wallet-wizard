@@ -59,7 +59,9 @@ label {
     font-size: 15px;
     margin-bottom: 4px !important;
     sup {
+        font-size: 18px;
         color: var(--error);
+        top: 0em;
     }
 }
 input,

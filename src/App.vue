@@ -99,8 +99,9 @@ html {
 body {
     height: 100%;
     overflow: auto !important;
-    width: fit-content;
-    min-width: 100vw;
+    width: 100vw;
+    min-width: 300px;
+    max-width: 100vw;
 }
 
 p {

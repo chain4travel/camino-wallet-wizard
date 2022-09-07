@@ -419,6 +419,7 @@ h1 {
     color: var(--primary-btn-border-color);
     background-color: var(--bg) !important;
     height: auto;
+    margin-left: auto;
 }
 
 .kyc_action {

@@ -155,7 +155,7 @@ export default class Home extends Vue {
                 border-radius: var(--border-radius-sm);
                 margin-bottom: 30px;
                 font-size: 20px;
-                padding: 15px;
+                padding: 25px;
                 font-weight: 500;
             }
             &--access-create {

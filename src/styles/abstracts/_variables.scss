@@ -34,7 +34,7 @@ html[data-theme='day'] {
     --sidebar-background: #fff;
     --icon-color: #0f172a;
     --icon-color-light: #334155;
-    --bg-light-2: rgba(226, 232, 240, 0.4);
+    --bg-light-2: rgba(226, 232, 240, 0.7);
 }
 
 html[data-theme='night'] {
@@ -62,7 +62,7 @@ html[data-theme='night'] {
     --sidebar-background: #1e293b;
     --icon-color: #ffffff;
     --icon-color--light: #ffffff;
-    --bg-light-2: rgba(30, 41, 59, 0.4);
+    --bg-light-2: rgba(30, 41, 59, 0.7);
 }
 
 $mobile_width: 900px;

@@ -34,7 +34,7 @@ import MnemonicWallet from '@/js/wallets/MnemonicWallet'
 import { bnToBig } from '@/helpers/helper'
 import Big from 'big.js'
 import AvaAsset from '@/js/AvaAsset'
-import CreateWalletStep from './CreateWallet.vue'
+import CreateWalletStep from './CreateWalletStep.vue'
 import Saft from './Saft.vue'
 import KycVerification from './KycVerification.vue'
 
@@ -412,6 +412,12 @@ body {
                 }
             }
         }
+    }
+}
+
+@include main.mobile-device {
+    .v-stepper__content {
+        padding: 24px 5px 16px 5px !important;
     }
 }
 </style>

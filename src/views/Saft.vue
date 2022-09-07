@@ -523,6 +523,8 @@ button .arrow {\
 }
 </script>
 <style scoped lang="scss">
+@use "../styles/main";
+
 .saft-view {
     display: flex;
     flex-direction: column;
@@ -557,9 +559,6 @@ form {
         display: flex;
         flex-direction: column;
         gap: 5px;
-    }
-    .v-btn {
-        margin-top: 20px;
     }
 }
 .input_box {
@@ -599,5 +598,21 @@ img {
     .v-btn {
         max-width: 350px;
     }
+}
+
+.form_actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .required_text {
+        color: var(--error);
+        font-size: 14px;
+        margin-top: 4px;
+    }
+}
+sup {
+    font-size: 18px;
+    color: var(--error);
+    top: 0em;
 }
 </style>
