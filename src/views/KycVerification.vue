@@ -4,7 +4,11 @@
             <div class="modal_body">
                 <div id="sumsub-websdk-container"></div>
                 <div class="kyc_action" v-if="verficationCompleted">
-                    <v-btn type="cancel" class="outlined_button" @click="doneWalletCreation">
+                    <v-btn
+                        type="cancel"
+                        class="kyc_button button_secondary"
+                        @click="doneWalletCreation"
+                    >
                         Next step
                     </v-btn>
                 </div>
@@ -410,16 +414,11 @@ h1 {
     font-weight: normal;
 }
 
-.outlined_button {
-    border-width: 1px;
-    border-style: solid;
-    border-radius: var(--border-radius-sm);
-    padding: 10px 24px;
-    border-color: var(--primary-btn-border-color);
-    color: var(--primary-btn-border-color);
-    background-color: var(--bg) !important;
+.kyc_button {
     height: auto;
+    padding: 10px 24px;
     margin-left: auto;
+    border-radius: var(--border-radius-sm);
 }
 
 .kyc_action {
