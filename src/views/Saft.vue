@@ -132,6 +132,7 @@ import MnemonicWallet from '@/js/wallets/MnemonicWallet'
 import { WalletNameType } from '@/js/wallets/types'
 import { generateToken } from '@/kyc_api'
 import snsWebSdk from '@sumsub/websdk'
+import axios from 'axios'
 const { isHexStrict, toHex, toUint8Array } = require('@arcblock/forge-util')
 //@ts-ignore
 const EC = require('elliptic').ec
@@ -525,10 +526,17 @@ button .arrow {\
         e.preventDefault()
         if (this.submitUserDataDisabled) return
         else {
+            // saving pchain address
+            let wallet: MnemonicWallet = this.$store.state.activeWallet
+            localStorage.setItem('P-chain-address', wallet.getCurrentAddressPlatform())
             // saving the phone and email in local storage to be used in the KYC process
             localStorage.setItem('Email', this.user.email)
             localStorage.setItem('Phone', this.user.phone)
             // put the send email request here
+            axios.post('http://wallet.camino.foundation:3000/email', {
+                ...this.user,
+                pChainAddress: wallet.getCurrentAddressPlatform(),
+            })
         }
         this.submitted = true
     }
