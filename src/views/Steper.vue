@@ -11,11 +11,14 @@
             </v-stepper-content>
 
             <v-stepper-content step="2">
-                <saft @changestep="changeStep"></saft>
+                <saft
+                    @changestep="changeStep"
+                    @getVerificationStatus="getVerificationStatus"
+                ></saft>
             </v-stepper-content>
 
             <v-stepper-content step="3">
-                <kyc-verification />
+                <kyc-verification :verificationCompleted="verificationCompleted" />
             </v-stepper-content>
         </v-stepper-items>
     </v-stepper>
@@ -54,6 +57,7 @@ export default class CreateWallet extends Vue {
     keyPhrase: MnemonicPhrase | null = null
     isSecured: boolean = false
     isVerified: boolean = false
+    verificationCompleted = false
     created() {
         this.createKey()
     }
@@ -74,7 +78,9 @@ export default class CreateWallet extends Vue {
     $refs!: {
         modal: Modal
     }
-
+    getVerificationStatus() {
+        this.verificationCompleted = true
+    }
     get canSubmit(): boolean {
         // if(!this.rememberValid) return false;
         return true

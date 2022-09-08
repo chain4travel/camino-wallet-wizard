@@ -1,8 +1,9 @@
 <template>
-    <div class="stage_2" v-if="!walletCreated">
+    <div class="stage_2" v-if="!verificationCompleted">
         <div class="modal_main">
             <div class="modal_body">
                 <div id="sumsub-websdk-container"></div>
+<<<<<<< HEAD
                 <div class="kyc_action" v-if="verficationCompleted">
                     <v-btn
                         type="cancel"
@@ -12,6 +13,8 @@
                         Next step
                     </v-btn>
                 </div>
+=======
+>>>>>>> df7c0be0db30294c0f4280df95ff14760ac64ee8
             </div>
         </div>
     </div>
@@ -20,13 +23,9 @@
 
 <script lang="ts">
 import 'reflect-metadata'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import Modal from '@/components/modals/Modal.vue'
-import { generateToken } from '@/kyc_api'
-import snsWebSdk from '@sumsub/websdk'
-import MnemonicWallet from '@/js/wallets/MnemonicWallet'
-import { WalletType, WalletNameType } from '@c4tplatform/camino-wallet-sdk'
-import { SingletonWallet } from '@/js/wallets/SingletonWallet'
+import { WalletType } from '@c4tplatform/camino-wallet-sdk'
 import WalletCreated from './WalletCreated.vue'
 const EC = require('elliptic').ec
 const { isHexStrict, toHex, toUint8Array } = require('@arcblock/forge-util')
@@ -35,9 +34,6 @@ interface UserData {
     phone: string
 }
 
-function strip0x(input: string) {
-    return isHexStrict(input) ? input.replace(/^0x/i, '') : input
-}
 @Component({
     components: {
         Modal,
@@ -47,322 +43,11 @@ function strip0x(input: string) {
 export default class KycVerification extends Vue {
     walletCreated: boolean = false
     @Prop() walle!: WalletType
-    $refs!: {
-        modal: Modal
-    }
-    /**/
-    verficationCompleted: boolean = false
-    /**/
-    userDataSubmitted: boolean = false
-    isLoading: boolean = true
-    userData: UserData = {
-        email: localStorage.getItem('Email') || '',
-        phone: localStorage.getItem('Phone') || '',
-    }
-    background = ''
-    @Watch('$root.theme', { immediate: true })
-    onthemechange(val: string) {
-        if (val === 'night') {
-            this.background =
-                ".step.active .line, .step.active .bullet:before, .radio-item .checkmark:after, .step.active.pending .bullet:before {\
-    background-color: #149ded;\
-}\
-.accent {\
-    color: #149ded;\
-}\
-.step .title, .title  {\
-    color: #f5f5f5;\
-}\
-.step.active .title {\
-    color: #149ded;\
-    font-size: 14px;\
-    font-weight: 400;\
-}\
-section {\
-    border-radius: 12px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-    background-color: #1e293b;\
-}\
-p , h3, h2, label, .markdown-instructions li , .markdown-instructions p,.line-form .line-form-item > .phone-input,\
-.line-form .line-form-item > input{\
-    color : #f5f5f5 !important;\
-    font-size : 14px;\
-}\
-.document-examples, .upload {\
-    gap : 10px;\
-}\
-.upload-payment-item {\
-    margin : 0px;\
-}\
-.upload-payment-item .upload-item , .mobile-button{\
-    border: 1px solid rgba(203, 213, 225, 0.12);\
-    border-radius: 7px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-}\
- .mobile-button h3{\
-    color : #149ded !important;\
- }\
- button.submit,\
-button[type='submit'] {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    background-image: none;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-button:active:not(:disabled):not(.disabled),\
-button:hover:not(:disabled):not(.disabled):not(:active) {\
-    box-shadow: none;\
-}\
-button.submit:active:not(:disabled),\
-button.submit:hover:not(:disabled):not(.disabled):not(:active),\
-button[type='submit']:active:not(:disabled),\
-button[type='submit']:hover:not(:disabled):not(.disabled):not(:active) {\
-     background-image: none;\
-}\
-button {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    font-weight: 600;\
-    text-align: center;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-.line-form .line-form-item > span {\
-    border-bottom: none;\
-}\
-button.submit .arrow, button[type=submit] .arrow {\
-    margin-right: 0;\
-    margin-left: 5px;\
-}\
-button .arrow {\
-    margin-right: 5px;\
-}\
-.upload-item h4.requiredDoc:after {\
-    color: #149ded;\
-}\
-.popup {\
-    background: #1e293b !important;\
-}\
-.popup .message-content p {\
-    color: #f5f5f5 !important;\
-}\
-.step.pending .bullet {\
-    background-color: #f5f5f5;\
-    background-image: none;\
-    border-color: #f5f5f5;\
-}\
-.step.pending .line , .step.active .line, .step.success .line{\
-    background-color: #149ded;\
-}\
-.step.success .bullet {\
-    background-color: #149ded;\
-    border-color: #f5f5f5;\
-}\
-.error-message.warn {\
-    background-color: #0f172a;\
-}\
-.radio-item input:disabled~.checkmark:after {\
-  background-color: #149ded;\
-}\
-.document-status {\
-    background-color: transparent !important;\
-}\
-"
-            // 'body {background-color: var(--secondary-color) !important; min-height: 450px !important;} .line {background-color: black !important;}'
-        } else {
-            this.background =
-                ".step.active .line, .step.active .bullet:before, .radio-item .checkmark:after, .step.active.pending .bullet:before {\
-    background-color: #149ded;\
-}\
-.accent {\
-    color: #149ded;\
-}\
-.step .title, .title  {\
-    color: #0f172a;\
-}\
-.step.active .title {\
-    color: #149ded;\
-    font-size: 14px;\
-    font-weight: 400;\
-}\
-section {\
-    border-radius: 12px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-    background-color: transparent;\
-}\
-p , h3, h2, label, .markdown-instructions li , .markdown-instructions p,.line-form .line-form-item > .phone-input,\
-.line-form .line-form-item > input{\
-    color : #0f172a !important;\
-    font-size : 14px;\
-}\
-.document-examples, .upload {\
-    gap : 10px;\
-}\
-.upload-payment-item {\
-    margin : 0px;\
-}\
-.upload-payment-item .upload-item , .mobile-button{\
-    border: 1px solid rgba(203, 213, 225, 0.12);\
-    border-radius: 7px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-}\
- .mobile-button h3{\
-    color : #149ded !important;\
- }\
- button.submit,\
-button[type='submit'] {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    background-image: none;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-button:active:not(:disabled):not(.disabled),\
-button:hover:not(:disabled):not(.disabled):not(:active) {\
-    box-shadow: none;\
-}\
-button.submit:active:not(:disabled),\
-button.submit:hover:not(:disabled):not(.disabled):not(:active),\
-button[type='submit']:active:not(:disabled),\
-button[type='submit']:hover:not(:disabled):not(.disabled):not(:active) {\
-     background-image: none;\
-}\
-button {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    font-weight: 600;\
-    text-align: center;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-.line-form .line-form-item > span {\
-    border-bottom: none;\
-}\
-button.submit .arrow, button[type=submit] .arrow {\
-    margin-right: 0;\
-    margin-left: 5px;\
-}\
-button .arrow {\
-    margin-right: 5px;\
-}\
-.upload-item h4.requiredDoc:after {\
-    color: #149ded;\
-}\
-.popup {\
-    background: #e2e8f0 !important;\
-}\
-.popup .message-content p {\
-    color: #0f172a !important;\
-}\
-.step.pending .bullet {\
-    background-color: #0f172a;\
-    background-image: none;\
-    border-color: #0f172a;\
-}\
-.step.pending .line , .step.active .line, .step.success .line{\
-    background-color: #149ded;\
-}\
-.step.success .bullet {\
-    background-color: #149ded;\
-    border-color: #0f172a;\
-}\
-.error-message.warn {\
-    background-color: transparent;\
-}\
-.radio-item input:disabled~.checkmark:after {\
-  background-color: #149ded;\
-}\
-.document-status {\
-    background-color: transparent !important;\
-}\
-"
-        }
-    }
-    get walletType(): WalletNameType {
-        return this.wallet.type
-    }
-    get privateKeyC(): string | null {
-        if (this.walletType === 'ledger') return null
-        let wallet = this.wallet as SingletonWallet | MnemonicWallet
-        return wallet.ethKey
-    }
-    get submitUserDataDisabled() {
-        return !this.userData.email || !this.userData.phone || this.isLoading
-    }
+    @Prop() verificationCompleted!: boolean
 
     doneWalletCreation() {
         this.walletCreated = true
     }
-
-    launchWebSdk(accessToken: string, applicantEmail: any, applicantPhone: any) {
-        let snsWebSdkInstance = snsWebSdk
-            .init(accessToken, () => this.getNewAccessToken())
-            .withConf({
-                email: applicantEmail,
-                phone: applicantPhone,
-                uiConf: {
-                    customCssStr: this.background,
-                },
-            })
-            .withOptions({ addViewportTag: false, adaptIframeHeight: true })
-            .on('idCheck.applicantStatus', async (applicantStatus) => {
-                await this.$store.dispatch('Accounts/updateKycStatus')
-                if (applicantStatus.reviewStatus === 'completed') {
-                    this.verficationCompleted = true
-                }
-            })
-            .build()
-        snsWebSdkInstance.launch('#sumsub-websdk-container')
-    }
-
-    async getNewAccessToken() {
-        const secp256k1 = new EC('secp256k1')
-        const compressed = false
-        const pk = secp256k1
-            .keyFromPrivate(strip0x(toHex(`0x${this.privateKeyC}`)), 'hex')
-            .getPublic(compressed, 'hex')
-        let PublicKey = `0x${pk}`
-        const result = await generateToken('0x' + this.wallet.getEvmAddress(), PublicKey)
-        return result.token
-    }
-
-    get wallet() {
-        let wallet: MnemonicWallet = this.$store.state.activeWallet
-        return wallet
-    }
-
-    async submitUserData() {
-        if (!this.userData.email || !this.userData.phone) return
-        try {
-            this.isLoading = true
-            const accessToken = await this.getNewAccessToken()
-            this.launchWebSdk(accessToken, this.userData.email, this.userData.phone)
-            this.userDataSubmitted = true
-        } finally {
-            this.isLoading = false
-        }
-    }
-    // async created() {
-    //     console.log(this.userData)
-    //     const accessToken = await this.getNewAccessToken()
-    //     this.launchWebSdk(accessToken, this.userData.email, this.userData.phone)
-    //     this.isLoading = false
-    // }
-    // mounted() {
-    //     console.log(this.userData)
-    // }
-    // async mounted() {
-    //     try {
-    //         this.isLoading = true
-    //         console.log(this.userData)
-    //         const accessToken = await this.getNewAccessToken()
-    //         this.launchWebSdk(accessToken, this.userData.email, this.userData.phone)
-    //         // this.userDataSubmitted = true
-    //     } finally {
-    //         this.isLoading = false
-    //     }
-    // }
 }
 </script>
 <style scoped lang="scss">
@@ -416,9 +101,12 @@ h1 {
 
 .kyc_button {
     height: auto;
+<<<<<<< HEAD
     padding: 10px 24px;
     margin-left: auto;
     border-radius: var(--border-radius-sm);
+=======
+>>>>>>> df7c0be0db30294c0f4280df95ff14760ac64ee8
 }
 
 .kyc_action {

@@ -55,7 +55,7 @@ export default {
             {
                 vmid: 'og:title',
                 name: 'og:title',
-                content: 'Secure Camino Wallet',
+                content: 'Camino Presale Wizard',
             },
         ],
         title: 'Secure Camino Wallet',
