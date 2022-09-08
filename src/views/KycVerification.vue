@@ -15,12 +15,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import Modal from '@/components/modals/Modal.vue'
 import { WalletType } from '@c4tplatform/camino-wallet-sdk'
 import WalletCreated from './WalletCreated.vue'
-const EC = require('elliptic').ec
-const { isHexStrict, toHex, toUint8Array } = require('@arcblock/forge-util')
-interface UserData {
-    email: string
-    phone: string
-}
 
 @Component({
     components: {

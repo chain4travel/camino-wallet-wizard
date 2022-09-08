@@ -65,7 +65,7 @@
                         @click="verifyMnemonic"
                         :disabled="!canVerify"
                     >
-                        vetify Mnemonic
+                        VERIFY KEY PHRASE
                     </button>
                 </div>
                 <!-- STEP 2b - ACCESS -->
