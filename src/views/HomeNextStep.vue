@@ -1,37 +1,12 @@
 <template>
     <div class="home" v-if="!starting">
-        <svg
-            class="blur"
-            width="1019"
-            height="621"
-            viewBox="0 0 1019 621"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <g filter="url(#filter0_f_2551_2336)">
-                <ellipse cx="509.5" cy="310.5" rx="369.5" ry="170.5" fill="none" />
-            </g>
-            <defs>
-                <filter
-                    id="filter0_f_2551_2336"
-                    x="0"
-                    y="0"
-                    width="1019"
-                    height="621"
-                    filterUnits="userSpaceOnUse"
-                    color-interpolation-filters="sRGB"
-                >
-                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                    <feBlend
-                        mode="normal"
-                        in="SourceGraphic"
-                        in2="BackgroundImageFix"
-                        result="shape"
-                    />
-                    <feGaussianBlur stdDeviation="70" result="effect1_foregroundBlur_2551_2336" />
-                </filter>
-            </defs>
-        </svg>
+        <v-stepper class="steper" :value="step">
+            <v-stepper-header class="steper__header elevation-0">
+                <v-stepper-step step="1" :complete="step > 1">Create Wallet</v-stepper-step>
+                <v-stepper-step step="2" :complete="step > 2">Personal Data</v-stepper-step>
+                <v-stepper-step step="3" :complete="step > 3">KYC Verification</v-stepper-step>
+            </v-stepper-header>
+        </v-stepper>
         <div class="home--wrapper">
             <div class="header">
                 <img src="@/assets/wallet-logo.svg" alt />
@@ -77,6 +52,7 @@ import Steper from './Steper.vue'
 })
 export default class Home extends Vue {
     starting = false
+    step = 1
     mounted() {
         this.starting = false
         localStorage.removeItem('Email')
@@ -94,19 +70,24 @@ export default class Home extends Vue {
 @use "../styles/main";
 
 .home {
-    padding: 15px;
-    padding-top: 50px;
-    padding-bottom: 50px;
-    display: flex;
-    justify-content: center;
-    min-height: calc(100vh - 80px);
-    background-image: url('../assets/home_background.svg');
-    background-size: cover;
-    background-position: center;
-    align-items: center;
-    background-repeat: no-repeat;
-    overflow: hidden;
-    min-width: 100vw;
+    min-height: calc(100vh - 80px) !important;
+    background-image: none !important;
+    background-size: cover !important;
+    background-position: center !important;
+    align-items: center !important;
+    background-repeat: no-repeat !important;
+    overflow: hidden !important;
+    min-width: 100vw !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    justify-content: flex-start !important;
+    .steper {
+        min-height: auto !important;
+        padding-top: 50px !important;
+        padding-bottom: 50px !important;
+    }
     svg {
         g {
             ellipse {
