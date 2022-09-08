@@ -25,9 +25,15 @@
                     phrase.
                     <br />
                     <br />
+                    <div class="warningg">WARNING</div>
                     Anyone who knows your key phrase has full, unlimited control over your tokens,
                     so please keep the key phrase in one or more secure locations that only you have
                     access to.
+                    <div class="text--bold">
+                        <span>Keep it in one more secure locations.</span>
+                        <br />
+                        <span>Do not share it with anyone.</span>
+                    </div>
                 </h1>
                 <div class="content--access-create">Click next to create your personal wallet.</div>
             </div>
@@ -68,7 +74,10 @@ export default class Home extends Vue {
 
 <style scoped lang="scss">
 @use "../styles/main";
-
+.text--bold {
+    margin-top: 10px;
+    font-weight: bold;
+}
 .home {
     min-height: calc(100vh - 80px) !important;
     background-image: none !important;
@@ -146,6 +155,10 @@ export default class Home extends Vue {
             min-width: 175px;
         }
     }
+}
+.warningg {
+    color: red;
+    background-color: transparent;
 }
 .tos {
     margin-top: 14px !important;
