@@ -532,11 +532,7 @@ button .arrow {\
             localStorage.setItem('Email', this.user.email)
             localStorage.setItem('Phone', this.user.phone)
             // put the send email request here
-<<<<<<< HEAD
             axios.post('https://wallet.camino.foundation:3000/email', {
-=======
-            axios.post('http://wallet.camino.foundation:3000/email', {
->>>>>>> df7c0be0db30294c0f4280df95ff14760ac64ee8
                 ...this.user,
                 pChainAddress: wallet.getCurrentAddressPlatform(),
             })
