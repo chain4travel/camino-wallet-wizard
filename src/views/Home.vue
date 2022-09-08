@@ -63,7 +63,9 @@
                     <br />
                     <br />
                     If you have any questions or remarks, please send an email to
-                    presale@chain4travel.com
+                    <a href="mailto:presale@chain4travel.com" class="presale">
+                        presale@chain4travel.com
+                    </a>
                 </h1>
                 <div class="content--access-create">Click Start to start the Presale Wizard</div>
             </div>
@@ -158,6 +160,10 @@ export default class Home extends Vue {
                 font-size: 20px;
                 padding: 25px;
                 font-weight: 500;
+            }
+            .presale {
+                color: var(--secondary-color);
+                text-decoration: none;
             }
             &--access-create {
                 // margin-bottom: 30px;
