@@ -78,12 +78,15 @@
                     required
                 />
                 <div class="multisig-box">
-                    <b>MultiSignature Option</b>
+                    <b>This option is only recommended for businesses</b>
                     <small>
-                        Camino supports MultiSignature tokens for shared control.
+                        Do you want to share control over your tokens?
                         <br />
-                        If you want your Camino tokens to be transferred to a MultiSignature wallet,
-                        please tick the box below.
+                        Camino supports MultiSignature wallets. If you want multiple persons to have
+                        control over your Camino tokens, please tick the box below. We will then
+                        reach out to you to clarify the process and guide your through the process.
+                        <br />
+                        Yes, I want to share control over my tokens. Please get in contact with me.
                     </small>
                     <MultiSigCheckbox v-model="user.multisig" :explain="$t('wizard.multisig')" />
                 </div>

@@ -45,7 +45,7 @@
                     This wizard guides you through the process of
                     <ul>
                         <li>Creating your wallet</li>
-                        <li>Enabling us to prepare your SAFT agreement</li>
+                        <li>Enabling us to prepare your Simple Agreement of Future Tokens</li>
                         <li>
                             Verifying yourself to ensure you are eligible to purchase tokens under
                             EU regulations

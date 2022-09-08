@@ -209,9 +209,9 @@
         "info_explanation_p2": "Please enter your contact details below."
     },
     "wizard": {
-        "title": "To prepare your SAFT aggrement, please fill out the below form :",
+        "title": "To prepare your Simple Agreement for Future Tokens (SAFT), please fill out the below form :",
         "send": "Send & Next",
-        "agree": "I agree that Chain4Travel AG may use my info only for creation of SAFT agreement. *",
+        "agree": "I agree that Chain4Travel may use my personal data internally and for verification purposes with Chain4Travel's KYC Partner Sumsub. *",
         "multisig": "Please contact me for the MultiSignature option",
         "errors": {
             "name": "Name must contain two or more letters",
