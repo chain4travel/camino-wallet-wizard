@@ -3,18 +3,6 @@
         <div class="modal_main">
             <div class="modal_body">
                 <div id="sumsub-websdk-container"></div>
-<<<<<<< HEAD
-                <div class="kyc_action" v-if="verficationCompleted">
-                    <v-btn
-                        type="cancel"
-                        class="kyc_button button_secondary"
-                        @click="doneWalletCreation"
-                    >
-                        Next step
-                    </v-btn>
-                </div>
-=======
->>>>>>> df7c0be0db30294c0f4280df95ff14760ac64ee8
             </div>
         </div>
     </div>
@@ -101,12 +89,6 @@ h1 {
 
 .kyc_button {
     height: auto;
-<<<<<<< HEAD
-    padding: 10px 24px;
-    margin-left: auto;
-    border-radius: var(--border-radius-sm);
-=======
->>>>>>> df7c0be0db30294c0f4280df95ff14760ac64ee8
 }
 
 .kyc_action {
