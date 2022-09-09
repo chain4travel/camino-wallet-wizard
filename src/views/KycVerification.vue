@@ -1,8 +1,13 @@
 <template>
-    <div class="stage_2" v-if="!verificationCompleted">
+    <div class="stage_2" v-if="!walletCreated">
         <div class="modal_main">
             <div class="modal_body">
                 <div id="sumsub-websdk-container"></div>
+                <div class="kyc_action">
+                    <v-btn type="cancel" @click="walletCreated = true" class="outlined_button">
+                        Next
+                    </v-btn>
+                </div>
             </div>
             <div class="verification--text">
                 <p>Verification might take a while.</p>
@@ -33,10 +38,9 @@ import WalletCreated from './WalletCreated.vue'
     },
 })
 export default class KycVerification extends Vue {
-    walletCreated: boolean = false
     @Prop() walle!: WalletType
     @Prop() verificationCompleted!: boolean
-
+    walletCreated: boolean = this.verificationCompleted ? true : false
     doneWalletCreation() {
         this.walletCreated = true
     }
@@ -49,6 +53,10 @@ export default class KycVerification extends Vue {
     display: flex;
     justify-content: center;
 } */
+.kyc_action {
+    display: flex;
+    justify-content: end;
+}
 .presale {
     color: var(--secondary-color);
     text-decoration: none;
