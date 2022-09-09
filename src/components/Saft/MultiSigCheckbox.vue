@@ -9,7 +9,7 @@ export default {
         value: Boolean,
         explain: {
             type: String,
-            default: 'Please contact me for MultiSignature option',
+            default: 'Yes, I want to share control over my tokens. Please get in contact with me.',
         },
     },
     model: {

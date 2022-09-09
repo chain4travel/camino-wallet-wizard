@@ -19,7 +19,7 @@ export default {
             copytext.select()
             copytext.setSelectionRange(0, 99999)
 
-            document.execCommand('copy')
+            navigator.clipboard.writeText(copytext.value)
             this.$store.dispatch('Notifications/add', {
                 title: ' Copied',
                 message: 'Copied to clipboard.',

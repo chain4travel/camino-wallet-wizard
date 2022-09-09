@@ -85,8 +85,6 @@
                         Camino supports MultiSignature wallets. If you want multiple persons to have
                         control over your Camino tokens, please tick the box below. We will then
                         reach out to you to clarify the process and guide your through the process.
-                        <br />
-                        Yes, I want to share control over my tokens. Please get in contact with me.
                     </small>
                     <MultiSigCheckbox v-model="user.multisig" :explain="$t('wizard.multisig')" />
                 </div>
@@ -160,7 +158,7 @@ function strip0x(input: string) {
     components: { SaftCheckbox, InputField, MultiSigCheckbox },
 })
 export default class Saft extends Vue {
-    nameRegex = /^([^<>()|[\]\\.,;:\s@\\"]|(\\".+\\")){2,30}$/
+    nameRegex = /^([^<>()|[\]\\.,;:\s@\\"0-9]|(\\".+\\")){2,30}$/
     emailRegex = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
     isLoading = false
