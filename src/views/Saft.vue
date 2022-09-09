@@ -85,8 +85,6 @@
                         Camino supports MultiSignature wallets. If you want multiple persons to have
                         control over your Camino tokens, please tick the box below. We will then
                         reach out to you to clarify the process and guide your through the process.
-                        <br />
-                        Yes, I want to share control over my tokens. Please get in contact with me.
                     </small>
                     <MultiSigCheckbox v-model="user.multisig" :explain="$t('wizard.multisig')" />
                 </div>

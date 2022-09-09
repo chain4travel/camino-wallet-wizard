@@ -212,7 +212,7 @@
         "title": "To prepare your Simple Agreement for Future Tokens (SAFT), please fill out the below form :",
         "send": "Send & Next",
         "agree": "I agree that Chain4Travel may use my personal data internally and for verification purposes with Chain4Travel's KYC Partner Sumsub. *",
-        "multisig": "Please contact me for the MultiSignature option",
+        "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
         "errors": {
             "name": "Name must contain two or more letters",
             "surname": "Surname must contain two or more letters",
