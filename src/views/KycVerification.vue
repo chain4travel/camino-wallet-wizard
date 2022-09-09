@@ -55,7 +55,7 @@ export default class KycVerification extends Vue {
 } */
 .kyc_action {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
 }
 .presale {
     color: var(--secondary-color);
