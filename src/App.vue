@@ -58,7 +58,7 @@ export default {
                 content: 'Camino Presale Wizard',
             },
         ],
-        title: 'Secure Camino Wallet',
+        title: 'Camino Presale Wizard',
     },
 }
 </script>
