@@ -25,12 +25,12 @@
                     phrase.
                     <br />
                     <br />
-                    <div class="warningg">WARNING</div>
+                    <div class="warningg">ATTENTION</div>
                     Anyone who knows your key phrase has full, unlimited control over your tokens,
                     so please keep the key phrase in one or more secure locations that only you have
                     access to.
                     <div class="text--bold">
-                        <span>Keep it in one more secure locations.</span>
+                        <span>Keep it in one or more secure locations.</span>
                         <br />
                         <span>Do not share it with anyone.</span>
                     </div>

@@ -4,6 +4,7 @@
             <!-- LEFT -->
             <div class="mneumonic_disp_col">
                 <div class="mnemonic_disp">
+                    <span class="mnemonic_title">Your mnemonic key phrase</span>
                     <p
                         class="phrase_raw"
                         v-bind:class="{
@@ -253,6 +254,10 @@ export default class CreateWalletStep extends Vue {
             display: flex;
             flex-direction: column;
         }
+        .mnemonic_title {
+            font-size: 24px;
+            font-weight: 700;
+        }
 
         .phrase_raw {
             color: var(--primary-color);
@@ -365,6 +370,11 @@ export default class CreateWalletStep extends Vue {
 }
 
 @include main.mobile-device {
+    .mnemonic_title {
+        font-size: 20px;
+        font-weight: 700;
+        text-align: center;
+    }
     .mneumonic_disp_col {
         display: flex;
         justify-content: center;
