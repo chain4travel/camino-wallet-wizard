@@ -5,7 +5,7 @@
                 <div id="sumsub-websdk-container"></div>
                 <div class="kyc_action">
                     <v-btn type="cancel" @click="walletCreated = true" class="outlined_button">
-                        Next
+                        Done & Next
                     </v-btn>
                 </div>
             </div>
