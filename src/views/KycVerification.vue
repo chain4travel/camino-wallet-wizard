@@ -1,8 +1,23 @@
 <template>
-    <div class="stage_2" v-if="!verificationCompleted">
+    <div class="stage_2" v-if="!walletCreated">
         <div class="modal_main">
             <div class="modal_body">
                 <div id="sumsub-websdk-container"></div>
+                <div class="kyc_action">
+                    <v-btn type="cancel" @click="walletCreated = true" class="outlined_button">
+                        Next
+                    </v-btn>
+                </div>
+            </div>
+            <div class="verification--text">
+                <p>Verification might take a while.</p>
+                <p>You will receive your result via Email.</p>
+                <p>
+                    If you don't receive your result within 24 hours, please contact
+                    <a href="mailto:presale@chain4travel.com" class="presale">
+                        presale@chain4travel.com
+                    </a>
+                </p>
             </div>
         </div>
     </div>
@@ -23,10 +38,9 @@ import WalletCreated from './WalletCreated.vue'
     },
 })
 export default class KycVerification extends Vue {
-    walletCreated: boolean = false
     @Prop() walle!: WalletType
     @Prop() verificationCompleted!: boolean
-
+    walletCreated: boolean = this.verificationCompleted ? true : false
     doneWalletCreation() {
         this.walletCreated = true
     }
@@ -39,15 +53,33 @@ export default class KycVerification extends Vue {
     display: flex;
     justify-content: center;
 } */
-
+.kyc_action {
+    display: flex;
+    justify-content: flex-end;
+}
+.presale {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
 .stage_2 {
     width: 100%;
+}
+.verification--text {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    p {
+        text-align: center;
+    }
 }
 
 .modal_main::v-deep {
     display: flex;
-    justify-content: center;
-    /* background-color: white; */
+    align-items: center;
+    flex-direction: column;
+    /* background-color: red; */
 
     .modal_body {
         width: 70%;
