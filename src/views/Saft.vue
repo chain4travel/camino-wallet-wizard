@@ -4,6 +4,12 @@
             <h1 class="header-text">{{ $t('wizard.title') }}</h1>
             <form @submit.prevent="submitSaftForm">
                 <InputField
+                    label="Company"
+                    :error_message="$t('wizard.errors.company')"
+                    placeholder="Company"
+                    @change="handleChange"
+                />
+                <InputField
                     labels="Name"
                     :error_value="error.name"
                     :error_message="$t('wizard.errors.name')"
@@ -139,6 +145,7 @@ const { isHexStrict, toHex, toUint8Array } = require('@arcblock/forge-util')
 const EC = require('elliptic').ec
 
 interface User {
+    company: string
     name: string
     surname: string
     street: string
@@ -158,7 +165,7 @@ function strip0x(input: string) {
     components: { SaftCheckbox, InputField, MultiSigCheckbox },
 })
 export default class Saft extends Vue {
-    nameRegex = /^([^<>()|[\]\\.,;:\s@\\"0-9]|(\\".+\\")){2,30}$/
+    nameRegex = /^([^<>()|[\]\\.,;:@\\"0-9]|(\\".+\\")){2,30}$/
     emailRegex = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
     isLoading = false
@@ -178,6 +185,7 @@ export default class Saft extends Vue {
     }
     submitted: boolean = false
     user: User = {
+        company: '',
         name: '',
         surname: '',
         street: '',
@@ -472,6 +480,9 @@ button .arrow {\
     }
     handleChange({ value, type }: { value: string; type: string }) {
         switch (type) {
+            case 'company':
+                this.user.company = value
+                break
             case 'name':
                 this.user.name = value
                 this.error.name = !this.nameRegex.test(value)
