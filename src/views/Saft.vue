@@ -165,7 +165,7 @@ function strip0x(input: string) {
     components: { SaftCheckbox, InputField, MultiSigCheckbox },
 })
 export default class Saft extends Vue {
-    nameRegex = /^([^<>()|[\]\\.,;:@\\"0-9]|(\\".+\\")){2,30}$/
+    nameRegex = /^([^<>()|[\]\\.,;:@\\"0-9]|(\\".+\\")){2,64}$/
     emailRegex = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
     isLoading = false
