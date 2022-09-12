@@ -480,7 +480,7 @@ button .arrow {\
     }
     handleChange({ value, type }: { value: string; type: string }) {
         switch (type) {
-            case 'company':
+            case 'company name':
                 this.user.company = value
                 break
             case 'name':
