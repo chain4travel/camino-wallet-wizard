@@ -4,9 +4,9 @@
             <h1 class="header-text">{{ $t('wizard.title') }}</h1>
             <form @submit.prevent="submitSaftForm">
                 <InputField
-                    label="Company"
+                    label="Company Name"
                     :error_message="$t('wizard.errors.company')"
-                    placeholder="Company"
+                    placeholder="Company Name"
                     @change="handleChange"
                 />
                 <InputField
