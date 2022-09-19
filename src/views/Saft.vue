@@ -4,7 +4,7 @@
             <h1 class="header-text">{{ $t('wizard.title') }}</h1>
             <form @submit.prevent="submitSaftForm">
                 <InputField
-                    label="Company Name"
+                    label="Company Name (only if Company is buying Camino Tokens)"
                     :error_message="$t('wizard.errors.company')"
                     placeholder="Company Name"
                     @change="handleChange"
