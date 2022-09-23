@@ -480,7 +480,7 @@ button .arrow {\
     }
     handleChange({ value, type }: { value: string; type: string }) {
         switch (type) {
-            case 'company name':
+            case 'company name (only if company is buying camino tokens)':
                 this.user.company = value
                 break
             case 'name':
