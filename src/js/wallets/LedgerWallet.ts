@@ -630,6 +630,7 @@ class LedgerWallet extends HdWalletCore implements AvaWalletCore {
     getEvmTransactionMessages(tx: Transaction): ILedgerBlockMessage[] {
         let gasPrice = tx.gasPrice
         let gasLimit = tx.gasLimit
+        // @ts-ignore
         let totFee = gasPrice.mul(new BN(gasLimit.toString()))
         let feeNano = bnToBig(new BN(totFee.toString()), 9)
 
@@ -810,6 +811,7 @@ class LedgerWallet extends HdWalletCore implements AvaWalletCore {
             tx.to !== undefined ? tx.to.buf : Buffer.from([]),
             bnToRlp(tx.value),
             tx.data,
+            // @ts-ignore
             bnToRlp(new BN(tx.getChainId())),
             Buffer.from([]),
             Buffer.from([]),
@@ -847,6 +849,7 @@ class LedgerWallet extends HdWalletCore implements AvaWalletCore {
             }
 
             const signedTx = Transaction.fromTxData(
+                // @ts-ignore
                 {
                     nonce: tx.nonce,
                     gasPrice: tx.gasPrice,

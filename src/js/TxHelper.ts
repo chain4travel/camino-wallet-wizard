@@ -228,9 +228,11 @@ export async function buildEvmTransferNativeTx(
     let tx = new Transaction(
         {
             nonce: nonce,
+            // @ts-ignore
             gasPrice: gasPrice,
             gasLimit: gasLimit,
             to: to,
+            // @ts-ignore
             value: amount,
             data: '0x',
         },
@@ -259,6 +261,7 @@ export async function buildEvmTransferErc20Tx(
     let tx = new Transaction(
         {
             nonce: nonce,
+            // @ts-ignore
             gasPrice: gasPrice,
             gasLimit: gasLimit,
             value: '0x0',
@@ -290,6 +293,7 @@ export async function buildEvmTransferERCNftTx(
     let tx = new Transaction(
         {
             nonce: nonce,
+            // @ts-ignore
             gasPrice: gasPrice,
             gasLimit: gasLimit,
             value: '0x0',
