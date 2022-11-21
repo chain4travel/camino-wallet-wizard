@@ -138,14 +138,14 @@ export default new Vuex.Store({
         },
 
         async onAccess(store) {
-            store.state.isAuth = true
-
-            store.dispatch('Assets/updateAvaAsset')
-            store.dispatch('Platform/update')
-            router.push('/wallet')
-            store.dispatch('Assets/updateUTXOs')
-            store.dispatch('Accounts/updateKycStatus')
-            store.dispatch('Launch/initialize')
+            // store.state.isAuth = true
+            // console.log('accwwww')
+            // router.push('/wallet')
+            // store.dispatch('Assets/updateAvaAsset')
+            // store.dispatch('Platform/update')
+            // store.dispatch('Assets/updateUTXOs')
+            // store.dispatch('Accounts/updateKycStatus')
+            // store.dispatch('Launch/initialize')
         },
 
         // TODO: Parts can be shared with the logout function below
