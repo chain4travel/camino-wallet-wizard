@@ -173,9 +173,7 @@ export default class CreateWalletStep extends Vue {
         this.$refs.print_modal.open()
     }
     async complete() {
-        let result = await this.access()
-        console.log(result)
-        console.log('gooood')
+        await this.access()
         this.isLoad = false
         this.isVerified = true
     }

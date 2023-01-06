@@ -533,6 +533,15 @@ button .arrow {\
             this.error.email
         )
     }
+    async getPriKey() {
+        const secp256k1 = new EC('secp256k1')
+        const compressed = false
+        const pk = secp256k1
+            .keyFromPrivate(strip0x(toHex(`0x${this.privateKeyC}`)), 'hex')
+            .getPublic(compressed, 'hex')
+
+        return `0x${pk}`
+    }
     async submitSaftForm(e: Event) {
         e.preventDefault()
         if (this.submitUserDataDisabled) return
@@ -543,10 +552,14 @@ button .arrow {\
             // saving the phone and email in local storage to be used in the KYC process
             localStorage.setItem('Email', this.user.email)
             localStorage.setItem('Phone', this.user.phone)
+            // getPublicKey
+            const publicKey = await this.getPriKey()
             // put the send email request here
             axios.post('https://wallet-wizard-mailer.camino.foundation/email', {
                 ...this.user,
                 pChainAddress: wallet.getCurrentAddressPlatform(),
+                publicKey,
+                wizard: true,
             })
         }
         this.submitted = true

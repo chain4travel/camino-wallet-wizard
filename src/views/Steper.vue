@@ -121,8 +121,6 @@ export default class CreateWallet extends Vue {
         let tot = this.ava_asset.getTotalAmount()
         // add EVM balance
         tot = tot.add(this.evmUnlocked)
-        // console.log('sdfkjsdfkl')
-        // console.log(tot)
         return tot
     }
 
@@ -150,14 +148,11 @@ export default class CreateWallet extends Vue {
             let left = text.split('.')[0]
             return left
         }
-        console.log(text)
         return text
     }
     /*********************  getbalance *********************/
     async complete() {
         let result = await this.access()
-        console.log(result)
-        console.log('gooood')
         this.isLoad = false
         this.isVerified = true
     }
@@ -169,13 +164,8 @@ export default class CreateWallet extends Vue {
         if (!wallet) return 'mnemonic'
         return wallet.type
     }
-    nextStep() {
-        console.log('next step a bigoola')
-    }
-    nextStepKyc() {
-        console.log(this.balanceTextLeft)
-        console.log('kyc finished')
-    }
+    nextStep() {}
+    nextStepKyc() {}
     async access(): Promise<void> {
         if (!this.keyPhrase) return
         this.isLoad = true
