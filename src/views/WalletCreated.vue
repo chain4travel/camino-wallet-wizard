@@ -20,7 +20,7 @@ import { Vue, Component } from 'vue-property-decorator'
 })
 export default class WalletCreated extends Vue {
     goToWallet() {
-        window.open('https://simple-wallet.camino.foundation/')
+        window.open('https://simple-wallet.camino.network/')
     }
 }
 </script>
