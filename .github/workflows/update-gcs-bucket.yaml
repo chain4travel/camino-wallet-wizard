@@ -26,10 +26,12 @@ jobs:
       - name: Prepare variables
         id: prepareVariables
         run: |
+          DOMAIN="wallet-wizard.camino.network"
+          echo "prodBucket=$DOMAIN" >> $GITHUB_OUTPUT
           if [[ "${{ github.ref }}" == "refs/heads/c4t" ]]; then
-              echo "bucket=wallet-wizard.camino.network" >> $GITHUB_OUTPUT
+              echo "bucket=stage.$DOMAIN" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-              echo "bucket=dev.wallet-wizard.camino.network" >> $GITHUB_OUTPUT
+              echo "bucket=dev.$DOMAIN" >> $GITHUB_OUTPUT
           fi
 
       - uses: actions/setup-node@v3
@@ -59,4 +61,4 @@ jobs:
       - name: Update Production Bucket
         if: ${{ github.ref == 'refs/heads/c4t' && inputs.update_production }}
         run: |
-          gsutil -m rsync -R -d build gs://${{ steps.prepareVariables.outputs.bucket }}
+          gsutil -m rsync -R -d build gs://${{ steps.prepareVariables.outputs.prodBucket }}
