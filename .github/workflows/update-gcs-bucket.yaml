@@ -14,51 +14,40 @@ on:
         - dev
 
 env:
-  node_version: 16
+  node_version: 15
 
 jobs:
   build_deploy_scrape:    
     name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Prepare variables
-        id: prepareVariables
-        run: |
-          DOMAIN="wallet-wizard.camino.network"
-          echo "prodBucket=$DOMAIN" >> $GITHUB_OUTPUT
-          if [[ "${{ github.ref }}" == "refs/heads/c4t" ]]; then
-              echo "bucket=stage.$DOMAIN" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-              echo "bucket=dev.$DOMAIN" >> $GITHUB_OUTPUT
-          fi
-
+       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node_version }}
-          
-      - name: Install yarn dependencies        
-        run: yarn install
 
-      - name: Build
+      - name: install yarn dependencies
+        run: yarn install
+      - name: build
         run: yarn build
 
-      - name: Cloud authentication
-        id: auth
+      - name: Set bucket names
+        id: setBucketNames
+        run: |
+          if [[ "${{ github.ref_name }}" == "c4t" ]]; then
+              echo "bucket=stage.wallet-wizard.camino.network" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "dev" ]]; then
+              echo "bucket=dev.wallet-wizard.camino.network" >> $GITHUB_OUTPUT
+          fi
+      - name: 'gcloud authentication'
+        id: 'auth'
+
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
 
-      - name: Update Bucket
-        if: ${{ github.ref == 'refs/heads/c4t' || github.ref == 'refs/heads/dev' }}
-        run: |
-          gsutil -m rsync -R -d dist gs://${{ steps.prepareVariables.outputs.bucket }}
-
-      - name: Update Production Bucket
-        if: ${{ github.ref == 'refs/heads/c4t' && inputs.update_production }}
-        run: |
-          gsutil -m rsync -R -d dist gs://${{ steps.prepareVariables.outputs.prodBucket }}
+      - name: update bucket files
+        run: gsutil -m rsync -R -d dist gs://${{ steps.setBucketNames.outputs.bucket }}
