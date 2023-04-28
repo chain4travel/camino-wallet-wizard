@@ -179,9 +179,8 @@ export default class CreateWallet extends Vue {
 </script>
 <style lang="scss">
 @use "../styles/main";
-
-body {
-    height: auto !important;
+.v-stepper {
+    flex: 1;
 }
 .v-application .primary {
     background-color: red !important;
@@ -195,10 +194,13 @@ body {
     align-items: center;
     flex-direction: column;
 }
+.v-stepper__header {
+    background-color: var(--bg-wallet-light);
+}
+
 .steper {
     width: 100%;
     height: auto;
-    min-height: calc(100vh - 80px);
     max-width: 1100px;
     padding: 15px;
     padding-top: 50px;
@@ -211,7 +213,6 @@ body {
     justify-content: center;
     margin-top: 0px !important;
     &__header {
-        /* background-color: turquoise !important; */
         border-radius: var(--border-radius-sm);
         .v-stepper__label {
             color: var(--primary-color) !important;
@@ -223,13 +224,8 @@ body {
         border: var(--secondary-border);
     }
     &__body {
-        /* flex-grow: 1; */
         margin-top: 50px;
-        /* min-height: 100vh !important; */
         overflow: auto !important;
-        /* display: flex; */
-        /* align-items: center; */
-        /* background-color: yellow !important; */
     }
 
     /* ==========================================

@@ -278,6 +278,7 @@ export default class CreateWalletStep extends Vue {
 
         .mneumonic_button_container {
             .but_randomize {
+                background-color: #0085ff !important;
                 span {
                     margin-left: 12px;
                 }
@@ -339,6 +340,9 @@ export default class CreateWalletStep extends Vue {
         .access_cont {
             text-align: left;
             flex-direction: column;
+            .access {
+                background-color: #0085ff !important;
+            }
 
             .submit {
                 display: flex;

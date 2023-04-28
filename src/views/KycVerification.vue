@@ -4,7 +4,7 @@
             <div class="modal_body">
                 <div id="sumsub-websdk-container"></div>
                 <div class="kyc_action">
-                    <v-btn type="cancel" @click="walletCreated = true" class="outlined_button">
+                    <v-btn type="cancel" @click="walletCreated = true" class="submit_but">
                         Done & Next
                     </v-btn>
                 </div>
@@ -14,8 +14,8 @@
                 <p>You will receive your result via Email.</p>
                 <p>
                     If you don't receive your result within 24 hours, please contact
-                    <a href="mailto:presale@chain4travel.com" class="presale">
-                        presale@chain4travel.com
+                    <a href="mailto:investors@camino.network" class="presale">
+                        investors@camino.network
                     </a>
                 </p>
             </div>
@@ -126,6 +126,17 @@ h1 {
     position: relative;
     padding: 16px 22px;
 }
+
+.submit_but {
+    // width: 100%;
+    height: 48px !important;
+    border-radius: 12px !important;
+    background-color: #0085ff !important;
+    text-transform: capitalize !important;
+    color: #fff !important;
+    font-size: 1rem !important;
+}
+
 .KYCform {
     padding: 20px;
     border-radius: var(--border-radius-sm);

@@ -55,10 +55,10 @@ export default {
             {
                 vmid: 'og:title',
                 name: 'og:title',
-                content: 'Camino Presale Wizard',
+                content: 'Camino Institutional Sale Wizard',
             },
         ],
-        title: 'Camino Presale Wizard',
+        title: 'Camino Institutional Sale Wizard',
     },
 }
 </script>
@@ -94,11 +94,11 @@ export default {
 
 html {
     height: 100%;
+    overflow: auto;
 }
 
 body {
     height: 100%;
-    overflow: auto !important;
     width: 100vw;
     min-width: 300px;
     max-width: 100vw;
@@ -120,13 +120,13 @@ p {
 }
 
 #nav {
-    height: 80px;
+    height: 69px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     z-index: 2;
-    background-color: transparent;
+    background-color: var(--bg-wallet-light);
     padding: main.$container_padding_m;
 }
 
