@@ -1,14 +1,19 @@
 <template>
     <button @click="toggle">
-        <img v-if="val" src="@/assets/theme_toggle/night.svg" />
-        <img v-else src="@/assets/theme_toggle/day.svg" />
+        <svg-icon type="mdi" :path="path"></svg-icon>
     </button>
 </template>
 <script>
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiWeatherSunny } from '@mdi/js'
 export default {
+    components: {
+        SvgIcon,
+    },
     data() {
         return {
             val: false,
+            path: mdiWeatherSunny,
         }
     },
     methods: {
