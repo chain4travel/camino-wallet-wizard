@@ -8,7 +8,7 @@
                 the wallet.
             </span>
         </div>
-        <v-btn @click="goToWallet" class="button_secondary">Access Wallet</v-btn>
+        <v-btn @click="goToWallet" class="button_secondary submit_but">Access Wallet</v-btn>
     </div>
 </template>
 <script lang="ts">
@@ -20,7 +20,7 @@ import { Vue, Component } from 'vue-property-decorator'
 })
 export default class WalletCreated extends Vue {
     goToWallet() {
-        window.open('https://simple-wallet.camino.foundation/')
+        window.open('https://suite.camino.network/wallet')
     }
 }
 </script>
@@ -49,5 +49,15 @@ export default class WalletCreated extends Vue {
     .v-btn {
         max-width: 350px;
     }
+}
+
+.submit_but {
+    width: 100%;
+    height: 48px !important;
+    border-radius: 12px !important;
+    background-color: #0085ff !important;
+    text-transform: capitalize !important;
+    color: #fff !important;
+    font-size: 1rem !important;
 }
 </style>

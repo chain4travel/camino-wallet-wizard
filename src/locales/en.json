@@ -209,9 +209,10 @@
         "info_explanation_p2": "Please enter your contact details below."
     },
     "wizard": {
-        "title": "To prepare your Simple Agreement for Future Tokens (SAFT), please fill out the below form :",
+        "title": "Please fill out the form below.",
+        "subtitle": "This data will be used to create your purchase agreement.",
         "send": "Send & Next",
-        "agree": "I agree that Chain4Travel may use my personal data internally and for verification purposes with Chain4Travel's KYC Partner Sumsub. *",
+        "agree": "I agree that Chain4Travel and the Camino Network Foundation may use my data internally and for verification purposes with Chain4Travel’s partner Sumsub. *",
         "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
         "errors": {
             "name": "Name must at least contain two and must not exceed 64 letters",

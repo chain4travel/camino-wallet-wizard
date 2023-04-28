@@ -2,6 +2,7 @@
     <div class="saft-view">
         <template v-if="!submitted">
             <h1 class="header-text">{{ $t('wizard.title') }}</h1>
+            <h1 class="header-text">{{ $t('wizard.subtitle') }}</h1>
             <form @submit.prevent="submitSaftForm">
                 <InputField
                     label="Company Name (only if Company is buying Camino Tokens)"
@@ -83,23 +84,12 @@
                     @change="handleChange"
                     required
                 />
-                <div class="multisig-box">
-                    <b>This option is only recommended for businesses</b>
-                    <small>
-                        Do you want to share control over your tokens?
-                        <br />
-                        Camino supports MultiSignature wallets. If you want multiple persons to have
-                        control over your Camino tokens, please tick the box below. We will then
-                        reach out to you to clarify the process and guide your through the process.
-                    </small>
-                    <MultiSigCheckbox v-model="user.multisig" :explain="$t('wizard.multisig')" />
-                </div>
                 <div class="form_actions">
                     <SaftCheckbox v-model="user.agree" :explain="$t('wizard.agree')" required />
                     <v-btn
                         type="submit"
                         :disabled="submitUserDataDisabled"
-                        class="ava_button button_secondary"
+                        class="ava_button button_secondary submit_but"
                         depressed
                     >
                         {{ $t('wizard.send') }}
@@ -121,7 +111,7 @@
                         <br />
                         {{ $t('wizard.success.thank_you_note2') }}
                     </p>
-                    <v-btn @click="completeSaftStep" class="button_secondary">
+                    <v-btn @click="completeSaftStep" class="button_secondary submit_but">
                         {{ $t('wizard.success.start') }}
                     </v-btn>
                 </div>
@@ -658,5 +648,14 @@ sup {
     font-size: 18px;
     color: var(--error);
     top: 0em;
+}
+.submit_but {
+    width: 100%;
+    height: 48px !important;
+    border-radius: 12px !important;
+    background-color: #0085ff !important;
+    text-transform: capitalize !important;
+    color: #fff !important;
+    font-size: 1rem !important;
 }
 </style>

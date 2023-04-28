@@ -2741,6 +2741,11 @@
   resolved "https://registry.npmjs.org/@istanbuljs/schema/-/schema-0.1.2.tgz"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
+"@jamescoyle/vue-icon@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@jamescoyle/vue-icon/-/vue-icon-0.1.2.tgz#b9e254187de6716b81bf9e0e8400ec012231bd05"
+  integrity sha512-KFrImXx5TKIi6iQXlnyLEBl4rNosNKbTeRnr70ucTdUaciVmd9qK9d/pZAaKt1Ob/8xNnX2GMp8LisyHdKtEgw==
+
 "@jest/console@^26.6.2":
   version "26.6.2"
   resolved "https://registry.npmjs.org/@jest/console/-/console-26.6.2.tgz"
@@ -3102,6 +3107,11 @@
   version "7.0.96"
   resolved "https://registry.yarnpkg.com/@mdi/font/-/font-7.0.96.tgz#9853c222623072f5575b4039c8c195ea929b61fc"
   integrity sha512-rzlxTfR64hqY8yiBzDjmANfcd8rv+T5C0Yedv/TWk2QyAQYdc66e0kaN1ipmnYU3RukHRTRcBARHzzm+tIhL7w==
+
+"@mdi/js@^7.2.96":
+  version "7.2.96"
+  resolved "https://registry.yarnpkg.com/@mdi/js/-/js-7.2.96.tgz#a2a20be740a75e65c8b8b9e12a2b699c06a9208f"
+  integrity sha512-paR9M9ZT7rKbh2boksNUynuSZMHhqRYnEZOm/KrZTjQ4/FzyhjLHuvw/8XYzP+E7fS4+/Ms/82EN1pl/OFsiIA==
 
 "@metamask/eth-sig-util@^4.0.0":
   version "4.0.0"
@@ -14598,11 +14608,6 @@ rlp@^2.2.3, rlp@^2.2.4:
   integrity sha512-HAfAmL6SDYNWPUOJNrM500x4Thn4PZsEy5pijPh40U9WfNk0z15hUYzO9xVIMAdIHdFtD8CBDHd75Td1g36Mjg==
   dependencies:
     bn.js "^4.11.1"
-
-roboto-fontface@0.10.0:
-  version "0.10.0"
-  resolved "https://registry.npmjs.org/roboto-fontface/-/roboto-fontface-0.10.0.tgz"
-  integrity sha512-OlwfYEgA2RdboZohpldlvJ1xngOins5d7ejqnIBWr9KaMxsnBqotpptRXTyfNRLnFpqzX6sTDt+X+a+6udnU8g==
 
 rsvp@^4.8.4:
   version "4.8.5"
