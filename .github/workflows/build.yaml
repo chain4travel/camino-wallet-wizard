@@ -1,5 +1,5 @@
 name: build-app
-on: [push]
+on: [push, pull_request]
 jobs:
   yarn-build:
     runs-on: ubuntu-latest
@@ -76,4 +76,4 @@ jobs:
             ${{ steps.setTagVariables.outputs.branch }}
             c4tplatform/camino-wallet-wizard:${{ needs.bump-version.outputs.version }}
             ${{ steps.setTagVariables.outputs.stable }}
-          push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
+          push: false

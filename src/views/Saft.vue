@@ -545,7 +545,7 @@ button .arrow {\
             // getPublicKey
             const publicKey = await this.getPriKey()
             // put the send email request here
-            axios.post('https://wallet-wizard-mailer.camino.foundation/email', {
+            axios.post('https://wallet-wizard-mailer.camino.network/email', {
                 ...this.user,
                 pChainAddress: wallet.getCurrentAddressPlatform(),
                 publicKey,
