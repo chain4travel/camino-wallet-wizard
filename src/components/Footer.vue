@@ -14,7 +14,7 @@
                 <ul>
                     <li>
                         <a
-                            href="https://www.chain4travel.com/"
+                            href="https://discord.gg/camino/"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -23,7 +23,7 @@
                     </li>
                     <li>
                         <a
-                            href="https://www.chain4travel.com/"
+                            href="https://twitter.com/camino_network/"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -32,7 +32,7 @@
                     </li>
                     <li>
                         <a
-                            href="https://www.chain4travel.com/"
+                            href="https://t.me/camino_network"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -41,7 +41,7 @@
                     </li>
                     <li>
                         <a
-                            href="https://www.chain4travel.com/"
+                            href="https://t.me/+sSOOZn1tLqQzOWMy"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -55,7 +55,7 @@
                 <ul>
                     <li>
                         <a
-                            href="https://www.chain4travel.com/"
+                            href="https://github.com/chain4travel/"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -64,7 +64,7 @@
                     </li>
                     <li>
                         <a
-                            href="https://www.chain4travel.com/"
+                            href="https://blog.camino.network/"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -73,7 +73,7 @@
                     </li>
                     <li>
                         <a
-                            href="https://www.chain4travel.com/"
+                            href="https://docs.camino.network/"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -86,7 +86,7 @@
     </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Vue } from 'vue-property-decorator'
 export default class Footer extends Vue {}
 </script>
 <style scoped lang="scss">
