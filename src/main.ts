@@ -10,6 +10,7 @@ import vuetify from './plugins/vuetify'
 import i18n from './plugins/i18n'
 //@ts-ignore
 import vueCountryRegionSelect from 'vue-country-region-select'
+import './index.css'
 
 Vue.use(VueMeta)
 Vue.use(BootstrapVue)

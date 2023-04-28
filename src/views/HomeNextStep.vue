@@ -1,28 +1,18 @@
 <template>
     <div class="home" v-if="!starting">
-        <v-stepper class="steper" :value="step">
-            <v-stepper-header class="steper__header elevation-0">
-                <v-stepper-step step="1" :complete="step > 1">Create Wallet</v-stepper-step>
-                <v-stepper-step step="2" :complete="step > 2">Personal Data</v-stepper-step>
-                <v-stepper-step step="3" :complete="step > 3">KYC Verification</v-stepper-step>
-            </v-stepper-header>
-        </v-stepper>
         <div class="home--wrapper">
-            <div class="header">
-                <img src="@/assets/wallet-logo.svg" alt />
-                <div class="header--title">Camino Pre-Sale Wizard</div>
-            </div>
+            <h2 class="content--title">Camino Institutional Sale Wizard</h2>
             <div class="content">
-                <h1 class="content--desc">
-                    In the first step, we will create an access key phrase for you.
+                <span class="content--desc">
+                    In the first step, a key phrase will be created.
                     <br />
                     <br />
                     The key phrase consists of 24 random words. These words in their specific order
                     represent the unique key to your wallet and Camino tokens.
                     <br />
                     <br />
-                    Chain4Travel will never save your key phrase and will never ask you for your key
-                    phrase.
+                    The Camino Network Foundation or Chain4Travel AG will never save your key phrase
+                    and will never ask you for your key phrase.
                     <br />
                     <br />
                     <div class="warningg">ATTENTION</div>
@@ -34,14 +24,10 @@
                         <br />
                         <span>Do not share it with anyone.</span>
                     </div>
-                </h1>
-                <div class="content--access-create">Click next to create your personal wallet.</div>
+                </span>
             </div>
-            <div class="buttons-wrapper">
-                <v-btn @click="goToStepper" class="ava_button button_secondary submit_but">
-                    Next
-                </v-btn>
-            </div>
+            <div class="access-create">Click next to create your personal wallet</div>
+            <v-btn @click="goToStepper" class="button_primary submit_but">Next</v-btn>
         </div>
     </div>
     <Steper v-else />
@@ -74,36 +60,20 @@ export default class Home extends Vue {
 
 <style scoped lang="scss">
 @use "../styles/main";
-.text--bold {
-    margin-top: 10px;
-    font-weight: bold;
-}
+
 .home {
-    min-height: calc(100vh - 80px) !important;
-    background-image: none !important;
-    background-size: cover !important;
-    background-position: center !important;
-    align-items: center !important;
-    background-repeat: no-repeat !important;
-    overflow: hidden !important;
-    min-width: 100vw !important;
-    display: flex !important;
-    flex-direction: column !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    justify-content: flex-start !important;
-    .steper {
-        min-height: auto !important;
-        padding-top: 50px !important;
-        padding-bottom: 50px !important;
-    }
-    svg {
-        g {
-            ellipse {
-                fill: var(--bg);
-            }
-        }
-    }
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    // justify-content: center;
+    background-size: cover;
+    background-position: center;
+    align-items: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    min-width: 100vw;
     .blur {
         position: absolute;
         left: 50%;
@@ -112,87 +82,73 @@ export default class Home extends Vue {
     }
 
     &--wrapper {
-        z-index: 1;
-        margin-top: 100px;
-        margin-bottom: 100px;
         display: flex;
         flex-direction: column;
-        gap: 30px;
+        z-index: 1;
+        background-color: var(--bg-wallet-light);
+        padding: 32px;
+        border-radius: 18px;
+        gap: 1.5rem;
+        max-width: 800px;
         align-items: center;
-        .header {
-            font-size: main.$l-size;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .content {
-            max-width: 750px;
+        margin: 0px 10px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px !important ;
+        border: 1px solid rgba(145, 158, 171, 0.24) !important;
+    }
+
+    .content {
+        &--title {
+            font-size: 2.75rem;
+            color: var(--text-color);
             text-align: center;
-            &--desc {
-                text-align: left;
-                background-color: var(--bg-light-2);
-                border-radius: var(--border-radius-sm);
-                margin-bottom: 30px;
-                font-size: 20px;
-                padding: 25px;
-                font-weight: 500;
-            }
-            &--access-create {
-                // margin-bottom: 30px;
-                font-size: 18px;
-                color: var(--primary-color-light);
-            }
+        }
+        &--desc {
+            font-size: 1.125rem;
+            line-height: 1.5;
         }
     }
-    .buttons-wrapper {
-        display: flex;
-        justify-content: center;
-        gap: 30px;
-        flex-wrap: wrap;
-        align-items: center;
-        .v-btn {
-            min-width: 175px;
-        }
+
+    .presale {
+        color: var(--secondary-color);
+        text-decoration: none;
     }
-}
-.warningg {
-    color: red;
-    background-color: transparent;
-}
-.tos {
-    margin-top: 14px !important;
-    text-align: center;
+
+    .click-start {
+        color: #475569;
+    }
+
+    .access-create {
+        font-size: 0.875rem;
+        // font-size: 18px;
+        color: var(--text-color);
+    }
+
+    .submit_but {
+        width: 100%;
+        height: 48px !important;
+        border-radius: 12px !important;
+        background-color: #0085ff !important;
+        text-transform: capitalize !important;
+        color: #fff !important;
+        font-size: 1rem !important;
+    }
 }
 
-.submit_but {
-    width: 100px;
-}
 /* ==========================================
    Nav
    ========================================== */
 
 @include main.mobile-device {
-    .home {
-        svg {
-            width: 300px;
+    .content {
+        &--title {
+            font-size: 18px;
         }
-        .header {
-            &--title {
-                font-size: main.$l-size-mobile;
-            }
+        &--desc {
+            font-size: 16px;
         }
-        .content {
-            &--desc {
-                font-size: 16px;
-            }
-            &--access-create {
-                font-size: 14px;
-            }
+        &--access-create {
+            font-size: 14px;
         }
     }
-}
-
-@media only screen and (max-width: 600px) {
 }
 </style>

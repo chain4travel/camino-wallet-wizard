@@ -71,6 +71,7 @@ button {
 }
 
 #nav {
+    border-bottom: 1px solid rgba(145, 158, 171, 0.24) !important;
     .logo {
         display: flex;
         align-items: center;
