@@ -168,10 +168,10 @@ const network_module: Module<NetworkState, RootState> = {
         async init({ state, commit, dispatch }) {
             let camino = new AvaNetwork(
                 'Camino',
-                'https://mainnet.camino.network',
+                'https://api.camino.network',
                 1000,
-                'https://magellan.mainnet.camino.network',
-                'https://explorer.camino.network/mainnet',
+                'https://magellan.camino.network',
+                'https://suite.camino.network',
                 true
             )
 
@@ -180,7 +180,7 @@ const network_module: Module<NetworkState, RootState> = {
                 'https://columbus.camino.network',
                 1001,
                 'https://magellan.columbus.camino.network',
-                'https://explorer.camino.network',
+                'https://suite.camino.network',
                 true
             )
 
