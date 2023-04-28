@@ -15,7 +15,7 @@
                     and will never ask you for your key phrase.
                     <br />
                     <br />
-                    <div class="warningg">ATTENTION</div>
+                    <div class="attention">ATTENTION</div>
                     Anyone who knows your key phrase has full, unlimited control over your tokens,
                     so please keep the key phrase in one or more secure locations that only you have
                     access to.
@@ -60,6 +60,11 @@ export default class Home extends Vue {
 
 <style scoped lang="scss">
 @use "../styles/main";
+
+.text--bold {
+    margin-top: 10px;
+    font-weight: bold;
+}
 
 .home {
     display: flex;
@@ -132,6 +137,12 @@ export default class Home extends Vue {
         color: #fff !important;
         font-size: 1rem !important;
     }
+}
+
+.attention {
+    color: #e84970;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 /* ==========================================

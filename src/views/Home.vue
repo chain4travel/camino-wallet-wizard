@@ -32,7 +32,7 @@
                     </span>
                 </div>
             </div>
-            <div class="access-create">Click Start to start the Presale Wizard</div>
+            <div class="access-create">Click Start to start the Wizard</div>
             <v-btn @click="goToStepper" class="button_primary submit_but">Start</v-btn>
         </div>
     </div>

@@ -2,7 +2,8 @@
     <div id="nav">
         <ConfirmLogout ref="logout"></ConfirmLogout>
         <div class="logo">
-            <img src="@/assets/camino_logo.png" />
+            <img v-if="$root.theme === 'day'" src="@/assets/LightModeLogo.svg" class="logo" />
+            <img v-else src="@/assets/DarkModeLogo.svg" class="logo" />
         </div>
         <v-spacer></v-spacer>
 

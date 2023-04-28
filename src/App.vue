@@ -55,10 +55,10 @@ export default {
             {
                 vmid: 'og:title',
                 name: 'og:title',
-                content: 'Camino Presale Wizard',
+                content: 'Camino Institutional Sale Wizard',
             },
         ],
-        title: 'Camino Presale Wizard',
+        title: 'Camino Institutional Sale Wizard',
     },
 }
 </script>
