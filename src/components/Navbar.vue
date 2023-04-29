@@ -96,7 +96,7 @@
         </v-navigation-drawer>
     </div>
 </template>
-<script lang="ts">
+<script scoped lang="ts">
 import 'reflect-metadata'
 import { Vue, Component } from 'vue-property-decorator'
 import LanguageSelect from './misc/LanguageSelect/LanguageSelect.vue'

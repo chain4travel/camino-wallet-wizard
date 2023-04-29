@@ -1,14 +1,16 @@
 <template>
     <div id="nav">
-        <ConfirmLogout ref="logout"></ConfirmLogout>
-        <div class="logo">
-            <img v-if="$root.theme === 'day'" src="@/assets/LightModeLogo.svg" class="logo" />
-            <img v-else src="@/assets/DarkModeLogo.svg" class="logo" />
-        </div>
-        <v-spacer></v-spacer>
+        <div class="nav-content">
+            <ConfirmLogout ref="logout"></ConfirmLogout>
+            <div class="logo">
+                <img v-if="$root.theme === 'day'" src="@/assets/LightModeLogo.svg" class="logo" />
+                <img v-else src="@/assets/DarkModeLogo.svg" class="logo" />
+            </div>
+            <v-spacer></v-spacer>
 
-        <div class="buts_right">
-            <DayNightToggle class="action_but"></DayNightToggle>
+            <div class="buts_right">
+                <DayNightToggle class="action_but"></DayNightToggle>
+            </div>
         </div>
     </div>
 </template>
@@ -85,12 +87,31 @@ button {
         }
 
         img {
-            height: 30px;
+            width: 120px;
+            height: 36px;
             max-height: none !important;
             object-fit: contain;
             margin-right: 5px;
         }
     }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 69px;
+    position: relative;
+    background-color: var(--bg-wallet-light);
+    z-index: 2;
+    padding: 0 1.5rem;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1536px;
+    height: 100%;
+    width: 100%;
+    padding: 0;
 }
 
 .buts_right {

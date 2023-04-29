@@ -105,7 +105,7 @@
             <div class="success_body">
                 <img src="@/assets/success.svg" alt />
                 <div class="success_content">
-                    <span>{{ $t('wizard.success.dear') }}, {{ user.name }}</span>
+                    <span>{{ $t('wizard.success.dear') }} {{ user.name }}</span>
                     <p>
                         {{ $t('wizard.success.thank_you_note') }}
                         <br />

@@ -89,7 +89,7 @@ export default {
 }
 </style>
 
-<style lang="scss">
+<style scoped lang="scss">
 @use './styles/main';
 
 html {
