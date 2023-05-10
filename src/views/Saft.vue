@@ -127,10 +127,9 @@ import MultiSigCheckbox from '../components/Saft/MultiSigCheckbox.vue'
 import { SingletonWallet } from '@/js/wallets/SingletonWallet'
 import MnemonicWallet from '@/js/wallets/MnemonicWallet'
 import { WalletNameType } from '@/js/wallets/types'
-import { generateToken } from '@/kyc_api'
+import { generateToken, getPublicKey } from '@/kyc_api'
 import snsWebSdk from '@sumsub/websdk'
 import axios from 'axios'
-const { isHexStrict, toHex, toUint8Array } = require('@arcblock/forge-util')
 //@ts-ignore
 const EC = require('elliptic').ec
 
@@ -148,9 +147,7 @@ interface User {
     agree: boolean
     multisig: boolean
 }
-function strip0x(input: string) {
-    return isHexStrict(input) ? input.replace(/^0x/i, '') : input
-}
+
 @Component({
     components: { SaftCheckbox, InputField, MultiSigCheckbox },
 })
@@ -193,14 +190,11 @@ export default class Saft extends Vue {
         localStorage.removeItem('Phone')
     }
     async getNewAccessToken() {
-        const secp256k1 = new EC('secp256k1')
-        const compressed = false
-        const pk = secp256k1
-            .keyFromPrivate(strip0x(toHex(`0x${this.privateKeyC}`)), 'hex')
-            .getPublic(compressed, 'hex')
-        let PublicKey = `0x${pk}`
-        const result = await generateToken('0x' + this.wallet.getEvmAddress(), PublicKey)
-        return result.token
+        if (this.privateKeyC) {
+            const result = await generateToken(this.privateKeyC)
+            return result.access_token
+        }
+        return ''
     }
     get walletType(): WalletNameType {
         return this.wallet.type
@@ -523,15 +517,7 @@ button .arrow {\
             this.error.email
         )
     }
-    async getPriKey() {
-        const secp256k1 = new EC('secp256k1')
-        const compressed = false
-        const pk = secp256k1
-            .keyFromPrivate(strip0x(toHex(`0x${this.privateKeyC}`)), 'hex')
-            .getPublic(compressed, 'hex')
 
-        return `0x${pk}`
-    }
     async submitSaftForm(e: Event) {
         e.preventDefault()
         if (this.submitUserDataDisabled) return
@@ -542,15 +528,17 @@ button .arrow {\
             // saving the phone and email in local storage to be used in the KYC process
             localStorage.setItem('Email', this.user.email)
             localStorage.setItem('Phone', this.user.phone)
-            // getPublicKey
-            const publicKey = await this.getPriKey()
-            // put the send email request here
-            axios.post('https://wallet-wizard-mailer.camino.network/email', {
-                ...this.user,
-                pChainAddress: wallet.getCurrentAddressPlatform(),
-                publicKey,
-                wizard: true,
-            })
+            if (this.privateKeyC) {
+                // getPublicKey
+                const publicKey = getPublicKey(this.privateKeyC)
+                // put the send email request here
+                axios.post('https://wallet-wizard-mailer.camino.network/email', {
+                    ...this.user,
+                    pChainAddress: wallet.getCurrentAddressPlatform(),
+                    publicKey,
+                    wizard: true,
+                })
+            }
         }
         this.submitted = true
     }

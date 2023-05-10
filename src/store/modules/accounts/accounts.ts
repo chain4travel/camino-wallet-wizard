@@ -167,10 +167,21 @@ const accounts_module: Module<AccountsState, RootState> = {
             commit('loadAccounts')
         },
 
-        async updateKycStatus({ state, rootState }) {
-            const wallet = rootState.activeWallet
-            if (!wallet) return
-            state.kycStatus = await checkVerificationStatus('0x' + wallet.ethAddress)
+        async updateKycStatus({ state, rootState, dispatch }) {
+            if (!rootState.activeWallet || rootState.activeWallet.type === 'ledger') return null
+            const wallet = rootState.activeWallet as SingletonWallet | MnemonicWallet
+            const privKey = '0x' + wallet.ethAddress
+            if (!privKey) return null
+            try {
+                state.kycStatus = await checkVerificationStatus(
+                    privKey,
+                    //@ts-ignore
+                    rootState.Network.selectedNetwork.name.toLowerCase()
+                )
+            } catch (e) {
+                console.log((e as Error).message)
+                state.kycStatus = false
+            }
         },
     },
     getters: {

@@ -194,11 +194,7 @@ import snsWebSdk from '@sumsub/websdk'
 import { bnToBig } from '@/helpers/helper'
 import Big from 'big.js'
 import AvaAsset from '@/js/AvaAsset'
-const EC = require('elliptic').ec
-const { isHexStrict, toHex, toUint8Array } = require('@arcblock/forge-util')
-function strip0x(input: string) {
-    return isHexStrict(input) ? input.replace(/^0x/i, '') : input
-}
+
 interface UserData {
     email: string
     phone: string
@@ -280,16 +276,12 @@ export default class CreateWallet extends Vue {
     }
 
     async getNewAccessToken() {
-        const secp256k1 = new EC('secp256k1')
-        const compressed = false
-        const pk = secp256k1
-            .keyFromPrivate(strip0x(toHex(`0x${this.privateKeyC}`)), 'hex')
-            .getPublic(compressed, 'hex')
-        let PublicKey = `0x${pk}`
-        const result = await generateToken('0x' + this.wallet.getEvmAddress(), PublicKey)
-        return result.token
+        if (this.privateKeyC) {
+            const result = await generateToken(this.privateKeyC)
+            return result.access_token
+        }
+        return ''
     }
-
     get wallet() {
         let wallet: MnemonicWallet = this.$store.state.activeWallet
         return wallet
