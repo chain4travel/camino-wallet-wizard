@@ -223,7 +223,7 @@
         },
         "success": {
             "dear": "Dear",
-            "thank_you_note": "Thank you for enabling us to prepare your SAFT agreement.",
+            "thank_you_note": "Thank you for enabling us to prepare your token agreement.",
             "thank_you_note2": "Next, we will guide you through the verification process.",
             "next": "Please have your id document at hand.",
             "start": "Start Verification Process"
