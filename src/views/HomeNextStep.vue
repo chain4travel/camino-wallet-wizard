@@ -59,7 +59,7 @@ export default class Home extends Vue {
 </script>
 
 <style scoped lang="scss">
-@use "../styles/main";
+@use '../styles/abstracts/mixins';
 
 .text--bold {
     margin-top: 10px;
@@ -149,7 +149,7 @@ export default class Home extends Vue {
    Nav
    ========================================== */
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .content {
         &--title {
             font-size: 18px;

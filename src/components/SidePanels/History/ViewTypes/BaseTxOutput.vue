@@ -1,9 +1,11 @@
 <template>
     <div class="tx_out">
         <div class="addresses">
-            <p v-for="addr in summary.addresses" :key="addr">{{ direction }} {{ 'X-' + addr }}</p>
+            <p v-for="addr in summary.addresses" :key="addr">
+                {{ direction }} {{ chainPrefix + addr }}
+            </p>
         </div>
-        <p class="amount" :profit="isProfit">
+        <p :class="'amount ' + colorClass">
             {{ amtText }}
             <template v-if="assetDetail">
                 {{ assetDetail.symbol }}
@@ -16,12 +18,14 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { BaseTxAssetSummary } from '@/helpers/history_helper'
 import AvaAsset from '@/js/AvaAsset'
 import { bnToBig } from '@/helpers/helper'
-import { BN } from '@c4tplatform/caminojs'
+import { BN } from '@c4tplatform/caminojs/dist'
 
 @Component
 export default class BaseTxOutput extends Vue {
     @Prop() assetID!: string
     @Prop() summary!: BaseTxAssetSummary
+    @Prop() isDeposit!: string
+    @Prop() chainPrefix!: string
 
     get assetDetail(): AvaAsset {
         return (
@@ -35,15 +39,19 @@ export default class BaseTxOutput extends Vue {
     }
 
     get isProfit() {
-        return this.summary.amount.gte(new BN(0))
+        return this.isDeposit || this.summary.amount.gte(new BN(0))
     }
 
     get actionText() {
         if (this.isProfit) {
-            return 'Received'
+            return 'Receive'
         } else {
-            return 'Sent'
+            return 'Send'
         }
+    }
+
+    get colorClass(): string {
+        return this.isDeposit ? 'deposit' : this.isProfit ? 'profit' : ''
     }
 
     get direction() {
@@ -54,13 +62,17 @@ export default class BaseTxOutput extends Vue {
         }
     }
     get amtText() {
-        let big = bnToBig(this.summary.amount, this.assetDetail?.denomination || 0)
+        let big = bnToBig(
+            this.isDeposit ? this.summary.deposited : this.summary.amount,
+            this.assetDetail?.denomination || 0
+        )
         return big.toLocaleString()
     }
 }
 </script>
 <style scoped lang="scss">
-@use "../../../../styles/main";
+@use '../../../../styles/abstracts/mixins';
+
 .tx_out {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -72,8 +84,12 @@ export default class BaseTxOutput extends Vue {
     font-size: 15px;
     color: #d04c4c;
 
-    &[profit] {
+    &.profit {
         color: var(--success);
+    }
+
+    &.deposit {
+        color: var(--info);
     }
 }
 
@@ -101,7 +117,7 @@ label {
     color: var(--primary-color-light);
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     .amount {
         font-size: 13px;
     }

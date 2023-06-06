@@ -1,6 +1,6 @@
 <template>
     <modal ref="modal" :title="title" class="modal_parent" icy>
-        <div class="mnemonic_body">
+        <form class="mnemonic_body" v-on:submit.prevent="verify">
             <h3>{{ $t('create.verify_desc') }}</h3>
             <div class="words">
                 <div v-for="i in 24" :key="i" class="mnemonic_in" tabindex="-1">
@@ -14,7 +14,7 @@
             </div>
             <p class="err">{{ err }}</p>
             <button class="but_primary ava_button button_primary" @click="verify">Verify</button>
-        </div>
+        </form>
     </modal>
 </template>
 
@@ -36,6 +36,9 @@ export default class VerifyMnemonic extends Vue {
     hiddenIndices: number[] = []
     err: string = ''
     title: string = ''
+    $refs!: {
+        modal: Modal
+    }
 
     @Prop() mnemonic?: MnemonicPhrase
 
@@ -45,7 +48,7 @@ export default class VerifyMnemonic extends Vue {
     }
     created() {
         this.init()
-        this.title = `${this.$t('create.verifytitle')}`
+        this.title = this.$t('create.verifytitle') as string
     }
 
     init() {
@@ -77,12 +80,13 @@ export default class VerifyMnemonic extends Vue {
     }
 
     open() {
-        // @ts-ignore
+        this.isActive = true
         this.$refs.modal.open()
     }
 
     close() {
         this.isActive = false
+        this.$refs.modal?.close()
     }
 
     formCheck() {
@@ -111,15 +115,14 @@ export default class VerifyMnemonic extends Vue {
 
     verify() {
         if (!this.formCheck()) return
-        // @ts-ignore
-        console.log('verifid and need create account')
-        // this.$refs.modal.close()
+        this.close()
         this.$emit('complete')
     }
 }
 </script>
 <style scoped lang="scss">
-@use "../../styles/main";
+@use '../../styles/abstracts/variables';
+@use '../../styles/abstracts/mixins';
 
 .mnemonic_body {
     padding: 30px;
@@ -128,19 +131,19 @@ export default class VerifyMnemonic extends Vue {
     width: 450px;
 }
 
-.close_but {
-    position: absolute;
-    top: 12px;
-    right: 20px;
-    background-color: transparent;
-    border: none;
-    outline: none;
-    opacity: 0.2;
+// .close_but {
+//     position: absolute;
+//     top: 12px;
+//     right: 20px;
+//     background-color: transparent;
+//     border: none;
+//     outline: none;
+//     opacity: 0.2;
 
-    &:hover {
-        opacity: 1;
-    }
-}
+//     &:hover {
+//         opacity: 1;
+//     }
+// }
 
 .verify {
     position: fixed;
@@ -187,12 +190,12 @@ h3 {
     display: flex;
     flex-direction: row;
     align-items: center;
-    border-bottom: 1px solid main.$primary-color-light;
+    border-bottom: 1px solid variables.$primary-color-light;
     outline: none;
 
     p {
         margin: 0 5px 0 0 !important;
-        color: main.$primary-color-light;
+        color: variables.$primary-color-light;
     }
 
     input {
@@ -225,9 +228,13 @@ h3 {
     color: var(--error);
 }
 
-@include main.mobile-device {
-    .mnemonic-body {
+@include mixins.mobile-device {
+    .mnemonic_body {
+        padding: 15px 30px;
         width: 100%;
+        overflow-y: scroll;
+        position: relative;
+        height: 60vh;
     }
 
     .words {

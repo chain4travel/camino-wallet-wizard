@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-checkbox :label="explain" v-model="value" @change="change" class="checkbox"></v-checkbox>
+        <v-checkbox :label="explain" v-model="localValue" @change="change" class="checkbox" />
     </div>
 </template>
 <script>
@@ -12,19 +12,24 @@ export default {
             default: 'Back up your mnemonic keyphrase!',
         },
     },
+    data() {
+        return {
+            localValue: this.value,
+        }
+    },
     model: {
         prop: 'value',
         event: 'change',
     },
     methods: {
         change() {
-            this.$emit('change', this.value)
+            this.$emit('change', this.localValue)
         },
     },
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use "../../styles/main";
 
 .checkbox {

@@ -1,20 +1,24 @@
 <template>
     <button @click="toggle">
-        <svg-icon type="mdi" :path="path"></svg-icon>
+        <img v-if="val" src="@/assets/theme_toggle/night.svg" />
+        <img v-else src="@/assets/theme_toggle/day.svg" />
     </button>
 </template>
 <script>
-import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiWeatherSunny } from '@mdi/js'
 export default {
-    components: {
-        SvgIcon,
-    },
     data() {
         return {
             val: false,
-            path: mdiWeatherSunny,
         }
+    },
+    watch: {
+        '$root.theme': [
+            {
+                handler: 'onThemeChange',
+                immediate: false,
+                deep: false,
+            },
+        ],
     },
     methods: {
         setNight() {
@@ -22,12 +26,14 @@ export default {
             localStorage.setItem('theme', 'night')
             document.documentElement.setAttribute('data-theme', 'night')
             this.$root.theme = 'night'
+            this.$vuetify.theme.dark = true
         },
         setDay() {
             this.val = false
             localStorage.setItem('theme', 'day')
             document.documentElement.setAttribute('data-theme', 'day')
             this.$root.theme = 'day'
+            this.$vuetify.theme.dark = false
         },
         toggle() {
             this.val = !this.val
@@ -37,12 +43,15 @@ export default {
                 this.setDay()
             }
         },
+        onThemeChange(now, before) {
+            this.val = now === 'night'
+        },
     },
     mounted() {
         let theme = localStorage.getItem('theme')
 
         if (!theme) {
-            this.setDay()
+            this.setNight()
             return
         }
 

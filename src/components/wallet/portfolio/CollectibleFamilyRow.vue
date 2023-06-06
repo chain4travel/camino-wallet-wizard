@@ -120,8 +120,8 @@ export default class CollectibleFamilyRow extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../../../styles/main';
-@use "tokens";
+@use '../../../styles/abstracts/mixins';
+@use 'tokens';
 
 .mint_card {
     font-size: 13px;
@@ -134,10 +134,10 @@ export default class CollectibleFamilyRow extends Vue {
     justify-content: space-between;
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .fam_header {
         grid-template-columns: max-content 1fr;
     }

@@ -4,8 +4,35 @@
             <div class="row">
                 <div class="col">
                     <transition name="fade" mode="out-in">
+                        <!-- PHASE 1 -->
+                        <div v-if="!keyPhrase" class="stage_1">
+                            <div class="img_container">
+                                <img
+                                    v-if="$root.theme === 'day'"
+                                    src="@/assets/diamond-secondary.png"
+                                    alt
+                                />
+                                <img v-else src="@/assets/diamond-secondary-night.svg" alt />
+                            </div>
+                            <h1>{{ $t('create.generate') }}</h1>
+                            <router-link to="/access" class="link">
+                                {{ $t('create.but_have') }}
+                            </router-link>
+                            <div class="options">
+                                <button
+                                    class="ava_button but_generate button_secondary"
+                                    @click="createKey"
+                                >
+                                    {{ $t('create.submit') }}
+                                </button>
+                                <!--                                <TorusGoogle class="torus_but"></TorusGoogle>-->
+                            </div>
+                            <ToS></ToS>
+
+                            <router-link to="/" class="link">{{ $t('create.cancel') }}</router-link>
+                        </div>
                         <!-- PHASE 2 -->
-                        <div class="stage_2" v-if="!kycStep">
+                        <div v-else class="stage_2">
                             <div class="cols">
                                 <!-- LEFT -->
                                 <div class="mneumonic_disp_col">
@@ -74,97 +101,31 @@
                                             @click="verifyMnemonic"
                                             :disabled="!canVerify"
                                         >
-                                            vetify Mnemonic
+                                            {{ $t('create.success_submit') }}
                                         </button>
                                     </div>
                                     <!-- STEP 2b - ACCESS -->
-                                    <div class="access_cont" v-if="isVerified && !kycStep">
-                                        <paper-wallet
-                                            ref="print_modal"
-                                            v-if="walletType === 'mnemonic'"
-                                            :wallet="activeWallet"
-                                        ></paper-wallet>
+                                    <div class="access_cont" v-if="isVerified">
                                         <div class="submit">
                                             <transition name="fade" mode="out-in">
                                                 <Spinner v-if="isLoad" class="spinner"></Spinner>
                                                 <div v-else>
-                                                    <!-- <v-btn
-                                                        :tooltip="$t('top.hover2')"
-                                                        @click="viewPrintModal"
-                                                        class="print_but"
-                                                        :disabled="
-                                                            selectedNetwork !== 'Camino' ||
-                                                            walletType !== 'mnemonic'
-                                                        "
-                                                    >
-                                                        <span>3. Print paper Wallet</span>
-                                                    </v-btn> -->
-                                                    <button
-                                                        :disabled="walletType !== 'mnemonic'"
-                                                        @click="viewPrintModal"
-                                                        class="but_primary ava_button button_secondary"
-                                                    >
-                                                        Print keyphrase
-                                                    </button>
                                                     <button
                                                         class="button_primary ava_button access generate"
-                                                        @click="nextStep"
+                                                        @click="access"
                                                         :disabled="!canSubmit"
                                                     >
-                                                        next step
+                                                        {{ $t('create.success_submit') }}
                                                     </button>
-                                                    <!-- <router-link to="/" class="link">
+                                                    <router-link to="/" class="link">
                                                         {{ $t('create.cancel') }}
-                                                    </router-link> -->
+                                                    </router-link>
                                                     <ToS style="margin: 30px 0 !important"></ToS>
                                                 </div>
                                             </transition>
                                         </div>
                                     </div>
-                                    <!-- <div class="kyc" v-if="isVerified && kycStep">toto d zeb</div> -->
-                                    <!-- STEP 3c - kyc -->
                                 </div>
-                            </div>
-                        </div>
-                        <div class="stage_2" v-else>
-                            <div v-if="!userDataSubmitted" class="KYCform">
-                                <div class="request-text">
-                                    {{ $t('kyc_process.info_explanation_p1') }}
-                                    <br />
-                                    {{ $t('kyc_process.info_explanation_p2') }}
-                                </div>
-                                <form @submit.prevent="submitUserData">
-                                    <div>
-                                        <label>{{ $t('kyc_process.your_email_address') }}</label>
-                                        <input
-                                            type="text"
-                                            :placeholder="$t('kyc_process.email_address')"
-                                            v-model="userData.email"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label>{{ $t('kyc_process.your_phone_number') }}</label>
-                                        <input
-                                            type="tel"
-                                            :placeholder="$t('kyc_process.phone_number')"
-                                            v-model="userData.phone"
-                                        />
-                                    </div>
-                                    <v-btn
-                                        type="submit"
-                                        :disabled="submitUserDataDisabled"
-                                        :loading="isLoading"
-                                        class="button_submit_form"
-                                    >
-                                        {{ $t('kyc_process.submit') }}
-                                    </v-btn>
-                                </form>
-                            </div>
-                            <div id="sumsub-websdk-container"></div>
-                            <div v-if="verficationCompleted" class="kyc_action">
-                                <v-btn type="cancel" @click="nextStepKyc" class="outlined_button">
-                                    Next step
-                                </v-btn>
                             </div>
                         </div>
                     </transition>
@@ -184,48 +145,22 @@ import VerifyMnemonic from '@/components/modals/VerifyMnemonic.vue'
 import MnemonicCopied from '@/components/CreateWalletWorkflow/MnemonicCopied.vue'
 import ToS from '@/components/misc/ToS.vue'
 import MnemonicPhrase from '@/js/wallets/MnemonicPhrase'
-import PaperWallet from '../modals/PaperWallet/PaperWallet.vue'
-import Modal from '../modals/Modal.vue'
-import { BN, WalletNameType, WalletType } from '@c4tplatform/camino-wallet-sdk'
-import MnemonicWallet from '@/js/wallets/MnemonicWallet'
-import { SingletonWallet } from '@/js/wallets/SingletonWallet'
-import { generateToken } from '@/kyc_api'
-import snsWebSdk from '@sumsub/websdk'
-import { bnToBig } from '@/helpers/helper'
-import Big from 'big.js'
-import AvaAsset from '@/js/AvaAsset'
 
-interface UserData {
-    email: string
-    phone: string
-}
 @Component({
     components: {
         ToS,
         Spinner,
         VerifyMnemonic,
         MnemonicCopied,
-        PaperWallet,
     },
 })
 export default class CreateWallet extends Vue {
     // TODO: We do not need to create keyPair, only mnemonic is sufficient
     isLoad: boolean = false
-    userDataSubmitted: boolean = false
-    isLoading: boolean = false
-    userData: UserData = {
-        email: '',
-        phone: '',
-    }
     keyPhrase: MnemonicPhrase | null = null
     isSecured: boolean = false
     isVerified: boolean = false
-    kycStep: boolean = false
-    background: string = 'body {background-color: red !important;}'
-    verficationCompleted: boolean = true
-    created() {
-        this.createKey()
-    }
+
     get canVerify(): boolean {
         return this.isSecured ? true : false
     }
@@ -238,14 +173,6 @@ export default class CreateWallet extends Vue {
         this.isSecured = false
         let mnemonic = bip39.generateMnemonic(256)
         this.keyPhrase = new MnemonicPhrase(mnemonic)
-    }
-
-    $refs!: {
-        modal: Modal
-        print_modal: PaperWallet
-    }
-    viewPrintModal() {
-        this.$refs.print_modal.open()
     }
 
     // Will be true if the values in remember wallet checkbox are valid
@@ -262,155 +189,26 @@ export default class CreateWallet extends Vue {
         this.$refs.verify.open()
     }
 
-    /********************* kyc *********************/
-    // get walletType(): WalletNameType {
-    //     return this.wallet.type
-    // }
-    get privateKeyC(): string | null {
-        if (this.walletType === 'ledger') return null
-        let wallet = this.wallet as SingletonWallet | MnemonicWallet
-        return wallet.ethKey
-    }
-    get submitUserDataDisabled() {
-        return !this.userData.email || !this.userData.phone || this.isLoading
-    }
-
-    async getNewAccessToken() {
-        if (this.privateKeyC) {
-            const result = await generateToken(this.privateKeyC)
-            return result.access_token
-        }
-        return ''
-    }
-    get wallet() {
-        let wallet: MnemonicWallet = this.$store.state.activeWallet
-        return wallet
-    }
-
-    async submitUserData() {
-        if (!this.userData.email || !this.userData.phone) return
-        try {
-            this.isLoading = true
-            const accessToken = await this.getNewAccessToken()
-            this.launchWebSdk(accessToken, this.userData.email, this.userData.phone)
-            this.userDataSubmitted = true
-        } finally {
-            this.isLoading = false
-        }
-    }
-    launchWebSdk(accessToken: string, applicantEmail: any, applicantPhone: any) {
-        let snsWebSdkInstance = snsWebSdk
-            .init(accessToken, () => this.getNewAccessToken())
-            .withConf({
-                email: applicantEmail,
-                phone: applicantPhone,
-                uiConf: {
-                    customCssStr: this.background,
-                },
-            })
-            .withOptions({ addViewportTag: false, adaptIframeHeight: true })
-            .on('idCheck.applicantStatus', async (applicantStatus) => {
-                await this.$store.dispatch('Accounts/updateKycStatus')
-                if (applicantStatus.reviewStatus === 'completed') {
-                    this.verficationCompleted = true
-                }
-            })
-            .build()
-        snsWebSdkInstance.launch('#sumsub-websdk-container')
-    }
-    /*********************  kyc *********************/
-    /*********************  getbalance *********************/
-    // updateBalance(): void {
-    //     this.$store.dispatch('Assets/updateUTXOs')
-    //     this.$store.dispatch('History/updateTransactionHistory')
-    // }
-    get isUpdateBalance(): boolean {
-        if (!this.wallet) return true
-        return this.wallet.isFetchUtxos
-    }
-    get ava_asset(): AvaAsset | null {
-        let ava = this.$store.getters['Assets/AssetAVA']
-        return ava
-    }
-    get evmUnlocked(): BN {
-        if (!this.wallet) return new BN(0)
-        // convert from ^18 to ^9
-        let bal = this.wallet.ethBalance
-        return bal.div(new BN(Math.pow(10, 9).toString()))
-    }
-
-    get totalBalance(): BN {
-        if (!this.ava_asset) return new BN(0)
-
-        let tot = this.ava_asset.getTotalAmount()
-        // add EVM balance
-        tot = tot.add(this.evmUnlocked)
-        // console.log('sdfkjsdfkl')
-        // console.log(tot)
-        return tot
-    }
-
-    get totalBalanceBig(): Big {
-        if (this.ava_asset) {
-            let denom = this.ava_asset.denomination
-            let bigTot = bnToBig(this.totalBalance, denom)
-            return bigTot
-        }
-        return Big(0)
-    }
-    get balanceText(): string {
-        if (this.ava_asset !== null) {
-            let denom = this.ava_asset.denomination
-            return this.totalBalanceBig.toLocaleString(denom)
-        } else {
-            return '?'
-        }
-    }
-
-    get balanceTextLeft(): string {
-        if (this.isUpdateBalance) return '--'
-        let text = this.balanceText
-        if (text.includes('.')) {
-            let left = text.split('.')[0]
-            return left
-        }
-        console.log(text)
-        return text
-    }
-    /*********************  getbalance *********************/
-    async complete() {
-        let result = await this.access()
-        console.log(result)
-        console.log('gooood')
-        this.isLoad = false
+    complete() {
         this.isVerified = true
     }
-    get activeWallet(): WalletType | null {
-        return this.$store.state.activeWallet
-    }
-    get walletType(): WalletNameType {
-        let wallet = this.activeWallet
-        if (!wallet) return 'mnemonic'
-        return wallet.type
-    }
-    nextStep() {
-        this.kycStep = true
-        console.log('next step a bigoola')
-    }
-    nextStepKyc() {
-        console.log(this.balanceTextLeft)
-        console.log('kyc finished')
-    }
+
     async access(): Promise<void> {
         if (!this.keyPhrase) return
+
         this.isLoad = true
+
         let parent = this
-        return await parent.$store.dispatch('accessWallet', this.keyPhrase!.getValue())
+
+        setTimeout(async () => {
+            await parent.$store.dispatch('accessWallet', this.keyPhrase!.getValue())
+        }, 500)
     }
 }
 </script>
 <style scoped lang="scss">
-@use '../../styles/main';
+@use '../../styles/abstracts/mixins';
+@use '../../styles/abstracts/variables';
 
 .create_wallet {
     display: flex;
@@ -428,22 +226,22 @@ export default class CreateWallet extends Vue {
     align-items: center;
     justify-content: space-between;
     background-color: var(--bg-light);
-    padding: main.$container-padding;
+    padding: variables.$container-padding;
     border-radius: 1rem;
     text-align: center;
     /*min-width: 1000px;*/
 
     img {
-        margin-top: main.$vertical-padding;
+        margin-top: variables.$vertical-padding;
         width: 89px;
         height: 89px;
         max-height: none;
     }
 
     h1 {
-        margin-top: main.$vertical-padding;
+        margin-top: variables.$vertical-padding;
         text-align: left;
-        font-size: main.$m-size;
+        font-size: variables.$m-size;
         font-weight: 400;
     }
 }
@@ -475,7 +273,7 @@ export default class CreateWallet extends Vue {
 .but_generate {
     display: block;
     height: max-content;
-    background-color: main.$secondary-color;
+    background-color: variables.$secondary-color;
 }
 
 .key_disp {
@@ -484,7 +282,7 @@ export default class CreateWallet extends Vue {
 }
 
 a {
-    color: main.$primary-color-light !important;
+    color: variables.$primary-color-light !important;
     text-decoration: underline !important;
     margin-top: 10px;
 }
@@ -497,7 +295,6 @@ a {
     margin: 0 auto;
     text-align: left;
     align-items: flex-start;
-    max-width: 100%;
 }
 
 .cols {
@@ -529,7 +326,7 @@ a {
     }
 
     .verified {
-        background-color: main.$green-light;
+        background-color: variables.$green-light;
         color: #222;
     }
 
@@ -555,40 +352,40 @@ a {
     }
 
     img {
-        width: main.$img-size;
-        height: main.$img-size;
+        width: variables.$img-size;
+        height: variables.$img-size;
         max-height: none;
     }
 
     header {
         h1 {
             margin-top: 10px;
-            font-size: main.$xl-size;
+            font-size: variables.$xl-size;
             line-height: 1.25em;
             font-weight: 400;
         }
 
         p {
-            color: main.$primary-color-light;
+            color: variables.$primary-color-light;
         }
     }
 
     .warn {
-        margin-top: main.$vertical-padding !important;
+        margin-top: variables.$vertical-padding !important;
 
         span {
             display: block;
-            font-size: main.$s-size;
+            font-size: variables.$s-size;
             font-weight: 700;
             text-transform: uppercase;
 
             &.label {
-                color: main.$secondary-color;
+                color: variables.$secondary-color;
                 text-transform: uppercase;
             }
 
             &.description {
-                color: main.$primary-color-light !important;
+                color: variables.$primary-color-light !important;
             }
         }
     }
@@ -602,6 +399,12 @@ a {
             flex-direction: row;
             margin-top: 14px;
             text-align: left;
+            //flex-direction: column;
+            //align-items: flex-start;
+            //justify-content: space-between;
+
+            .access {
+            }
 
             .link {
                 margin-left: 40px;
@@ -619,67 +422,13 @@ a {
     margin: 20px 0;
 }
 
-h1 {
-    font-weight: normal;
-}
-
-.outlined_button {
-    border-width: 1px;
-    border-style: solid;
-    border-radius: var(--border-radius-sm);
-    padding: 10px 24px;
-    border-color: var(--primary-btn-border-color);
-    color: var(--primary-btn-border-color);
-    background-color: var(--bg) !important;
-    height: auto;
-}
-
-.kyc_action {
-    display: flex;
-    background-color: var(--bg);
-    border-bottom: var(--bg);
-    color: var(--primary-color);
-    border-top: 2px solid var(--bg-light);
-    position: relative;
-    padding: 16px 22px;
-}
-.KYCform {
-    padding: 20px;
-    border-radius: var(--border-radius-sm);
-    overflow: auto;
-    .request-text {
-        padding: 1rem;
-        /* border: var(--primary-border); */
-        text-align: center;
-        color: var(--primary-contrast-text);
-        border-radius: var(--border-radius-sm);
-        margin-bottom: 25px;
-        box-shadow: var(--box-shadow);
-        background-color: var(--bg-light);
-    }
-    form {
-        display: grid;
-        gap: 10px;
-        label {
-            font-size: 14px;
-            margin-bottom: 10px !important;
-            color: var(--primary-contrast-text);
-        }
-        > div {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 5px;
-        }
-    }
-}
-
-@include main.medium-device {
+@include mixins.medium-device {
     .stage_1 {
         min-width: unset;
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .stage_1 {
         min-width: unset;
     }
@@ -740,18 +489,18 @@ h1 {
         align-items: center;
 
         img {
-            width: main.$img-size-mobile;
-            height: main.$img-size-mobile;
+            width: variables.$img-size-mobile;
+            height: variables.$img-size-mobile;
         }
 
         header {
             h1 {
-                font-size: main.$xl-size-mobile;
+                font-size: variables.$xl-size-mobile;
             }
         }
 
         .warn {
-            margin-top: main.$vertical-padding-mobile !important;
+            margin-top: variables.$vertical-padding-mobile !important;
         }
 
         .access_cont {

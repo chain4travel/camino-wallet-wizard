@@ -31,7 +31,7 @@ import 'reflect-metadata'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { ITransaction } from './types'
 import { UTXO } from '@c4tplatform/caminojs/dist/apis/avm'
-import { BN } from '@c4tplatform/caminojs'
+import { BN } from '@c4tplatform/caminojs/dist'
 import { bnToBig, getPayloadFromUTXO } from '@/helpers/helper'
 import NftPayloadView from '@/components/misc/NftPayloadView/NftPayloadView.vue'
 @Component({
@@ -87,7 +87,7 @@ export default class TxSummary extends Vue {
     padding: 8px 16px;
     color: var(--primary-color-light);
     font-size: 16px;
-    font-family: 'Inter', monospace;
+    font-family: 'Inter' sans-serif;
     margin-bottom: 6px !important;
 }
 .amt {

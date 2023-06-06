@@ -7,7 +7,7 @@ import {
 import { UTXOSet as PlatformUTXOSet } from '@c4tplatform/caminojs/dist/apis/platformvm'
 import { ava, bintools } from '@/AVA'
 import HDKey from 'hdkey'
-import { Buffer } from '@c4tplatform/caminojs'
+import { Buffer } from '@c4tplatform/caminojs/dist'
 import {
     KeyChain as PlatformVMKeyChain,
     KeyPair as PlatformVMKeyPair,
@@ -18,7 +18,7 @@ import { getAddressChains } from '@/explorer_api'
 import { AvaNetwork } from '@/js/AvaNetwork'
 import { ChainAlias } from './wallets/types'
 import { avmGetAllUTXOs, platformGetAllUTXOs } from '@/helpers/utxo_helper'
-import { updateFilterAddresses } from '../providers'
+import { updateFilterAddresses } from '@/providers'
 
 const INDEX_RANGE: number = 20 // a gap of at least 20 indexes is needed to claim an index unused
 
@@ -38,6 +38,7 @@ class HdHelper {
     }
     changePath: string
     masterKey: HDKey
+    ethKeyPair: AVMKeyPair | PlatformVMKeyPair | undefined
     hdIndex: number
     utxoSet: AVMUTXOSet | PlatformUTXOSet
     isPublic: boolean
@@ -47,6 +48,7 @@ class HdHelper {
     constructor(
         changePath: string,
         masterKey: HDKey,
+        ethKey?: HDKey,
         chainId: ChainAlias = 'X',
         isPublic: boolean = false
     ) {
@@ -70,16 +72,16 @@ class HdHelper {
         this.masterKey = masterKey
         this.hdIndex = 0
         this.isPublic = isPublic
-        // this.oninit()
-    }
+        this.ethKeyPair = undefined
 
-    async oninit() {
-        await this.findHdIndex()
+        if (ethKey) {
+            this.ethKeyPair = this.keyChain.importKey(Buffer.from(ethKey.privateKey))
+        }
     }
 
     // When the wallet connects to a different network
     // Clear internal data and scan again
-    async onNetworkChange() {
+    onNetworkChange() {
         this.clearCache()
         this.isInit = false
         let hrp = ava.getHRP()
@@ -91,7 +93,8 @@ class HdHelper {
             this.utxoSet = new PlatformUTXOSet()
         }
         this.hdIndex = 0
-        await this.oninit()
+        this.addressCache = {}
+        this.keyCache = {}
     }
 
     // Increments the hd index by one and adds the key
@@ -143,16 +146,18 @@ class HdHelper {
         this.isInit = true
     }
 
+    startUTXOFetch(): void {
+        this.isFetchUtxo = true
+    }
+
     // Fetches the utxos for the current keychain
     // and increments the index if last index has a utxo
     async updateUtxos(): Promise<AVMUTXOSet | PlatformUTXOSet> {
-        this.isFetchUtxo = true
-
         if (!this.isInit) {
             console.error('HD Index not found yet.')
         }
 
-        let addrs: string[] = this.getAllDerivedAddresses()
+        let addrs: string[] = this.getAllAddresses()
         let result: AVMUTXOSet | PlatformUTXOSet
 
         if (this.chainId === 'X') {
@@ -195,6 +200,7 @@ class HdHelper {
         } else {
             keychain = new PlatformVMKeyChain(hrp, this.chainId)
         }
+        if (this.ethKeyPair) keychain.addKey(this.ethKeyPair)
 
         for (let i: number = 0; i <= this.hdIndex; i++) {
             let key: AVMKeyPair | PlatformVMKeyPair
@@ -215,8 +221,8 @@ class HdHelper {
     }
 
     // Returns all key pairs up to hd index
-    getAllDerivedKeys(upTo = this.hdIndex): AVMKeyPair[] | PlatformVMKeyPair[] {
-        let set: AVMKeyPair[] | PlatformVMKeyPair[] = []
+    getAllKeys(upTo = this.hdIndex): AVMKeyPair[] | PlatformVMKeyPair[] {
+        let set: AVMKeyPair[] | PlatformVMKeyPair[] = this.ethKeyPair ? [this.ethKeyPair] : []
         for (var i = 0; i <= upTo; i++) {
             if (this.chainId === 'X') {
                 let key = this.getKeyForIndex(i) as AVMKeyPair
@@ -229,12 +235,24 @@ class HdHelper {
         return set
     }
 
+    getStaticAddress(): string {
+        return this.ethKeyPair
+            ? bintools.addressToString(ava.getHRP(), this.chainId, this.ethKeyPair.getAddress())
+            : ''
+    }
+
     getAllDerivedAddresses(upTo = this.hdIndex, start = 0): string[] {
-        let res = []
+        const res = []
         for (var i = start; i <= upTo; i++) {
             let addr = this.getAddressForIndex(i)
             res.push(addr)
         }
+        return res
+    }
+
+    getAllAddresses(upTo = this.hdIndex, start = 0): string[] {
+        const res = this.getAllDerivedAddresses(upTo, start)
+        if (start === 0 && this.ethKeyPair) res.unshift(this.getStaticAddress())
         return res
     }
 
@@ -258,31 +276,22 @@ class HdHelper {
             chainID = ava.PChain().getBlockchainID()
         }
 
-        for (var i = 0; i < addrs.length - INDEX_RANGE; i++) {
-            let gapSize: number = 0
-
-            for (var n = 0; n < INDEX_RANGE; n++) {
-                let scanIndex = i + n
-                let scanAddr = addrs[scanIndex]
-
-                let rawAddr = scanAddr.split('-')[1]
-                let chains: string[] = addrChains[rawAddr]
-                if (!chains) {
-                    // If doesnt exist on any chain
-                    gapSize++
-                } else if (!chains.includes(chainID)) {
-                    // If doesnt exist on this chain
-                    gapSize++
-                } else {
-                    i = i + n
-                    break
-                }
+        let gapSize = 0,
+            i = 0
+        for (; i < addrs.length && gapSize < INDEX_RANGE; i++) {
+            let rawAddr = addrs[i].split('-')[1]
+            let chains: string[] = addrChains[rawAddr]
+            if (!chains || !chains.includes(chainID)) {
+                gapSize++
+            } else {
+                gapSize = 0
+                // No chance to find gap in this chunk
+                if (addrs.length - i < INDEX_RANGE) break
             }
-
-            // If the gap is reached return the index
-            if (gapSize === INDEX_RANGE) {
-                return startIndex + i
-            }
+        }
+        // If the gap is reached return the index
+        if (gapSize === INDEX_RANGE) {
+            return i - INDEX_RANGE
         }
 
         return await this.findAvailableIndexExplorer(startIndex + (upTo - INDEX_RANGE))
@@ -308,29 +317,25 @@ class HdHelper {
         }
 
         // Scan UTXOs of these indexes and try to find a gap of INDEX_RANGE
-        for (let i: number = 0; i < addrs.length - INDEX_RANGE; i++) {
-            let gapSize: number = 0
-            // console.log(`Scan index: ${this.chainId} ${this.changePath}/${i+start}`);
-            for (let n: number = 0; n < INDEX_RANGE; n++) {
-                let scanIndex: number = i + n
-                let addr: string = addrs[scanIndex]
-                let addrBuf = bintools.parseAddress(addr, this.chainId)
-                let addrUTXOs: string[] = utxoSet.getUTXOIDs([addrBuf])
-                if (addrUTXOs.length === 0) {
-                    gapSize++
-                } else {
-                    // Potential improvement
-                    i = i + n
-                    break
-                }
-            }
-
-            // If we found a gap of 20, we can return the last fullIndex+1
-            if (gapSize === INDEX_RANGE) {
-                let targetIndex = start + i
-                return targetIndex
+        let gapSize = 0,
+            i = 0
+        for (; i < addrs.length && gapSize < INDEX_RANGE; i++) {
+            let addrBuf = bintools.parseAddress(addrs[i], this.chainId)
+            let addrUTXOs: string[] = utxoSet.getUTXOIDs([addrBuf])
+            if (addrUTXOs.length === 0) {
+                gapSize++
+            } else {
+                gapSize = 0
+                // No chance to find gap in this chunk
+                if (addrs.length - i < INDEX_RANGE) break
             }
         }
+
+        // If we found a gap of 20, we can return the last fullIndex+1
+        if (gapSize === INDEX_RANGE) {
+            return i - INDEX_RANGE
+        }
+
         return await this.findAvailableIndexNode(start + SCAN_RANGE)
     }
 

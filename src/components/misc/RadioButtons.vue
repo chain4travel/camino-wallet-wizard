@@ -27,7 +27,7 @@ export default class RadioButtons extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../../styles/main';
+@use '../../styles/abstracts/mixins';
 .radio_buts {
     display: flex;
     flex-wrap: wrap;
@@ -45,7 +45,7 @@ button {
     margin-right: 6px;
     margin-bottom: 6px;
     transition-duration: 0.2s;
-    font-family:'Inter', sans-serif;
+    font-family: 'Inter', sans-serif;
 
     //&:hover {
     //    border-color: var(--bg-light);
@@ -58,7 +58,7 @@ button {
     }
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     button {
         font-size: 11px;
         padding: 4px 8px;

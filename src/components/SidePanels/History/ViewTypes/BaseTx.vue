@@ -1,43 +1,19 @@
 <template>
     <div>
         <div class="utxos">
-            <div v-if="hasSent">
-                <label>Sent</label>
-                <BaseTxOutput
-                    v-for="(asset, assetId) in tokensSent"
-                    :key="assetId"
-                    :asset-i-d="assetId"
-                    :summary="asset"
-                ></BaseTxOutput>
-                <div class="nft_cols">
-                    <div class="nft_addr">
-                        <p v-for="addr in summary.collectibles.sent.addresses" :key="addr">
-                            to {{ 'X-' + addr }}
-                        </p>
-                    </div>
-                    <div class="nft_fams">
-                        <BaseTxNFTOutput
-                            v-for="(asset, assetId) in summary.collectibles.sent.assets"
-                            :key="assetId"
-                            :asset-i-d="assetId"
-                            :summary="asset"
-                            class="nft_out"
-                        ></BaseTxNFTOutput>
-                    </div>
-                </div>
-            </div>
             <div v-if="hasReceived">
-                <label>Received</label>
+                <label>{{ receiveText }}</label>
                 <BaseTxOutput
                     v-for="(asset, assetId) in tokensReceived"
                     :key="assetId"
                     :asset-i-d="assetId"
                     :summary="asset"
+                    :chainPrefix="chainPrefix"
                 ></BaseTxOutput>
                 <div class="nft_cols">
                     <div class="nft_addr">
                         <p v-for="addr in summary.collectibles.received.addresses" :key="addr">
-                            from {{ 'X-' + addr }}
+                            from {{ chainPrefix + addr }}
                         </p>
                     </div>
                     <div class="nft_fams">
@@ -51,47 +27,63 @@
                     </div>
                 </div>
             </div>
-
-            <!--            <tx-history-value-->
-            <!--                v-for="(amount, assetId) in valList"-->
-            <!--                :key="assetId"-->
-            <!--                :amount="amount"-->
-            <!--                :type="type"-->
-            <!--                :asset-id="assetId"-->
-            <!--                :is-income="false"-->
-            <!--                :operation-color="operationColor"-->
-            <!--                :operation-direction="operationDirection"-->
-            <!--            ></tx-history-value>-->
-            <!--            <div class="nfts">-->
-            <!--                <div v-for="(groupIDs, assetID) in nftGroups" :key="assetID">-->
-            <!--                    <tx-history-nft-family-group-->
-            <!--                        v-for="(payloads, id) in groupIDs"-->
-            <!--                        :key="id"-->
-            <!--                        :payloads="payloads"-->
-            <!--                        :assetID="assetID"-->
-            <!--                        class="group"-->
-            <!--                    ></tx-history-nft-family-group>-->
-            <!--                </div>-->
-            <!--            </div>-->
+            <div v-if="['deposit', 'unlock_deposit'].includes(type)">
+                <label>{{ type == 'deposit' ? 'Deposit' : 'Undeposit' }}</label>
+                <BaseTxOutput
+                    v-for="(asset, assetId) in tokensDeposited"
+                    :key="assetId"
+                    :asset-i-d="assetId"
+                    :summary="asset"
+                    :isDeposit="true"
+                    :chainPrefix="chainPrefix"
+                ></BaseTxOutput>
+            </div>
+            <div v-if="hasSent">
+                <label>Send</label>
+                <BaseTxOutput
+                    v-for="(asset, assetId) in tokensSent"
+                    :key="assetId"
+                    :asset-i-d="assetId"
+                    :summary="asset"
+                    :chainPrefix="chainPrefix"
+                ></BaseTxOutput>
+                <div class="nft_cols">
+                    <div class="nft_addr">
+                        <p v-for="addr in summary.collectibles.sent.addresses" :key="addr">
+                            to {{ chainPrefix + addr }}
+                        </p>
+                    </div>
+                    <div class="nft_fams">
+                        <BaseTxNFTOutput
+                            v-for="(asset, assetId) in summary.collectibles.sent.assets"
+                            :key="assetId"
+                            :asset-i-d="assetId"
+                            :summary="asset"
+                            class="nft_out"
+                        ></BaseTxNFTOutput>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { ITransactionData, UTXO } from '@/store/modules/history/types'
-import { TransactionValueDict } from '@/components/SidePanels/types'
-import { PayloadBase, PayloadTypes } from '@c4tplatform/caminojs/dist/utils'
-import { BN, Buffer } from '@c4tplatform/caminojs'
-import { WalletType } from '@/js/wallets/types'
 
 import { ava } from '@/AVA'
-
+import { ZeroBN } from '@/constants'
+import { getTransactionSummary } from '@/helpers/history_helper'
+import { WalletType } from '@/js/wallets/types'
 import TxHistoryValue from '@/components/SidePanels/TxHistoryValue.vue'
+import { TransactionValueDict } from '@/components/SidePanels/types'
 import TxHistoryValueFunctional from '@/components/SidePanels/History/TxHistoryValueFunctional.vue'
 import TxHistoryNftFamilyGroup from '@/components/SidePanels/TxHistoryNftFamilyGroup.vue'
-import { getTransactionSummary } from '@/helpers/history_helper'
 import BaseTxOutput from '@/components/SidePanels/History/ViewTypes/BaseTxOutput.vue'
 import BaseTxNFTOutput from '@/components/SidePanels/History/ViewTypes/BaseTxNFTOutput.vue'
+import { ITransactionData, UTXO } from '@/store/modules/history/types'
+
+import { Buffer } from '@c4tplatform/caminojs/dist'
+import { DefaultPlatformChainID, PayloadBase, PayloadTypes } from '@c4tplatform/caminojs/dist/utils'
 
 let payloadtypes = PayloadTypes.getInstance()
 
@@ -140,11 +132,16 @@ export default class BaseTx extends Vue {
         return this.transaction.type
     }
 
+    get receiveText(): string {
+        return this.type === 'claim' ? 'Claim' : 'Receive'
+    }
+
+    get chainPrefix() {
+        return this.transaction.chainID === DefaultPlatformChainID ? 'P-' : 'X-'
+    }
+
     // What did I lose?
     get inValues() {
-        let addrs: string[] = this.addresses
-        let addrsRaw = addrs.map((addr) => addr.split('-')[1])
-
         let ins = this.transaction.inputs
         let res: TransactionValueDict = {} // asset id -> value dict
 
@@ -207,7 +204,20 @@ export default class BaseTx extends Vue {
         let res = {}
         for (var assetId in tokens) {
             let asset = tokens[assetId]
-            if (asset.amount.gte(new BN(0))) {
+            if (asset.amount.gt(ZeroBN)) {
+                //@ts-ignore
+                res[assetId] = asset
+            }
+        }
+        return res
+    }
+
+    get tokensDeposited() {
+        let tokens = this.summary.tokens
+        let res = {}
+        for (var assetId in tokens) {
+            let asset = tokens[assetId]
+            if (asset.deposited.gt(ZeroBN)) {
                 //@ts-ignore
                 res[assetId] = asset
             }
@@ -220,7 +230,7 @@ export default class BaseTx extends Vue {
         let res = {}
         for (var assetId in tokens) {
             let asset = tokens[assetId]
-            if (asset.amount.lt(new BN(0))) {
+            if (asset.amount.lt(ZeroBN)) {
                 //@ts-ignore
                 res[assetId] = asset
             }
@@ -229,8 +239,6 @@ export default class BaseTx extends Vue {
     }
     // what did I gain?
     get outValues() {
-        let addrs: string[] = this.addresses
-        let addrsRaw = addrs.map((addr) => addr.split('-')[1])
         let outs = this.transaction.outputs
         let res: TransactionValueDict = {} // asset id -> value dict
 
@@ -240,7 +248,6 @@ export default class BaseTx extends Vue {
         }
 
         outs.forEach((utxoOut) => {
-            let utxoAddrs = utxoOut.addresses
             let assetId = utxoOut.assetID
             let amt = utxoOut.amount
 
@@ -276,9 +283,6 @@ export default class BaseTx extends Vue {
     }
 
     get nftGroups() {
-        let addrs: string[] = this.addresses
-        let addrsRaw = addrs.map((addr) => addr.split('-')[1])
-
         let ins = this.transaction.inputs
         let outs = this.transaction.outputs
         let res: { [key in string]: { [key in string]: PayloadBase[] } } = {}
@@ -352,11 +356,11 @@ export default class BaseTx extends Vue {
             })
         })
 
-        return isFromWallet ? 'Sent' : 'Received'
+        return isFromWallet ? 'Send' : 'Receive'
     }
 
     get operationColor() {
-        return this.operationDirection === 'Received' ? 'success' : 'sent'
+        return this.operationDirection === 'Receive' ? 'success' : 'sent'
     }
 }
 </script>
@@ -386,7 +390,7 @@ label {
     font-size: 12px;
     color: var(--primary-color-light);
     overflow: hidden;
-    font-family: 'Inter';
+    font-family: 'Inter' sans-serif;
     white-space: nowrap;
 
     p {

@@ -13,21 +13,6 @@
             ></span>
             <p v-if="activeNetwork">{{ activeNetwork.name }}</p>
             <p v-else>Disconnected</p>
-            <!--            <template v-if="status === 'disconnected' || status === 'connecting'">-->
-            <!--                <img v-if="$root.theme === 'day'" src="@/assets/network_off.png" />-->
-            <!--                <img v-else src="@/assets/network_off_night.svg" />-->
-            <!--            </template>-->
-            <!--            <template v-else>-->
-            <!--                <img v-if="$root.theme === 'day'" src="@/assets/network_on.png" />-->
-            <!--                <img v-else src="@/assets/network_off_night.svg" />-->
-            <!--            </template>-->
-            <!--            <button v-if="status === 'connected'">-->
-            <!--                {{ activeNetwork.name }}-->
-            <!--            </button>-->
-            <!--            <button v-else-if="status === 'connecting'">-->
-            <!--                {{ $t('network.status1') }}-->
-            <!--            </button>-->
-            <!--            <button v-else>{{ $t('network.status2') }}</button>-->
         </div>
         <transition name="fade">
             <div class="network_dispose_bg" v-if="isActive" key="bg" @click="closeMenu"></div>
@@ -77,7 +62,6 @@
 import 'reflect-metadata'
 import { Vue, Component } from 'vue-property-decorator'
 
-import NetworkRow from './NetworkRow.vue'
 import CustomPage from './CustomPage.vue'
 import ListPage from './ListPage.vue'
 import EditPage from '@/components/NetworkSettings/EditPage.vue'
@@ -87,7 +71,6 @@ import { NetworkStatus } from '@/store/modules/network/types'
 @Component({
     components: {
         ListPage,
-        NetworkRow,
         CustomPage,
         EditPage,
     },
@@ -157,7 +140,8 @@ export default class NetworkMenu extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../../styles/main';
+@use '../../styles/abstracts/mixins';
+@use '../../styles/abstracts/variables';
 
 .network_menu {
     margin-right: 16px;
@@ -169,10 +153,12 @@ export default class NetworkMenu extends Vue {
 }
 
 .toggle_but {
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
     //border: 2px solid var(--bg-light);
-    padding: 2px 10px;
+    // padding: 2px 10px;
     //font-size: 13px;
-    display: flex;
+    // display: flex;
     border-radius: 6px;
     position: relative;
     align-items: center;
@@ -192,6 +178,9 @@ export default class NetworkMenu extends Vue {
 
     p {
         user-select: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     button {
@@ -266,7 +255,7 @@ export default class NetworkMenu extends Vue {
     }
 }
 
-@media only screen and (max-width: main.$mobile_width) {
+@media only screen and (max-width: variables.$mobile_width) {
     .network_body {
         position: fixed;
         width: 100vw;
@@ -276,7 +265,7 @@ export default class NetworkMenu extends Vue {
     }
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     .toggle_but {
         min-width: auto;
     }

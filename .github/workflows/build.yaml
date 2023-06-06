@@ -1,5 +1,9 @@
 name: build-app
-on: [push, pull_request]
+on:
+  workflow_dispatch: 
+  pull_request:
+    branches:
+        - c4t
 jobs:
   yarn-build:
     runs-on: ubuntu-latest
@@ -7,7 +11,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '15'
+          node-version: '18'
       - run: yarn install
       - run: yarn build 
       # this might need --frozen-lockfile but it seems to break build

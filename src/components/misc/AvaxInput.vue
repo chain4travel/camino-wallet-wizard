@@ -10,6 +10,8 @@
                 :max="max"
                 placeholder="0.00"
                 @change="amount_in"
+                :readonly="readonly"
+                :initial="initial"
             ></BigNumInput>
         </div>
         <p class="ticker">{{ nativeAssetSymbol }}</p>
@@ -31,10 +33,10 @@
 <script lang="ts">
 import 'reflect-metadata'
 import { Vue, Component, Prop, Model } from 'vue-property-decorator'
-import { bnToBig, Big } from '@c4tplatform/camino-wallet-sdk'
+import { bnToBig, Big } from '@/helpers/helper'
 //@ts-ignore
 import { BigNumInput } from '@c4tplatform/vue_components'
-import { BN } from '@c4tplatform/caminojs'
+import { BN } from '@c4tplatform/caminojs/dist'
 import { priceDict } from '../../store/types'
 
 @Component({
@@ -44,14 +46,15 @@ import { priceDict } from '../../store/types'
 })
 export default class AvaxInput extends Vue {
     @Model('change', { type: Object }) readonly amount!: BN
-
     @Prop({
         default: null,
     })
     max?: BN | null
+    @Prop() initial?: BN
 
     @Prop() balance?: Big | null
     @Prop() alias?: string
+    @Prop() readonly?: boolean
 
     maxOut(ev: MouseEvent) {
         ev.preventDefault()
@@ -81,7 +84,7 @@ export default class AvaxInput extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../../styles/main';
+@use '../../styles/abstracts/mixins';
 
 .avax_input {
     display: grid;
@@ -142,22 +145,12 @@ export default class AvaxInput extends Vue {
 .col1 {
     border-radius: var(--border-radius-sm);
     background-color: var(--bg-light);
-    border: 1px solid transparent;
-    //display: flex;
     display: grid;
     grid-template-columns: max-content 1fr;
     width: 100%;
     box-sizing: border-box;
-    //overflow: auto;
     padding: 8px 14px;
     position: relative;
-
-    //&:hover {
-    //    border-color: var(--primary-color-light);
-    //}
-    //&:focus-within {
-    //    border-color: var(--secondary-color);
-    //}
 }
 
 .ticker {
@@ -176,7 +169,7 @@ p {
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .balance {
         font-size: 12px;
     }

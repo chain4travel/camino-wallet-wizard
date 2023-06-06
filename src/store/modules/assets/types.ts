@@ -1,17 +1,17 @@
-import { UTXO, UTXOSet } from '@c4tplatform/caminojs/dist/apis/avm'
+import { UTXO } from '@c4tplatform/caminojs/dist/apis/avm'
 
 import AvaAsset from '@/js/AvaAsset'
-import { BN } from '@c4tplatform/caminojs'
 import { AvaNftFamily } from '@/js/AvaNftFamily'
-import { IWalletBalanceDict } from '@/store/types'
+import { IWalletBalanceDict, PlatformBalances } from '@/store/types'
 import { UTXO as AVMUTXO } from '@c4tplatform/caminojs/dist/apis/avm/utxos'
 import Erc20Token from '@/js/Erc20Token'
 
 export interface AssetsState {
-    // isUpdateBalance: boolean
+    balanceLoading: boolean
     assets: AvaAsset[]
     assetsDict: AssetsDict
-    AVA_ASSET_ID: string | null
+    platformBalances: PlatformBalances
+    AVA_ASSET_ID: string
     nftFams: AvaNftFamily[]
     nftFamsDict: NftFamilyDict
     balanceDict: IWalletBalanceDict
@@ -46,10 +46,6 @@ export interface AssetsDict {
 
 export interface AddressUtxoDict {
     [key: string]: [UTXO]
-}
-
-export interface IBalanceDict {
-    [assetId: string]: BN
 }
 
 export interface AssetAPI {

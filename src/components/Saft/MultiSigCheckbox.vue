@@ -1,6 +1,11 @@
 <template>
     <div>
-        <v-checkbox :label="explain" v-model="value" @change="change" class="checkbox"></v-checkbox>
+        <v-checkbox
+            :label="explain"
+            v-model="localValue"
+            @change="change"
+            class="checkbox"
+        ></v-checkbox>
     </div>
 </template>
 <script>
@@ -12,20 +17,25 @@ export default {
             default: 'Yes, I want to share control over my tokens. Please get in contact with me.',
         },
     },
+    data() {
+        return {
+            localValue: this.value,
+        }
+    },
     model: {
         prop: 'value',
         event: 'change',
     },
     methods: {
         change() {
-            this.$emit('change', this.value)
+            this.$emit('change', this.localValue)
         },
     },
 }
 </script>
 
 <style lang="scss">
-@use "../../styles/main";
+@use '../../styles/main';
 
 .checkbox {
     .v-input__slot {

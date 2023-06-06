@@ -1,38 +1,32 @@
 import { Module } from 'vuex'
-import { RootState } from '@/store/types'
 
-import { BN } from '@c4tplatform/caminojs'
 import { ava } from '@/AVA'
-
+import { ZeroBN } from '@/constants'
+import { RootState } from '@/store/types'
 import {
+    ValidatorRaw,
     GetPendingValidatorsResponse,
     GetValidatorsResponse,
     PlatformState,
-    ValidatorDelegatorDict,
-    ValidatorDelegatorPendingDict,
-    ValidatorListItem,
-} from '@/store/modules/platform/types'
-import {
-    DelegatorPendingRaw,
-    DelegatorRaw,
-    ValidatorRaw,
-} from '@/components/misc/ValidatorList/types'
-import { ONEAVAX } from '@c4tplatform/caminojs/dist/utils'
+    PlatformRewards,
+} from './types'
 
-const MINUTE_MS = 60000
-const HOUR_MS = MINUTE_MS * 60
-const DAY_MS = HOUR_MS * 24
+import { BN } from '@c4tplatform/caminojs/dist'
+import { Claimable, OwnerParam } from '@c4tplatform/caminojs/dist/apis/platformvm/interfaces'
 
 const platform_module: Module<PlatformState, RootState> = {
     namespaced: true,
     state: {
         validators: [],
         validatorsPending: [],
-        // delegators: [],
-        delegatorsPending: [],
         minStake: new BN(0),
         minStakeDelegation: new BN(0),
         currentSupply: new BN(1),
+        depositOffers: [],
+        rewards: {
+            treasuryRewards: [],
+            depositRewards: [],
+        },
     },
     mutations: {
         setValidators(state, validators: ValidatorRaw[]) {
@@ -44,201 +38,143 @@ const platform_module: Module<PlatformState, RootState> = {
             state.currentSupply = await ava.PChain().getCurrentSupply()
         },
 
-        async updateMinStakeAmount({ state }) {
-            let res = await ava.PChain().getMinStake(true)
-            state.minStake = res.minValidatorStake
-            state.minStakeDelegation = res.minDelegatorStake
-
-            // console.log(state.minStake.toString())
-            // console.log(state.minStakeDelegation.toString())
+        updateMinStakeAmount({ state }) {
+            state.minStake = ava.getNetwork().P.minStake
+            state.minStakeDelegation = ava.getNetwork().P.minDelegationStake
         },
 
         async update({ dispatch }) {
-            dispatch('updateValidators')
-            dispatch('updateValidatorsPending')
             dispatch('updateCurrentSupply')
+            dispatch('updateMinStakeAmount')
+            dispatch('updateValidators').then(() =>
+                dispatch('updateAllDepositOffers').then(() => dispatch('updateRewards'))
+            )
         },
 
-        async updateValidators({ state, commit }) {
+        async updateValidators({ dispatch }) {
+            const p1 = dispatch('updateValidatorsCurrent')
+            const p2 = dispatch('updateValidatorsPending')
+            await Promise.all([p1, p2])
+        },
+
+        async updateValidatorsCurrent({ commit }) {
             let res = (await ava.PChain().getCurrentValidators()) as GetValidatorsResponse
             let validators = res.validators
 
             commit('setValidators', validators)
         },
 
-        async updateValidatorsPending({ state, commit }) {
+        async updateValidatorsPending({ state }) {
             let res = (await ava.PChain().getPendingValidators()) as GetPendingValidatorsResponse
             let validators = res.validators
-            let delegators = res.delegators
 
             //@ts-ignore
             state.validatorsPending = validators
-            state.delegatorsPending = delegators
+        },
+
+        async updateAllDepositOffers({ state }) {
+            const res = await ava.PChain().getAllDepositOffers()
+            res.sort((a, b) => {
+                if (!a.start.eq(b.start)) return a.start.lt(b.start) ? -1 : 1
+                return a.id < b.id ? -1 : 1
+            })
+            state.depositOffers = res
+        },
+
+        async updateRewards({ state, rootState, getters }) {
+            const newRewards: PlatformRewards = { treasuryRewards: [], depositRewards: [] }
+            const wallet = rootState.activeWallet
+            if (wallet) {
+                const lockedTxIDs = wallet.getPlatformUTXOSet().getLockedTxIDs()
+                const addresses = wallet.getAllAddressesP()
+                if (lockedTxIDs.depositIDs.length > 0) {
+                    try {
+                        const activeDepositOffers = await ava
+                            .PChain()
+                            .getDeposits(lockedTxIDs.depositIDs)
+                        activeDepositOffers.deposits.forEach((deposit, idx) =>
+                            newRewards.depositRewards.push({
+                                amountToClaim: activeDepositOffers.availableRewards[idx],
+                                deposit: deposit,
+                            })
+                        )
+                    } catch (e: unknown) {
+                        console.log(e)
+                    }
+                }
+                // Since magellan is not ready we get treasury rewards
+                // by requesting the node with all single threshold owners
+                const owners = addresses.map(
+                    (a) => ({ locktime: '0', threshold: 1, addresses: [a] } as OwnerParam)
+                )
+
+                let validatorFound = false
+                const pushReward = (c: Claimable, idx: number, v: boolean) => {
+                    if (v) validatorFound = true
+                    newRewards.treasuryRewards.push({
+                        type: v ? 'validator' : 'deposit',
+                        amountToClaim: c.expiredDepositRewards,
+                        rewardOwner: c.rewardOwner
+                            ? c.rewardOwner
+                            : {
+                                  addresses: owners[idx].addresses,
+                                  threshold: owners[idx].threshold,
+                                  locktime: new BN(owners[idx].locktime),
+                              },
+                    })
+                }
+
+                try {
+                    const treasuryRewards = await ava.PChain().getClaimables(owners)
+                    treasuryRewards.claimables.forEach((c, idx) => {
+                        if (!c.expiredDepositRewards.isZero()) pushReward(c, idx, false)
+                        if (!c.validatorRewards.isZero()) pushReward(c, idx, true)
+                    })
+                    if (!validatorFound) {
+                        const v = getters.getValidatorByRewardOwner(addresses) as ValidatorRaw
+                        if (v)
+                            pushReward(
+                                {
+                                    rewardOwner: {
+                                        addresses: v.rewardOwner.addresses,
+                                        threshold: parseInt(v.rewardOwner.threshold),
+                                        locktime: new BN(v.rewardOwner.locktime),
+                                    },
+                                    validatorRewards: ZeroBN,
+                                    expiredDepositRewards: ZeroBN,
+                                },
+                                -1,
+                                true
+                            )
+                    }
+                } catch (e: unknown) {
+                    console.log(e)
+                }
+            }
+            state.rewards = newRewards
         },
     },
     getters: {
-        validatorListEarn(state, getters): ValidatorListItem[] {
-            // Filter validators we do not need
-            let now = Date.now()
-
-            let validators = state.validators
-            validators = validators.filter((v) => {
-                let endTime = parseInt(v.endTime) * 1000
-                let dif = endTime - now
-
-                // If End time is less than 2 weeks + 1 hour, remove from list they are no use
-                let threshold = DAY_MS * 14 + 10 * MINUTE_MS
-                if (dif <= threshold) {
-                    return false
-                }
-
-                return true
-            })
-
-            let delegatorMap: ValidatorDelegatorDict = getters.nodeDelegatorMap
-            let delegatorPendingMap: ValidatorDelegatorPendingDict = getters.nodeDelegatorPendingMap
-
-            let res: ValidatorListItem[] = []
-
-            for (var i = 0; i < validators.length; i++) {
-                let v = validators[i]
-
-                let nodeID = v.nodeID
-
-                let delegators: DelegatorRaw[] = delegatorMap[nodeID] || []
-                let delegatorsPending: DelegatorPendingRaw[] = delegatorPendingMap[nodeID] || []
-
-                let delegatedAmt = new BN(0)
-                let delegatedPendingAmt = new BN(0)
-
-                if (delegators) {
-                    delegatedAmt = delegators.reduce((acc: BN, val: DelegatorRaw) => {
-                        return acc.add(new BN(val.stakeAmount))
-                    }, new BN(0))
-                }
-
-                if (delegatorsPending) {
-                    delegatedPendingAmt = delegatorsPending.reduce(
-                        (acc: BN, val: DelegatorPendingRaw) => {
-                            return acc.add(new BN(val.stakeAmount))
-                        },
-                        new BN(0)
-                    )
-                }
-
-                let startTime = new Date(parseInt(v.startTime) * 1000)
-                let endTime = new Date(parseInt(v.endTime) * 1000)
-
-                let delegatedStake = delegatedAmt.add(delegatedPendingAmt)
-                let validatorStake = new BN(v.stakeAmount)
-                // Calculate remaining stake
-                let absMaxStake = ONEAVAX.mul(new BN(3000000))
-                let relativeMaxStake = validatorStake.mul(new BN(5))
-                let stakeLimit = BN.min(absMaxStake, relativeMaxStake)
-
-                let remainingStake = stakeLimit.sub(validatorStake).sub(delegatedStake)
-
-                let listItem: ValidatorListItem = {
-                    nodeID: v.nodeID,
-                    validatorStake: validatorStake,
-                    delegatedStake: delegatedStake,
-                    remainingStake: remainingStake,
-                    numDelegators: delegators.length + delegatorsPending.length,
-                    startTime: startTime,
-                    endTime,
-                    uptime: parseFloat(v.uptime),
-                    fee: parseFloat(v.delegationFee),
-                }
-                res.push(listItem)
-            }
-
-            res = res.filter((v) => {
-                // Remove if remaining space is less than minimum
-                let min = state.minStakeDelegation
-                if (v.remainingStake.lt(min)) return false
-                return true
-            })
-
-            return res
+        // Return if a given nodeID is either current or pending validator
+        isValidator: (state) => (nodeID: string) => {
+            return (
+                state.validators.findIndex((v) => v.nodeID === nodeID) >= 0 ||
+                state.validatorsPending.findIndex((v) => v.nodeID === nodeID) >= 0
+            )
         },
-
-        // Maps delegators to a node id
-
-        nodeDelegatorMap(state): ValidatorDelegatorDict {
-            let res: ValidatorDelegatorDict = {}
-            let validators = state.validators
-            for (var i = 0; i < validators.length; i++) {
-                let validator = validators[i]
-                let nodeID = validator.nodeID
-                res[nodeID] = validator.delegators || []
-            }
-            return res
+        getValidatorByRewardOwner: (state) => (addresses: string[]): ValidatorRaw | undefined => {
+            return state.validators.find(
+                (v) => v.rewardOwner.addresses.findIndex((a) => addresses.includes(a)) >= 0
+            )
         },
-
-        nodeDelegatorPendingMap(state): ValidatorDelegatorPendingDict {
-            let res: ValidatorDelegatorPendingDict = {}
-            let delegators = state.delegatorsPending
-            for (var i = 0; i < delegators.length; i++) {
-                let delegator = delegators[i]
-                let nodeID = delegator.nodeID
-                let target = res[nodeID]
-
-                if (target) {
-                    res[nodeID].push(delegator)
-                } else {
-                    res[nodeID] = [delegator]
-                }
-            }
-            return res
+        depositOffers: (state) => (active: boolean) => {
+            const lockedFlag = new BN(1)
+            const expected = active ? ZeroBN : lockedFlag
+            return state.depositOffers.filter((v) => v.flags.and(lockedFlag).eq(expected))
         },
-
-        // Given a validator list item, calculate the max stake of this item
-        validatorMaxStake: (state, getters) => (validator: ValidatorListItem) => {
-            let stakeAmt = validator.validatorStake
-
-            // 5 times the validator's stake
-            let relativeMaxStake = stakeAmt.mul(new BN(5))
-
-            // absolute max stake
-            let mult = new BN(10).pow(new BN(6 + 9))
-            let absMaxStake = new BN(3).mul(mult)
-
-            if (relativeMaxStake.lt(absMaxStake)) {
-                return relativeMaxStake
-            } else {
-                return absMaxStake
-            }
+        depositOffer: (state) => (depositOfferID: string) => {
+            return state.depositOffers.find((v) => v.id === depositOfferID)
         },
-
-        // Returns total active and pending delegation amount for the given node id
-        // validatorTotalDelegated: (state, getters) => (nodeId: string) => {
-        //     // let validator: ValidatorRaw = getters.validatorsDict[nodeId];
-        //
-        //     let delegators: DelegatorRaw[]|undefined = getters.nodeDelegatorMap[nodeId];
-        //     let delegatorsPending: DelegatorPendingRaw[]|undefined = getters.nodeDelegatorPendingMap[nodeId];
-        //
-        //     // let stakeTotal = new BN(validator.stakeAmount);
-        //
-        //     let activeTotal = new BN(0);
-        //     let pendingTotal = new BN(0);
-        //
-        //     if(delegators){
-        //         activeTotal = delegators.reduce((acc: BN, val: DelegatorRaw) => {
-        //             let valBn = new BN(val.stakeAmount);
-        //             return acc.add(valBn);
-        //         }, new BN(0));
-        //     }
-        //
-        //     if(delegatorsPending){
-        //         pendingTotal = delegatorsPending.reduce((acc: BN, val: DelegatorPendingRaw) => {
-        //             let valBn = new BN(val.stakeAmount);
-        //             return acc.add(valBn);
-        //         }, new BN(0));
-        //     }
-        //
-        //     let totDel = activeTotal.add(pendingTotal);
-        //     return totDel;
-        // },
     },
 }
 

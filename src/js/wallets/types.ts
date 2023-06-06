@@ -21,7 +21,7 @@ import {
 } from '@c4tplatform/caminojs/dist/apis/evm'
 
 import { ITransaction } from '@/components/wallet/transfer/types'
-import { BN, Buffer } from '@c4tplatform/caminojs'
+import { BN, Buffer } from '@c4tplatform/caminojs/dist'
 import { PayloadBase } from '@c4tplatform/caminojs/dist/utils'
 import Erc20Token from '@/js/Erc20Token'
 
@@ -29,19 +29,26 @@ import { Transaction } from '@ethereumjs/tx'
 import MnemonicWallet from '@/js/wallets/MnemonicWallet'
 import { LedgerWallet } from '@/js/wallets/LedgerWallet'
 import { SingletonWallet } from '@/js/wallets/SingletonWallet'
-import { ExportChainsC, ExportChainsP, ExportChainsX } from '@c4tplatform/camino-wallet-sdk'
+import { MultisigWallet } from '@/js/wallets/MultisigWallet'
+import { ExportChainsC, ExportChainsP, ExportChainsX } from '@c4tplatform/camino-wallet-sdk/dist'
 import { UTXOSet as EVMUTXOSet } from '@c4tplatform/caminojs/dist/apis/evm/utxos'
+import { ChainIdType } from '@/constants'
 
 export interface IIndexKeyCache {
     [index: number]: AVMKeyPair
+}
+
+export interface INetwork {
+    name: string
 }
 
 export type ChainAlias = 'X' | 'P'
 export type AvmImportChainType = 'P' | 'C'
 export type AvmExportChainType = 'P' | 'C'
 
-export type WalletNameType = 'mnemonic' | 'ledger' | 'singleton'
-export type WalletType = MnemonicWallet | LedgerWallet | SingletonWallet
+export type WalletNameType = 'mnemonic' | 'ledger' | 'singleton' | 'multisig'
+export type HotWalletType = MnemonicWallet | SingletonWallet | MultisigWallet
+export type WalletType = MnemonicWallet | LedgerWallet | SingletonWallet | MultisigWallet
 
 interface IAddressManager {
     getCurrentAddressAvm(): string
@@ -73,13 +80,18 @@ export interface AvaWalletCore extends IAddressManager {
     ethBalance: BN
     isFetchUtxos: boolean // true if fetching utxos
     isInit: boolean // True once the wallet can be used (ex. when HD index is found)
-    onnetworkchange(): void
+    onNetworkChange(network: INetwork): void
     getUTXOs(): Promise<void>
     getUTXOSet(): UTXOSet
     getStake(): Promise<BN>
     getPlatformUTXOSet(): PlatformUTXOSet
     createNftFamily(name: string, symbol: string, groupNum: number): Promise<string>
-    mintNft(mintUtxo: AVMUTXO, payload: PayloadBase, quantity: number): Promise<string>
+    mintNft(
+        mintUtxo: AVMUTXO,
+        payload: PayloadBase,
+        quantity: number,
+        owners: string[]
+    ): Promise<string>
     getEthBalance(): Promise<BN>
     sendEth(to: string, amount: BN, gasPrice: BN, gasLimit: number): Promise<string>
     sendERC20(
@@ -112,7 +124,6 @@ export interface AvaWalletCore extends IAddressManager {
         rewardAddress?: string,
         utxos?: PlatformUTXO[]
     ): Promise<string>
-    // chainTransfer(amt: BN, sourceChain: ChainIdType, destinationChain: ChainIdType): Promise<string>
     exportFromXChain(amt: BN, destinationChain: ExportChainsX): Promise<string>
     exportFromPChain(amt: BN, destinationChain: ExportChainsP): Promise<string>
     exportFromCChain(amt: BN, destinationChain: ExportChainsC, baseFee: BN): Promise<string>
@@ -120,7 +131,12 @@ export interface AvaWalletCore extends IAddressManager {
     importToPlatformChain(sourceChain: ExportChainsP): Promise<string>
     importToXChain(sourceChain: ExportChainsX): Promise<string>
     importToCChain(sourceChain: ExportChainsC, baseFee: BN, utxoSet?: EVMUTXOSet): Promise<string>
-    issueBatchTx(orders: (AVMUTXO | ITransaction)[], addr: string, memo?: Buffer): Promise<string>
+    issueBatchTx(
+        chainId: ChainIdType,
+        orders: (AVMUTXO | ITransaction)[],
+        addr: string,
+        memo?: Buffer
+    ): Promise<string>
     signMessage(msg: string, address: string): Promise<string>
 }
 

@@ -3,8 +3,10 @@
     "password": "Password",
     "password_confirm": "Confirm Password",
     "private_key": "Private Key",
+    "multisig_alias": "Multisig Alias",
     "address": "Address",
     "add_pk": "Add Private Key",
+    "add_multisig_alias": "Add Multisig Alias",
     "home": {
         "header": "@.project:(0) Wallet",
         "desc": "@.project:(0) Wallet is a simple, secure, non-custodial wallet for storing @.project:(0) assets.",
@@ -57,10 +59,12 @@
         "password_error": "Invalid Password.",
         "submit": "Access Wallet",
         "mnemonic": {
-            "title": "Enter your MNEMONIC phrase\n",
-            "subtitle": "Hit ‘SPACE’ after every successful word entry.",
+            "title": "Enter your key phrase",
+            "subtitle": "Your key phrase consists of 24 words separated by an empty space",
             "cancel": "Cancel",
-            "error": "Invalid key phrase. Your phrase must be 24 words separated by a single space."
+            "error": "Invalid key phrase. Your phrase must be 24 words separated by a single space.",
+            "showKeyPhrase": "Show Key Phrase",
+            "hideKeyPhrase": "Hide Key Phrase"
         },
         "accounts_found": "Accounts found on your device"
     },
@@ -71,6 +75,7 @@
             "send": "Send",
             "export": "Cross Chain",
             "earn": "Earn",
+            "validator": "Validator",
             "studio": "Studio",
             "advanced": "Advanced",
             "activity": "Activity",
@@ -101,6 +106,27 @@
         "error_number": "Oops, looks like you forgot to fill number",
         "error_word": "The mnemonic phrase you entered for word not match the actual phrase."
     },
+    "wizard": {
+        "title": "Please fill out the form below.",
+        "subtitle": "This data will be used to create your purchase agreement.",
+        "send": "Send & Next",
+        "agree": "I agree that Chain4Travel and the Camino Network Foundation may use my data internally and for verification purposes with Chain4Travel’s partner Sumsub. *",
+        "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
+        "errors": {
+            "name": "Name must at least contain two and must not exceed 64 letters",
+            "surname": "Surname must at least contain two and must not exceed 64 letters",
+            "city": "City name must at least contain two and must not exceed 64 letters",
+            "email": "Please enter a correct email address",
+            "phone": "Please enter a correct phone number"
+        },
+        "success": {
+            "dear": "Dear",
+            "thank_you_note": "Thank you for enabling us to prepare your token agreement.",
+            "thank_you_note2": "Next, we will guide you through the verification process.",
+            "next": "Please have your id document at hand.",
+            "start": "Start Verification Process"
+        }
+    },
     "top": {
         "title1": "Derived @.project:(0) Wallet Address",
         "title2": "Balance",
@@ -120,6 +146,9 @@
             "hide": "Hide Breakdown",
             "available": "Available",
             "locked": "Locked",
+            "deposited": "Deposited",
+            "bonded": "Bonded",
+            "bonded_deposited": "Bonded & Deposited",
             "locked_stake": "Locked Stakeable",
             "stake": "Staking",
             "collectibles": "Collectibles"
@@ -129,14 +158,16 @@
             "title_x": "Derived Wallet Address",
             "title_p": "Derived Platform Wallet Address",
             "title_c": "Derived EVM Wallet Address",
-            "desc_x_1": "This is your X-Chain address to receive funds.",
-            "desc_x_2": "Your address will change after every deposit. You can keep using previous addresses.",
+            "desc_x": "This is your X-Chain address to receive funds and cross chain transfers.",
             "desc_p": "This is your P-Chain address to receive staking rewards and cross chain transfers.",
             "desc_c": "This is your C-Chain address. Use it to interact with the ethereum virtual machine."
         }
     },
     "transfer": {
         "title": "Send",
+        "transfer": "Transfer",
+        "receivers": "Receivers and Amounts",
+        "airdrop": "Airdrop",
         "no_cash": "You must have an asset in your wallet to issue a transaction.",
         "faucet": "Have you checked our faucet?",
         "to": "To Address",
@@ -208,27 +239,6 @@
         "info_explanation_p1": "We need your email address and phone number to follow up with you in case your verification requires clarification and to inform you about the verification result.",
         "info_explanation_p2": "Please enter your contact details below."
     },
-    "wizard": {
-        "title": "Please fill out the form below.",
-        "subtitle": "This data will be used to create your purchase agreement.",
-        "send": "Send & Next",
-        "agree": "I agree that Chain4Travel and the Camino Network Foundation may use my data internally and for verification purposes with Chain4Travel’s partner Sumsub. *",
-        "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
-        "errors": {
-            "name": "Name must at least contain two and must not exceed 64 letters",
-            "surname": "Surname must at least contain two and must not exceed 64 letters",
-            "city": "City name must at least contain two and must not exceed 64 letters",
-            "email": "Please enter a correct email address",
-            "phone": "Please enter a correct phone number"
-        },
-        "success": {
-            "dear": "Dear",
-            "thank_you_note": "Thank you for enabling us to prepare your token agreement.",
-            "thank_you_note2": "Next, we will guide you through the verification process.",
-            "next": "Please have your id document at hand.",
-            "start": "Start Verification Process"
-        }
-    },
     "studio": {
         "title": "Studio",
         "desc": "Create and manage assets.",
@@ -285,6 +295,7 @@
             },
             "form_col": {
                 "label1": "Quantity",
+                "label2": "Owners (optional)",
                 "fee": "Fee",
                 "submit": "Mint"
             },
@@ -322,6 +333,7 @@
         "button2": "IMPORT KEYS",
         "button3": "EXPORT KEYS",
         "subtitle": "Active Key",
+        "del_check": "Are you sure you want to delete this key?",
         "save_account": {
             "title": "Save Account",
             "desc": "Encode your wallet with a password and store securely on this browser.",
@@ -354,19 +366,22 @@
         "import_mnemonic_duplicate_err": "This mnemonic has already been added to this wallet.",
         "import_mnemonic_err": "Invalid key phrase.",
         "tooltip": "This key will be forgotten when you refresh the browser.",
-        "view_priv_key": "View Private Key",
-        "view_priv_key_c": "View C Chain Private Key",
-        "view_key": "View Key Phrase",
+        "edit_wallet_name_tooltip": "Edit wallet name",
+        "keys_info": "Key Info",
+        "static_keys_info": "Static Key Info",
+        "view_key": "Key Phrase",
         "export_key": "Export Key",
         "hd_addresses": "HD Addresses",
         "remove_key": "Remove Key",
+        "remove_key_disabled": "Cannot remove key that is an owner of imported multisig wallet",
         "active_wallet": "Active Key",
         "activate_key": "Activate Key",
         "remove_success_title": "Key Removed",
         "remove_success_msg": "Private key and assets removed from the wallet.",
         "password_validation": "Password must be at least 9 characters long.",
         "password_validation2": "Password do not match.",
-        "account_name_required": "Account Name Required."
+        "account_name_required": "Account Name Required.",
+        "view_multisig_owners": "Owners"
     },
     "portfolio": {
         "assets": "Assets",
@@ -393,12 +408,13 @@
     "earn": {
         "title": "Earn",
         "desc": "You can earn more @.native:(0) by staking your existing tokens.",
-        "subtitle1": "Validate",
+        "subtitle1": "Setting up a Validator Node",
         "subtitle2": "Delegate",
         "subtitle3": "Cross Chain Transfer",
         "subtitle4": "Estimated Rewards",
         "warning_1": "You must have at least {0} @.native:(0) on the P chain to become a validator.",
         "warning_2": "You must have at least {0} @.native:(0) on the P chain to become a delegator.",
+        "warning_3": "Setting up a validator node is not possible for your selected network. Please change your network to start running a validator node.",
         "validate_card": {
             "title": "Validate",
             "desc": "You have an @.project:(0) node that you want to stake with.",
@@ -445,7 +461,42 @@
             "total": "Total Rewards",
             "validation": "Validation",
             "delegation": "Delegation",
-            "empty": "You do not have any pending rewards.",
+            "empty": "No pending rewards found.",
+            "earn_now": {
+                "title": "Saving Pools"
+            },
+            "offer": {
+                "title": "Active Saving Pools",
+                "reward": "Reward",
+                "pool_size": "Pool Size",
+                "pool_start": "Pool Start",
+                "pool_end": "Pool End",
+                "min_deposit": "Minimum Deposit",
+                "min_duration": "Minimum Duration",
+                "max_duration": "Maximum Duration",
+                "unlock_duration": "Unlock Duration",
+                "no_reward_duration": "NoReward Duration",
+                "balance": "Available for Deposit",
+                "deposit": "Deposit Now"
+            },
+            "active_earning": {
+                "title": "Rewards",
+                "deposit_start": "Deposit Start",
+                "deposit_end": "Deposit End",
+                "deposit_amount": "Deposit Amount",
+                "deposited_amount": "Deposited Amount",
+                "pending_reward": "Pending Reward",
+                "already_claimed": "Already Claimed",
+                "claim": "Claim Reward"
+            },
+            "claim_modal": {
+                "are_you_sure": "Are you sure you want to claim {amount} {symbol} rewards?",
+                "note_message": "Transaction fee: {fee} {symbol}",
+                "confirmation_message": "{amount} {symbol} have been claimed.",
+                "confirm": "Confirm",
+                "cancel": "Cancel"
+            },
+            "no_saving_pool": "No saving pools available",
             "row": {
                 "start": "Start",
                 "end": "End",
@@ -469,16 +520,20 @@
             }
         },
         "validate": {
-            "label_1": "Node ID",
+            "requirements_introduction": "In order to set up your validator node you have to:",
+            "nodeId": "Node ID",
+            "label_1": "Validator Node's Private Key",
+            "description_1": "Node Private Key",
+            "label_3": "P-Chain address your validator node will be assigned to",
             "duration": {
-                "label": "Staking End Date",
+                "label": "Validation End Date",
                 "desc": "Your @.native:(0) tokens will be locked until this date.",
                 "start": "Start Date & Time",
                 "end": "End Date & Time"
             },
             "amount": {
-                "label": "Stake Amount",
-                "desc": "The amount of @.native:(0) to lock for staking."
+                "label": "Bonded Amount",
+                "desc": "Bonded amount is always {0} @.native:(0)."
             },
             "fee": {
                 "label": "Delegation Fee",
@@ -493,7 +548,7 @@
             "summary": {
                 "max_del": "Max Delegation Amount",
                 "max_del_tooltip": "Maximum amount that can be delegated to this validator.",
-                "duration": "Staking Duration",
+                "duration": "Duration",
                 "rewards": "Estimated Rewards",
                 "warn": "If it is your first time staking, start small. Staked tokens are locked until the end of the staking period."
             },
@@ -508,6 +563,7 @@
                 "type_local": "This wallet",
                 "type_custom": "Custom"
             },
+            "register_validator_node": "Register Validator Node",
             "confirm": "Confirm",
             "submit": "Submit",
             "cancel": "Cancel",
@@ -517,13 +573,21 @@
                 "status": "Status",
                 "reason": "Reason"
             },
+            "warns": {
+                "camino_available": "{0} @.native:(0) are available on your P-chain address",
+                "kyc_verified": "KYC or KYB verified",
+                "consortium_member_verified": "Accepted to be a member of the consortium",
+                "consortium_member_address_linked_to_node": "Your consortium member address is linked to your Node ID"
+            },
             "errs": {
                 "duration_warn": "WARNING: You must have at least 14 days remaining on your validation period to accept delegations.",
                 "date": "Start date must be in the future and end date must be after start date.",
                 "amount": "Stake amount must be at least {0} @.native:(0)",
                 "id": "Invalid Node ID.",
                 "fee": "Delegation fee must be at least {0}%",
-                "address": "Invalid address. Reward address must be a valid P chain address."
+                "address": "Invalid address. Reward address must be a valid P chain address.",
+                "validating": "Your registered node: {nodeID} is already validating.",
+                "suspended": "Your registered node: {nodeID} is suspended."
             }
         },
         "delegate": {
@@ -656,7 +720,7 @@
         "mode1": "All",
         "mode2": "Transfer",
         "mode3": "Export & Import",
-        "mode4": "Validation & Delegation",
+        "mode4": "Validation",
         "found": "{0} transactions found",
         "months": {
             "0": "January",
@@ -671,6 +735,9 @@
             "9": "October",
             "10": "November",
             "11": "December"
+        },
+        "multisig": {
+            "title": "Multisig Transaction"
         }
     },
     "launch": {
@@ -702,7 +769,8 @@
         "date_reward": "Reward Date",
         "reward_amount": "Reward Received",
         "fee_amount": "Fee Received",
-        "reward_pending": "Reward Pending"
+        "reward_pending": "Reward Pending",
+        "multisig": "Pending Multisig Transaction"
     },
     "modal": {
         "qr": {
@@ -725,7 +793,12 @@
         "mnemonic": {
             "title": "Key Phrase"
         },
+        "multisig": {
+            "title": "Multisignature owners",
+            "subtitle": "{n}, Threshold: {t}"
+        },
         "priv_key": {
+            "info": "Key Info",
             "title": "Private Key"
         },
         "activateWallet": {
