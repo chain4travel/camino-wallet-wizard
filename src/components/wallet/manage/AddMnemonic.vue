@@ -1,6 +1,14 @@
 <template>
     <div class="add_mnemonic">
-        <textarea v-model="phrase" placeholder="web  jar  rack  cereal  inherit ...."></textarea>
+        <div class="m_input">
+            <QrReader @change="onChange" v-model="phrase" class="qrIn">
+                <fa icon="camera"></fa>
+            </QrReader>
+            <textarea
+                v-model="phrase"
+                placeholder="web  jar  rack  cereal  inherit ...."
+            ></textarea>
+        </div>
         <p class="err">{{ err }}</p>
         <v-btn
             :disabled="!canSubmit"
@@ -15,14 +23,25 @@
     </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 import * as bip39 from 'bip39'
+// @ts-ignore
+import { QrReader } from '@c4tplatform/vue_components'
 
-@Component
+@Component({
+    components: {
+        QrReader,
+    },
+})
 export default class AddMnemonic extends Vue {
     phrase: string = ''
     err: string = ''
     isLoading: boolean = false
+
+    onChange(val: string) {
+        this.phrase = val
+        this.errCheck
+    }
 
     errCheck() {
         let phrase = this.phrase.trim()
@@ -61,10 +80,10 @@ export default class AddMnemonic extends Vue {
 
         setTimeout(async () => {
             try {
-                await this.$store.dispatch('addWalletMnemonic', phrase)
+                await this.$store.dispatch('addWalletMnemonic', { key: phrase })
                 this.isLoading = false
                 this.handleImportSuccess()
-            } catch (e) {
+            } catch (e: any) {
                 this.isLoading = false
                 if (e.message.includes('already')) {
                     this.err = this.$t('keys.import_mnemonic_duplicate_err') as string
@@ -92,20 +111,32 @@ export default class AddMnemonic extends Vue {
     }
 }
 </script>
+<style lang="scss">
+.buts {
+    display: flex;
+    align-items: center;
+}
+</style>
+
 <style scoped lang="scss">
 .add_mnemonic {
     /*background-color: #e7e7ea;*/
     padding: 14px 0;
 }
 
+.m_input {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 24px auto;
+}
+
 textarea {
     padding: 12px;
     font-size: 0.8rem;
-    background-color: var(--bg-wallet);
+    background-color: var(--bg-light);
     resize: none;
     width: 100%;
     height: 120px;
-    margin-top: 14px;
 }
 
 .but_submit {

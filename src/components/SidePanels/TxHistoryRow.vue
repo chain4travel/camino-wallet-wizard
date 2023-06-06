@@ -4,7 +4,7 @@
             <p class="time">
                 {{ timeText }}
                 <a
-                    v-if="explorerUrl"
+                    v-if="explorerUrl && !multisigTx"
                     :href="explorerUrl"
                     target="_blank"
                     tooltip="View in Explorer"
@@ -13,6 +13,18 @@
                     <fa icon="search"></fa>
                 </a>
             </p>
+            <div v-if="!multisigTx" class="txid">
+                <span class="mr-1">Tx:</span>
+                <ellipsis
+                    title="Transaction ID"
+                    :text="transaction.id"
+                    :copy="Number(1)"
+                ></ellipsis>
+            </div>
+            <router-link v-if="multisigTx !== undefined" :to="multisigTx" class="msig">
+                {{ $t('transactions.multisig') }}
+                <span><fa icon="arrow-right"></fa></span>
+            </router-link>
             <div v-if="memo" class="memo">
                 <p>Memo</p>
                 <p>{{ memo }}</p>
@@ -26,20 +38,20 @@ import 'reflect-metadata'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 import moment from 'moment'
-// import TxHistoryValue from '@/components/SidePanels/TxHistoryValue.vue'
 import TxHistoryNftFamilyGroup from '@/components/SidePanels/TxHistoryNftFamilyGroup.vue'
 import { Chain, ITransactionData } from '@/store/modules/history/types'
 import { AvaNetwork } from '@/js/AvaNetwork'
 import ImportExport from '@/components/SidePanels/History/ViewTypes/ImportExport.vue'
 import BaseTx from '@/components/SidePanels/History/ViewTypes/BaseTx.vue'
 import StakingTx from '@/components/SidePanels/History/ViewTypes/StakingTx.vue'
+import RegisterNodeTx from '@/components/SidePanels/History/ViewTypes/RegisterNodeTx.vue'
 import getMemoFromByteString from '@/services/history/utils'
+import Ellipsis from '@/components/misc/Ellipsis.vue'
 
 @Component({
     components: {
-        // TxHistoryValue,
+        Ellipsis,
         TxHistoryNftFamilyGroup,
-        // TxHistoryValueFunctional,
     },
 })
 export default class TxHistoryRow extends Vue {
@@ -49,9 +61,10 @@ export default class TxHistoryRow extends Vue {
         let network: AvaNetwork = this.$store.state.Network.selectedNetwork
         if (network.explorerSiteUrl) {
             let chains = this.$store.state.History.chains
-            let alias = chains.find((elem: Chain) => elem.chainID === this.transaction.chainID)
-                .chainAlias
-            let url = `${network.explorerSiteUrl}/${alias}-chain/transactions/${this.transaction.id}`
+            let alias = chains
+                .find((elem: Chain) => elem.chainID === this.transaction.chainID)
+                .chainAlias.toLowerCase()
+            let url = `${network.explorerSiteUrl}/${alias}-chain/tx/${this.transaction.id}`
             return url
         }
         return null
@@ -90,14 +103,33 @@ export default class TxHistoryRow extends Vue {
             case 'add_delegator':
             case 'add_validator':
                 return StakingTx
+            case 'register_node':
+                return RegisterNodeTx
             default:
                 return BaseTx
         }
     }
+
+    get multisigTx(): Object | undefined {
+        return this.transaction.multisigStatus !== undefined
+            ? { path: '/wallet/activity', query: { multisigTx: this.transaction.id } }
+            : undefined
+    }
 }
 </script>
+<style lang="scss">
+.eps_copy {
+    color: var(--primary-color);
+    opacity: 0.4;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+</style>
+
 <style scoped lang="scss">
-@use '../../styles/main';
+@use '../../styles/abstracts/mixins';
 
 .icons {
     justify-self: center;
@@ -110,18 +142,27 @@ export default class TxHistoryRow extends Vue {
 
 .tx_history_row {
     padding: 10px 0px;
-    /*padding-right: 0;*/
-    /*display: grid;*/
-    /*grid-template-columns: 40px 1fr;*/
 
     > div {
         align-self: center;
         overflow: auto;
+        margin-bottom: 4px;
+    }
+}
+
+.msig {
+    font-size: 12px;
+    color: var(--warning);
+    display: block;
+
+    span {
+        font-size: 14px;
+        float: right;
     }
 }
 
 .explorer_link {
-    color: var(--primary-color-light);
+    color: var(--primary-color);
 }
 
 .time {
@@ -129,11 +170,11 @@ export default class TxHistoryRow extends Vue {
 
     a {
         float: right;
-        opacity: 0.4;
-        font-size: 12px;
+        opacity: 0.6;
+        font-size: 14px;
 
         &:hover {
-            opacity: 0.8;
+            opacity: 0.9;
         }
     }
 }
@@ -152,7 +193,7 @@ export default class TxHistoryRow extends Vue {
     overflow-wrap: break-word;
     word-break: break-word;
     font-size: 12px;
-    color: main.$primary-color-light;
+    color: var(--primary-color-light);
     display: grid;
     grid-template-columns: max-content 1fr;
     column-gap: 12px;
@@ -161,6 +202,13 @@ export default class TxHistoryRow extends Vue {
     p:last-of-type {
         text-align: right;
     }
+}
+
+.txid {
+    display: flex;
+    flex-direction: row;
+    font-size: 12px;
+    color: var(--primary-color-light);
 }
 
 .rewarded {
@@ -182,7 +230,7 @@ export default class TxHistoryRow extends Vue {
     }
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     .icons {
         justify-self: left;
         img {

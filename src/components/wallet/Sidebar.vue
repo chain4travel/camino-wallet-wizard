@@ -25,11 +25,20 @@
                     <v-icon>mdi-hand-coin-outline</v-icon>
                     {{ $t('wallet.sidebar.earn') }}
                 </router-link>
+                <router-link to="/wallet/validator" data-cy="wallet_validator" class="wallet_link">
+                    <v-icon>mdi-check-network-outline</v-icon>
+                    <!-- {{ $t('wallet.sidebar.earn') }} -->
+                    Validator
+                </router-link>
                 <router-link to="/wallet/studio" data-cy="wallet_studio" class="wallet_link">
                     <v-icon>mdi-file-table-box-multiple-outline</v-icon>
                     {{ $t('wallet.sidebar.studio') }}
                 </router-link>
-                <router-link to="/wallet/activity" data-cy="wallet_activity" class="wallet_link">
+                <router-link
+                    to="/wallet/activity"
+                    data-cy="wallet_activity"
+                    class="wallet_link wallet_active"
+                >
                     <v-icon>mdi-update</v-icon>
                     {{ $t('wallet.sidebar.activity') }}
                 </router-link>

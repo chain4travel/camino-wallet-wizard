@@ -1,5 +1,10 @@
 <template>
-    <v-checkbox :label="explain" v-model="value" @change="change" class="checkbox"></v-checkbox>
+    <v-checkbox
+        :label="explain"
+        v-model="localValue"
+        @change="change"
+        class="checkbox"
+    ></v-checkbox>
 </template>
 <script>
 export default {
@@ -15,20 +20,25 @@ export default {
             default: false,
         },
     },
+    data() {
+        return {
+            localValue: this.value,
+        }
+    },
     model: {
         prop: 'value',
         event: 'change',
     },
     methods: {
         change() {
-            this.$emit('change', this.value)
+            this.$emit('change', this.localValue)
         },
     },
 }
 </script>
 
 <style lang="scss">
-@use "../../styles/main";
+@use '../../styles/main';
 
 .checkbox {
     .v-input__slot {

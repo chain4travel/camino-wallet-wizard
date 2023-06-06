@@ -8,13 +8,11 @@ import { Datetime } from 'vue-datetime'
 import 'vue-datetime/dist/vue-datetime.css'
 import vuetify from './plugins/vuetify'
 import i18n from './plugins/i18n'
-//@ts-ignore
+// @ts-ignores
 import vueCountryRegionSelect from 'vue-country-region-select'
-import './index.css'
-
 Vue.use(VueMeta)
 Vue.use(BootstrapVue)
-Vue.component('datetime', Datetime)
+Vue.component('DateTime', Datetime)
 Vue.use(vueCountryRegionSelect)
 Vue.config.productionTip = false
 
@@ -26,7 +24,8 @@ const app = new Vue({
     render: (h) => h(App),
     created: () => {
         store.commit('Accounts/loadAccounts')
-        if (store.getters['Accounts/hasAccounts'] > 0) router.replace('/access')
+        if (store.getters['Accounts/hasAccounts'] > 0 && router.currentRoute.path !== '/access')
+            router.replace('/access')
     },
     mounted() {
         // Reveal app version
@@ -36,6 +35,9 @@ const app = new Vue({
         if (loader) {
             loader.style.display = 'none'
         }
+    },
+    components: {
+        App,
     },
     data: {
         theme: 'day',
@@ -64,7 +66,7 @@ Big.prototype.toLocaleString = function (toFixed: number = 9) {
 
     let fixedStr = this.toFixed(toFixed)
     let split = fixedStr.split('.')
-    let wholeStr = parseInt(split[0]).toLocaleString('en-US')
+    let wholeStr = parseInt(split[0]).toLocaleString('fi-FI')
 
     if (split.length === 1) {
         return wholeStr

@@ -1,38 +1,45 @@
+import * as bip39 from 'bip39'
+import HDKey from 'hdkey'
+import { privateToAddress } from '@ethereumjs/util'
+import { Transaction } from '@ethereumjs/tx'
+
 import { ava, bintools } from '@/AVA'
+import { ChainIdType } from '@/constants'
 import { ITransaction } from '@/components/wallet/transfer/types'
 import { digestMessage } from '@/helpers/helper'
 import { WalletNameType } from '@/js/wallets/types'
-
-import { Buffer as BufferAvalanche, BN } from '@c4tplatform/caminojs'
-import {
-    KeyPair as AVMKeyPair,
-    KeyChain as AVMKeyChain,
-    UTXOSet as AVMUTXOSet,
-    UTXO,
-} from '@c4tplatform/caminojs/dist/apis/avm'
-import {
-    KeyPair as PlatformKeyPair,
-    KeyChain as PlatformKeyChain,
-    UTXOSet as PlatformUTXOSet,
-} from '@c4tplatform/caminojs/dist/apis/platformvm'
-import { KeyChain, KeyChain as EVMKeyChain } from '@c4tplatform/caminojs/dist/apis/evm'
-import { PayloadBase } from '@c4tplatform/caminojs/dist/utils'
 import { buildUnsignedTransaction } from '../TxHelper'
 import { AvaWalletCore, UnsafeWallet } from './types'
-import { UTXO as PlatformUTXO } from '@c4tplatform/caminojs/dist/apis/platformvm/utxos'
-import { privateToAddress } from 'ethereumjs-util'
-import { Tx as AVMTx, UnsignedTx as AVMUnsignedTx } from '@c4tplatform/caminojs/dist/apis/avm/tx'
-import {
-    Tx as PlatformTx,
-    UnsignedTx as PlatformUnsignedTx,
-} from '@c4tplatform/caminojs/dist/apis/platformvm/tx'
-import { Tx as EvmTx, UnsignedTx as EVMUnsignedTx } from '@c4tplatform/caminojs/dist/apis/evm/tx'
+import MnemonicPhrase from './MnemonicPhrase'
 import Erc20Token from '@/js/Erc20Token'
 import { WalletCore } from '@/js/wallets/WalletCore'
 import { WalletHelper } from '@/helpers/wallet_helper'
 import { avmGetAllUTXOs, platformGetAllUTXOs } from '@/helpers/utxo_helper'
-import { UTXO as AVMUTXO } from '@c4tplatform/caminojs/dist/apis/avm/utxos'
-import { Transaction } from '@ethereumjs/tx'
+
+import { Buffer as BufferAvalanche, BN } from '@c4tplatform/caminojs/dist'
+import { PayloadBase } from '@c4tplatform/caminojs/dist/utils'
+import {
+    Tx as AVMTx,
+    UnsignedTx as AVMUnsignedTx,
+    UTXO as AVMUTXO,
+    KeyPair as AVMKeyPair,
+    KeyChain as AVMKeyChain,
+    UTXOSet as AVMUTXOSet,
+} from '@c4tplatform/caminojs/dist/apis/avm'
+import {
+    KeyPair as PlatformKeyPair,
+    KeyChain as PlatformKeyChain,
+    Tx as PlatformTx,
+    UnsignedTx as PlatformUnsignedTx,
+    UTXO as PlatformUTXO,
+    UTXOSet as PlatformUTXOSet,
+} from '@c4tplatform/caminojs/dist/apis/platformvm'
+import {
+    KeyChain as EVMKeyChain,
+    Tx as EvmTx,
+    UnsignedTx as EVMUnsignedTx,
+} from '@c4tplatform/caminojs/dist/apis/evm'
+import { SECP256k1KeyPair } from '@c4tplatform/caminojs/dist/common'
 
 class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet {
     keyChain: AVMKeyChain
@@ -45,6 +52,8 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
     chainIdP: string
 
     key: string
+    seed: string = ''
+    private mnemonic?: MnemonicPhrase
 
     stakeAmount: BN
 
@@ -57,11 +66,23 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
     ethAddressBech: string
     ethBalance: BN
 
-    constructor(pk: string) {
+    constructor(pk: string, mnemonic?: string, seedStr?: string) {
         super()
+        this.name = 'Singleton Wallet'
+
+        if (mnemonic) {
+            const seed: globalThis.Buffer = seedStr
+                ? Buffer.from(seedStr, 'hex')
+                : bip39.mnemonicToSeedSync(mnemonic)
+            this.seed = seed.toString('hex')
+            this.mnemonic = new MnemonicPhrase(mnemonic)
+
+            const masterHdKey: HDKey = HDKey.fromMasterSeed(seed)
+            const pkBuf = masterHdKey.derive("m/44'/60'/0'/0/0").privateKey
+            pk = `PrivateKey-` + bintools.cb58Encode(BufferAvalanche.from(pkBuf))
+        }
 
         this.key = pk
-
         this.chainId = ava.XChain().getBlockchainAlias() || ava.XChain().getBlockchainID()
         this.chainIdP = ava.PChain().getBlockchainAlias() || ava.PChain().getBlockchainID()
 
@@ -86,7 +107,7 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
 
         let cPrivKey = `PrivateKey-` + bintools.cb58Encode(BufferAvalanche.from(pkBuf))
         this.ethKeyBech = cPrivKey
-        let cKeyChain = new KeyChain(ava.getHRP(), 'C')
+        let cKeyChain = new EVMKeyChain(ava.getHRP(), 'C')
         this.ethKeyChain = cKeyChain
 
         let cKeypair = cKeyChain.importKey(cPrivKey)
@@ -94,6 +115,22 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
 
         this.type = 'singleton'
         this.isInit = true
+    }
+
+    getSeed(): string {
+        return this.seed
+    }
+
+    getMnemonic(): string {
+        return this.mnemonic?.getValue() ?? ''
+    }
+
+    getMnemonicEncrypted(): MnemonicPhrase {
+        return this.mnemonic || new MnemonicPhrase('')
+    }
+
+    getStaticKeyPair(): SECP256k1KeyPair | undefined {
+        return this.keyPair
     }
 
     getChangeAddressAvm(): string {
@@ -193,7 +230,7 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
     }
 
     async buildUnsignedTransaction(
-        orders: (ITransaction | UTXO)[],
+        orders: (ITransaction | AVMUTXO)[],
         addr: string,
         memo?: BufferAvalanche
     ) {
@@ -212,18 +249,19 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
     }
 
     async issueBatchTx(
+        chainId: ChainIdType,
         orders: (ITransaction | AVMUTXO)[],
         addr: string,
         memo: BufferAvalanche | undefined
     ): Promise<string> {
-        return await WalletHelper.issueBatchTx(this, orders, addr, memo)
+        return await WalletHelper.issueBatchTx(this, chainId, orders, addr, memo)
     }
 
     getFirstAvailableAddressPlatform(): string {
         return this.getCurrentAddressPlatform()
     }
 
-    onnetworkchange(): void {
+    onNetworkChange(): void {
         let hrp = ava.getHRP()
 
         this.keyChain = new AVMKeyChain(hrp, this.chainId)
@@ -239,8 +277,6 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
         let cKeypair = this.ethKeyChain.importKey(this.ethKeyBech)
         this.ethAddressBech = cKeypair.getAddressString()
         this.ethBalance = new BN(0)
-
-        this.getUTXOs()
     }
 
     async signX(unsignedTx: AVMUnsignedTx): Promise<AVMTx> {
@@ -250,8 +286,14 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
         return tx
     }
 
-    async signP(unsignedTx: PlatformUnsignedTx): Promise<PlatformTx> {
+    async signP(unsignedTx: PlatformUnsignedTx, additionalSigners?: string[]): Promise<PlatformTx> {
         let keychain = this.platformKeyChain
+
+        if (additionalSigners?.length) {
+            keychain = keychain.clone()
+            additionalSigners.forEach((k) => keychain.importKey(k))
+        }
+
         const tx = unsignedTx.sign(keychain)
         return tx
     }
@@ -312,8 +354,8 @@ class SingletonWallet extends WalletCore implements AvaWalletCore, UnsafeWallet 
         return await WalletHelper.createNftFamily(this, name, symbol, groupNum)
     }
 
-    async mintNft(mintUtxo: AVMUTXO, payload: PayloadBase, quantity: number) {
-        return await WalletHelper.mintNft(this, mintUtxo, payload, quantity)
+    async mintNft(mintUtxo: AVMUTXO, payload: PayloadBase, quantity: number, owners: string[]) {
+        return await WalletHelper.mintNft(this, mintUtxo, payload, quantity, owners)
     }
 
     async sendEth(to: string, amount: BN, gasPrice: BN, gasLimit: number) {

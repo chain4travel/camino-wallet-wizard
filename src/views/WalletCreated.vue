@@ -25,7 +25,7 @@ export default class WalletCreated extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use "../styles/main";
+@use '../styles/main';
 
 .success_body {
     display: flex;

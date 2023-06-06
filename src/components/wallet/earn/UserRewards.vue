@@ -1,141 +1,81 @@
 <template>
-    <div v-if="totLength > 0" class="user_rewards">
-        <div>
-            <label>{{ $t('earn.rewards.total') }}</label>
-            <p class="amt">{{ totalRewardBig.toLocaleString(9) }} {{ nativeAssetSymbol }}</p>
+    <div v-if="hasRewards">
+        <div class="claimables">
+            <ClaimableRewardCard
+                v-for="(v, i) in platformRewards.treasuryRewards"
+                :key="'c' + i"
+                :reward="v"
+            ></ClaimableRewardCard>
         </div>
-        <div v-if="validators.length > 0">
-            <h3>{{ $t('earn.rewards.validation') }}</h3>
-            <UserRewardRow
-                v-for="(v, i) in validators"
-                :key="i"
-                :staker="v"
-                class="reward_row"
-            ></UserRewardRow>
-        </div>
-        <div v-if="delegators.length > 0">
-            <h3>{{ $t('earn.rewards.delegation') }}</h3>
-            <UserRewardRow
-                v-for="(d, i) in delegators"
-                :key="i"
-                :staker="d"
-                class="reward_row"
-            ></UserRewardRow>
+        <div class="user_offers">
+            <DepositRewardCard
+                v-for="(v, i) in platformRewards.depositRewards"
+                :key="'u' + i"
+                :reward="v"
+                class="reward_card"
+            ></DepositRewardCard>
         </div>
     </div>
-    <div v-else class="empty">
-        <p>{{ $t('earn.rewards.empty') }}</p>
-    </div>
+    <div v-else class="empty">No Active Earning</div>
 </template>
 <script lang="ts">
 import 'reflect-metadata'
-import { Vue, Component } from 'vue-property-decorator'
-import { AvaWalletCore } from '../../../js/wallets/types'
-import { DelegatorRaw, ValidatorRaw } from '@/components/misc/ValidatorList/types'
-import UserRewardRow from '@/components/wallet/earn/UserRewardRow.vue'
-import { bnToBig } from '@/helpers/helper'
-import Big from 'big.js'
-import { BN } from '@c4tplatform/caminojs'
+import { Component, Vue } from 'vue-property-decorator'
+
+import ClaimableRewardCard from '@/components/wallet/earn/ClaimableRewardCard.vue'
+import DepositRewardCard from '@/components/wallet/earn/DepositRewardCard.vue'
+import { PlatformRewards } from '@/store/modules/platform/types'
 
 @Component({
     components: {
-        UserRewardRow,
+        ClaimableRewardCard,
+        DepositRewardCard,
     },
 })
 export default class UserRewards extends Vue {
-    get userAddresses() {
-        let wallet: AvaWalletCore = this.$store.state.activeWallet
-        if (!wallet) return []
-
-        return wallet.getAllAddressesP()
+    get platformRewards(): PlatformRewards {
+        return this.$store.state.Platform.rewards
     }
 
-    get validators(): ValidatorRaw[] {
-        let validators: ValidatorRaw[] = this.$store.state.Platform.validators
-
-        return this.cleanList(validators) as ValidatorRaw[]
-    }
-
-    get delegators(): DelegatorRaw[] {
-        let delegators: DelegatorRaw[] = []
-        let validators: ValidatorRaw[] = this.$store.state.Platform.validators
-
-        for (var i = 0; i < validators.length; i++) {
-            let v = validators[i]
-            if (v.delegators === null) continue
-            delegators.push(...v.delegators)
-        }
-
-        return this.cleanList(delegators) as DelegatorRaw[]
-    }
-
-    get totLength() {
-        return this.validators.length + this.delegators.length
-    }
-
-    get totalReward() {
-        let vals = this.validators.reduce((acc, val: ValidatorRaw) => {
-            return acc.add(new BN(val.potentialReward))
-        }, new BN(0))
-
-        let dels = this.delegators.reduce((acc, val: DelegatorRaw) => {
-            return acc.add(new BN(val.potentialReward))
-        }, new BN(0))
-
-        return vals.add(dels)
-    }
-
-    get totalRewardBig(): Big {
-        return bnToBig(this.totalReward, 9)
+    get hasRewards(): boolean {
+        return (
+            this.platformRewards.depositRewards.length > 0 ||
+            this.platformRewards.treasuryRewards.length > 0
+        )
     }
 
     get nativeAssetSymbol(): string {
         return this.$store.getters['Assets/AssetAVA']?.symbol ?? ''
     }
-
-    cleanList(list: ValidatorRaw[] | DelegatorRaw[]) {
-        let res = list.filter((val) => {
-            let rewardAddrs = val.rewardOwner.addresses
-            let filtered = rewardAddrs.filter((addr) => {
-                return this.userAddresses.includes(addr)
-            })
-            return filtered.length > 0
-        })
-
-        res.sort((a, b) => {
-            let startA = parseInt(a.startTime)
-            let startB = parseInt(b.startTime)
-            return startA - startB
-        })
-        return res
-    }
 }
 </script>
 <style scoped lang="scss">
-.user_rewards {
-    padding-bottom: 5vh;
+@use '../../../styles/abstracts/mixins';
+.user_offers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: auto;
+    grid-gap: 1rem;
 }
 
-.reward_row {
-    margin-bottom: 12px;
+.claimables {
+    margin-bottom: 10px;
 }
 
-h3 {
-    margin: 12px 0;
-    margin-top: 32px;
-    font-size: 2em;
-    color: var(--primary-color-light);
-    font-weight: lighter;
+@include mixins.medium-device {
+    .user_offers {
+        display: grid;
+        grid-template-rows: repeat(1, 1fr);
+        grid-template-columns: auto;
+        grid-gap: 1rem;
+    }
 }
-
-label {
-    margin-top: 6px;
-    color: var(--primary-color-light);
-    font-size: 14px;
-    margin-bottom: 3px;
-}
-
-.amt {
-    font-size: 2em;
+@include mixins.mobile-device {
+    .user_offers {
+        display: grid;
+        grid-template-rows: repeat(1, 1fr);
+        grid-template-columns: auto;
+        grid-gap: 1rem;
+    }
 }
 </style>

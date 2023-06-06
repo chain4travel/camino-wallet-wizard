@@ -46,7 +46,7 @@ export default class Navbar extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../styles/main';
+@use '../styles/abstracts/mixins';
 
 img {
     max-height: 25px;
@@ -151,7 +151,7 @@ button {
     margin: 0;
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     img {
         max-height: 18px;
     }
@@ -162,7 +162,7 @@ button {
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .lang_web {
         display: none;
     }

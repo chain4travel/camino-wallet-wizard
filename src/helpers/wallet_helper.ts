@@ -1,26 +1,31 @@
-import { ava } from '@/AVA'
+import { ava, bintools } from '@/AVA'
+import { ChainIdType, ZeroBN } from '@/constants'
+import { web3 } from '@/evm'
+import { BulkOrder, ITransaction } from '@/components/wallet/transfer/types'
+import { getStakeForAddresses } from '@/helpers/utxo_helper'
+import Erc20Token from '@/js/Erc20Token'
+import ERCNftToken from '@/js/ERCNftToken'
+import AvaAsset from '@/js/AvaAsset'
 import {
-    UTXOSet as PlatformUTXOSet,
-    UTXO as PlatformUTXO,
-} from '@c4tplatform/caminojs/dist/apis/platformvm/utxos'
-import { UTXO as AVMUTXO } from '@c4tplatform/caminojs/dist/apis/avm/utxos'
-import { WalletType } from '@/js/wallets/types'
-
-import { BN, Buffer } from '@c4tplatform/caminojs'
-import {
+    buildBulkTransfer,
     buildCreateNftFamilyTx,
     buildEvmTransferErc20Tx,
     buildEvmTransferERCNftTx,
     buildEvmTransferNativeTx,
     buildMintNftTx,
 } from '@/js/TxHelper'
-import { PayloadBase } from '@c4tplatform/caminojs/dist/utils'
-import { ITransaction } from '@/components/wallet/transfer/types'
+import { WalletType } from '@/js/wallets/types'
 
-import { web3 } from '@/evm'
-import Erc20Token from '@/js/Erc20Token'
-import { getStakeForAddresses } from '@/helpers/utxo_helper'
-import ERCNftToken from '@/js/ERCNftToken'
+import { BN, Buffer } from '@c4tplatform/caminojs/dist'
+import {
+    ClaimAmountParams,
+    ClaimType,
+    UTXO as PlatformUTXO,
+    UTXOSet as PlatformUTXOSet,
+} from '@c4tplatform/caminojs/dist/apis/platformvm'
+import { UTXO as AVMUTXO } from '@c4tplatform/caminojs/dist/apis/avm/utxos'
+import { PayloadBase } from '@c4tplatform/caminojs/dist/utils'
+import { OutputOwners } from '@c4tplatform/caminojs/dist/common'
 
 class WalletHelper {
     static async getStake(wallet: WalletType): Promise<BN> {
@@ -34,14 +39,13 @@ class WalletHelper {
         symbol: string,
         groupNum: number
     ) {
-        let fromAddresses = wallet.getDerivedAddresses()
-        let changeAddress = wallet.getChangeAddressAvm()
+        const fromAddresses = wallet.getAllAddressesX()
+        const changeAddress = wallet.getChangeAddressAvm()
+        const minterAddress = wallet.getCurrentAddressAvm()
 
-        let minterAddress = wallet.getCurrentAddressAvm()
+        const utxoSet = wallet.utxoset
 
-        let utxoSet = wallet.utxoset
-
-        let unsignedTx = await buildCreateNftFamilyTx(
+        const unsignedTx = await buildCreateNftFamilyTx(
             name,
             symbol,
             groupNum,
@@ -59,19 +63,21 @@ class WalletHelper {
         wallet: WalletType,
         mintUtxo: AVMUTXO,
         payload: PayloadBase,
-        quantity: number
+        quantity: number,
+        owners: string[]
     ) {
         let ownerAddress = wallet.getCurrentAddressAvm()
+        for (let i = owners.length; i < quantity; ++i) {
+            owners.push(ownerAddress)
+        }
         let changeAddress = wallet.getChangeAddressAvm()
-
-        let sourceAddresses = wallet.getDerivedAddresses()
+        let sourceAddresses = wallet.getAllAddressesX()
 
         let utxoSet = wallet.utxoset
         let tx = await buildMintNftTx(
             mintUtxo,
             payload,
-            quantity,
-            ownerAddress,
+            owners,
             changeAddress,
             sourceAddresses,
             utxoSet
@@ -82,15 +88,44 @@ class WalletHelper {
 
     static async issueBatchTx(
         wallet: WalletType,
+        chainId: ChainIdType,
         orders: (ITransaction | AVMUTXO)[],
         addr: string,
         memo: Buffer | undefined
     ): Promise<string> {
+        if (chainId === 'P') {
+            if (orders.length !== 1 || !(orders[0] as ITransaction).asset)
+                throw new Error('Can only process 1 fungible order')
+            const order = orders[0] as ITransaction
+            return await this.platformBaseTx(wallet, order.amount, addr, memo ?? Buffer.alloc(0))
+        }
+
         let unsignedTx = await wallet.buildUnsignedTransaction(orders, addr, memo)
         const tx = await wallet.signX(unsignedTx)
         const txId: string = await ava.XChain().issueTx(tx)
 
         return txId
+    }
+
+    static async issueBulkTx(
+        wallet: WalletType,
+        asset: AvaAsset,
+        orders: BulkOrder[],
+        memo: Buffer | undefined
+    ): Promise<string> {
+        const fromAddresses = wallet.getAllAddressesX()
+        const changeAddress = wallet.getChangeAddressAvm()
+
+        let unsignedTx = buildBulkTransfer(
+            fromAddresses,
+            [changeAddress],
+            wallet.getUTXOSet(),
+            orders,
+            asset,
+            memo
+        )
+        const tx = await wallet.signX(unsignedTx)
+        return await ava.XChain().issueTx(tx)
     }
 
     static async validate(
@@ -111,7 +146,9 @@ class WalletHelper {
             utxoSet.addArray(utxos)
         }
 
-        let pAddressStrings = wallet.getAllAddressesP()
+        const pAddressStrings = wallet.getAllAddressesP()
+        const signerAddresses = wallet.getSignerAddresses('P')
+        const nodeOwner = wallet.getStaticAddress('P')
 
         let stakeAmount = amt
 
@@ -129,17 +166,20 @@ class WalletHelper {
         let startTime = new BN(Math.round(start.getTime() / 1000))
         let endTime = new BN(Math.round(end.getTime() / 1000))
 
-        const unsignedTx = await ava.PChain().buildAddValidatorTx(
+        const unsignedTx = await ava.PChain().buildCaminoAddValidatorTx(
             utxoSet,
             [stakeReturnAddr],
-            pAddressStrings, // from
+            [pAddressStrings, signerAddresses], // from
             [changeAddress], // change
             nodeID,
+            {
+                address: nodeOwner,
+                auth: [[0, nodeOwner]],
+            },
             startTime,
             endTime,
             stakeAmount,
-            [rewardAddress],
-            delegationFee
+            [rewardAddress]
         )
 
         let tx = await wallet.signP(unsignedTx)
@@ -156,9 +196,8 @@ class WalletHelper {
         utxos?: PlatformUTXO[]
     ): Promise<string> {
         let utxoSet = wallet.getPlatformUTXOSet()
-        let pAddressStrings = wallet.getAllAddressesP()
-
-        let stakeAmount = amt
+        const pAddressStrings = wallet.getAllAddressesP()
+        const signerAddresses = wallet.getSignerAddresses('P')
 
         // If given custom UTXO set use that
         if (utxos) {
@@ -183,16 +222,104 @@ class WalletHelper {
         const unsignedTx = await ava.PChain().buildAddDelegatorTx(
             utxoSet,
             [stakeReturnAddr],
-            pAddressStrings,
+            [pAddressStrings, signerAddresses],
             [changeAddress],
             nodeID,
             startTime,
             endTime,
-            stakeAmount,
+            amt,
             [rewardAddress] // reward address
         )
 
         const tx = await wallet.signP(unsignedTx)
+        return await ava.PChain().issueTx(tx)
+    }
+
+    static async getAddressState(address: string): Promise<BN> {
+        return await ava.PChain().getAddressStates(address)
+    }
+
+    static async getRegisteredNode(address: string): Promise<string> {
+        return await ava.PChain().getRegisteredShortIDLink(address)
+    }
+
+    static async registerNodeTx(
+        wallet: WalletType,
+        nodePrivateKey: string,
+        oldNodeID: string | undefined,
+        newNodeID: string | undefined,
+        address: string,
+        utxos?: PlatformUTXO[]
+    ): Promise<string> {
+        let utxoSet = wallet.getPlatformUTXOSet()
+
+        // If given custom UTXO set use that
+        if (utxos) {
+            utxoSet = new PlatformUTXOSet()
+            utxoSet.addArray(utxos)
+        }
+
+        const pAddressStrings = wallet.getAllAddressesP()
+        const signerAddresses = wallet.getSignerAddresses('P')
+
+        // For change address use first available on the platform chain
+        const changeAddress = wallet.getChangeAddressPlatform()
+        const consortiumMemberAuthCredentials: [number, Buffer | string][] = [
+            [0, pAddressStrings[0]],
+        ]
+
+        const unsignedTx = await ava.PChain().buildRegisterNodeTx(
+            utxoSet,
+            [pAddressStrings, signerAddresses], // from + possible signers
+            [changeAddress], // change
+            oldNodeID,
+            newNodeID,
+            address,
+            consortiumMemberAuthCredentials,
+            undefined, // memo
+            undefined, // asOf
+            1 // changeThreshold
+        )
+
+        let tx = await wallet.signP(unsignedTx, [nodePrivateKey])
+        return await ava.PChain().issueTx(tx)
+    }
+
+    static async platformBaseTx(
+        wallet: WalletType,
+        amount: BN,
+        toAddress: string,
+        memo: Buffer,
+        utxos?: PlatformUTXO[]
+    ): Promise<string> {
+        let utxoSet = wallet.getPlatformUTXOSet()
+
+        // If given custom UTXO set use that
+        if (utxos) {
+            utxoSet = new PlatformUTXOSet()
+            utxoSet.addArray(utxos)
+        }
+
+        const pAddressStrings = wallet.getAllAddressesP()
+        const signerAddresses = wallet.getSignerAddresses('P')
+
+        // For change address use first available on the platform chain
+        const changeAddress = wallet.getChangeAddressPlatform()
+
+        const unsignedTx = await ava.PChain().buildBaseTx(
+            utxoSet,
+            amount,
+            [toAddress],
+            [pAddressStrings, signerAddresses], // from + possible signers
+            [changeAddress], // change
+            memo,
+            undefined, // asOf
+            undefined, // lockTime
+            1, // toThreshold
+            1 // changeThreshold
+        )
+
+        let tx = await wallet.signP(unsignedTx)
         return await ava.PChain().issueTx(tx)
     }
 
@@ -266,6 +393,76 @@ class WalletHelper {
         })
         // Return 10% more
         return Math.round(estGas * 1.1)
+    }
+
+    static async buildDepositClaimTx(
+        wallet: WalletType,
+        depositTxID: string | undefined,
+        rewardOwner: OutputOwners,
+        claimAmount: BN,
+        claimValidator: boolean
+    ) {
+        const pAddressStrings = wallet.getAllAddressesP()
+        const signerAddresses = wallet.getSignerAddresses('P')
+
+        // For change address use first available on the platform chain
+        const changeAddress = wallet.getChangeAddressPlatform()
+
+        const claimAmountParam = {
+            claimType: claimValidator
+                ? ClaimType.VALIDATOR_REWARD
+                : ClaimType.EXPIRED_DEPOSIT_REWARD,
+            amount: claimAmount,
+            owners: rewardOwner,
+            sigIdxs: [0],
+        } as ClaimAmountParams
+
+        if (depositTxID) {
+            claimAmountParam.id = bintools.cb58Decode(depositTxID)
+            claimAmountParam.claimType = ClaimType.ACTIVE_DEPOSIT_REWARD
+        }
+
+        const unsignedTx = await ava
+            .PChain()
+            .buildClaimTx(
+                wallet.platformUtxoset,
+                [pAddressStrings, signerAddresses],
+                [changeAddress],
+                Buffer.alloc(0),
+                ZeroBN,
+                1,
+                [claimAmountParam]
+            )
+        let tx = await wallet.signP(unsignedTx)
+        return await ava.PChain().issueTx(tx)
+    }
+
+    static async buildDepositTx(
+        wallet: WalletType,
+        depositID: string,
+        depositDuration: number,
+        depositAmount: BN
+    ) {
+        const pAddressStrings = wallet.getAllAddressesP()
+        const signerAddresses = wallet.getSignerAddresses('P')
+        const rewardAddress = bintools.parseAddress(wallet.getPlatformRewardAddress(), 'P')
+        const changeAddress = wallet.getChangeAddressPlatform()
+
+        const unsignedTx = await ava
+            .PChain()
+            .buildDepositTx(
+                wallet.platformUtxoset,
+                [pAddressStrings, signerAddresses],
+                [changeAddress],
+                depositID,
+                depositDuration,
+                new OutputOwners([rewardAddress], ZeroBN, 1),
+                Buffer.alloc(0),
+                ZeroBN,
+                depositAmount
+            )
+        let tx = await wallet.signP(unsignedTx)
+        return await ava.PChain().issueTx(tx)
     }
 }
 

@@ -6,18 +6,18 @@
             <v-stepper-step step="3" :complete="step > 3">KYC Verification</v-stepper-step>
         </v-stepper-header>
         <v-stepper-items class="steper__body">
-            <v-stepper-content class="steper__item" step="1">
+            <v-stepper-content step="1" key="1">
                 <create-wallet-step @changestep="changeStep" />
             </v-stepper-content>
 
-            <v-stepper-content step="2">
+            <v-stepper-content step="2" key="2">
                 <saft
                     @changestep="changeStep"
                     @getVerificationStatus="getVerificationStatus"
                 ></saft>
             </v-stepper-content>
 
-            <v-stepper-content step="3">
+            <v-stepper-content step="3" key="3">
                 <kyc-verification :verificationCompleted="verificationCompleted" />
             </v-stepper-content>
         </v-stepper-items>
@@ -178,7 +178,8 @@ export default class CreateWallet extends Vue {
 }
 </script>
 <style lang="scss">
-@use "../styles/main";
+@use '../styles/abstracts/mixins';
+@use '../styles/abstracts/variables';
 .v-stepper {
     flex: 1;
 }
@@ -202,9 +203,9 @@ export default class CreateWallet extends Vue {
     width: 100%;
     height: auto;
     max-width: 1100px;
-    padding: 15px;
-    padding-top: 50px;
-    padding-bottom: 50px;
+    padding: 15px !important;
+    padding-top: 50px !important;
+    padding-bottom: 50px !important;
     border: none !important;
     display: flex;
     flex-direction: column;
@@ -267,7 +268,7 @@ export default class CreateWallet extends Vue {
         }
 
         .verified {
-            background-color: main.$green-light;
+            background-color: variables.$green-light;
             color: #222;
         }
 
@@ -293,40 +294,40 @@ export default class CreateWallet extends Vue {
         }
 
         img {
-            width: main.$img-size;
-            height: main.$img-size;
+            width: variables.$img-size;
+            height: variables.$img-size;
             max-height: none;
         }
 
         header {
             h1 {
                 margin-top: 10px;
-                font-size: main.$xl-size;
+                font-size: variables.$xl-size;
                 line-height: 1.25em;
                 font-weight: 400;
             }
 
             p {
-                color: main.$primary-color-light;
+                color: variables.$primary-color-light;
             }
         }
 
         .warn {
-            margin-top: main.$vertical-padding !important;
+            margin-top: variables.$vertical-padding !important;
 
             span {
                 display: block;
-                font-size: main.$s-size;
+                font-size: variables.$s-size;
                 font-weight: 700;
                 text-transform: uppercase;
 
                 &.label {
-                    color: main.$secondary-color;
+                    color: variables.$secondary-color;
                     text-transform: uppercase;
                 }
 
                 &.description {
-                    color: main.$primary-color-light !important;
+                    color: variables.$primary-color-light !important;
                 }
             }
         }
@@ -363,7 +364,7 @@ export default class CreateWallet extends Vue {
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .steper .cols {
         display: block;
     }
@@ -373,18 +374,18 @@ export default class CreateWallet extends Vue {
         text-align: center;
 
         img {
-            width: main.$img-size-mobile;
-            height: main.$img-size-mobile;
+            width: variables.$img-size-mobile;
+            height: variables.$img-size-mobile;
         }
 
         header {
             h1 {
-                font-size: main.$xl-size-mobile;
+                font-size: variables.$xl-size-mobile;
             }
         }
 
         .warn {
-            margin-top: main.$vertical-padding-mobile !important;
+            margin-top: variables.$vertical-padding-mobile !important;
         }
 
         .access_cont {
@@ -407,7 +408,7 @@ export default class CreateWallet extends Vue {
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .v-stepper__content {
         padding: 24px 5px 16px 5px !important;
     }

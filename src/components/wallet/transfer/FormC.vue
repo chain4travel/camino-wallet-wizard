@@ -134,12 +134,12 @@ import {
     bnToAvaxC,
     bnToBigAvaxC,
     bnToBigAvaxX,
-} from '@c4tplatform/camino-wallet-sdk'
+} from '@c4tplatform/camino-wallet-sdk/dist'
 
 // @ts-ignore
 import { QrInput } from '@c4tplatform/vue_components'
 import Big from 'big.js'
-import { BN } from '@c4tplatform/caminojs'
+import { BN } from '@c4tplatform/caminojs/dist'
 import { bnToBig } from '@/helpers/helper'
 import { web3 } from '@/evm'
 import EVMInputDropdown from '@/components/misc/EVMInputDropdown/EVMInputDropdown.vue'
@@ -160,7 +160,7 @@ export default class FormC extends Vue {
     addressIn = ''
     amountIn = new BN(0)
     gasPrice = new BN(225000000000)
-    gasPriceInterval: NodeJS.Timeout | undefined = undefined
+    gasPriceInterval: number | undefined = undefined
     gasLimit = 21000
     err = ''
     isLoading = false
@@ -182,7 +182,7 @@ export default class FormC extends Vue {
     created() {
         // Update gas price automatically
         this.updateGasPrice()
-        this.gasPriceInterval = setInterval(() => {
+        this.gasPriceInterval = window.setInterval(() => {
             if (!this.isConfirm) {
                 this.updateGasPrice()
             }
@@ -498,7 +498,7 @@ export default class FormC extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../../../styles/main';
+@use '../../../styles/abstracts/mixins';
 
 h4 {
     display: block;
@@ -583,14 +583,14 @@ label {
     padding-bottom: 30px;
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     .cols {
         grid-template-columns: 1fr 1fr 220px;
         column-gap: 25px;
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .cols {
         display: block;
     }

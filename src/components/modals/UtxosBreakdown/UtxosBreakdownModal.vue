@@ -169,7 +169,7 @@ export default class UtxosBreakdownModal extends Vue {
 
 .scrollable {
     height: 100%;
-    overflow: scroll;
+    overflow: auto;
     position: relative;
 }
 table {
@@ -219,8 +219,6 @@ thead {
 <style lang="scss">
 .utxos_breakdown_body {
     .col_id {
-        //padding-left: 12px !important;
-        //width: 60px;
         display: block;
     }
 

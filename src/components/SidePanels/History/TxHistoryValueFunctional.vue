@@ -43,9 +43,9 @@ export default {
         switch (type) {
             case 'base':
                 if (isIncome) {
-                    return 'Received'
+                    return 'Receive'
                 }
-                return 'Sent'
+                return 'Send'
             case 'operation':
                 return operationDirection
             default:
@@ -59,7 +59,8 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-@use '../../../styles/main';
+@use '../../../styles/abstracts/variables';
+@use '../../../styles/abstracts/mixins';
 
 .utxo {
     display: grid;
@@ -79,7 +80,7 @@ export default {
 
 .action {
     font-size: 12px;
-    color: main.$primary-color-light;
+    color: variables.$primary-color-light;
 }
 .amount {
     text-align: right;
@@ -87,7 +88,7 @@ export default {
     font-size: 15px;
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     .amount {
         font-size: 14px;
     }

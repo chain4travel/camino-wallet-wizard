@@ -64,7 +64,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@use './styles/main';
+@use './styles/abstracts/mixins';
+@use './styles/abstracts/variables';
 
 .main_cols {
     &[wallet_view] {
@@ -79,18 +80,19 @@ export default {
     #router_view {
         position: relative;
         min-height: calc(100vh);
-        /* padding: main.$container_padding_m; */
+        /* padding: variables.$container_padding_m; */
     }
 }
 
 #router_view {
     position: relative;
-    /* padding: main.$container_padding_m; */
+    /* padding: variables.$container_padding_m; */
 }
 </style>
 
 <style scoped lang="scss">
-@use './styles/main';
+@use './styles/abstracts/mixins';
+@use './styles/abstracts/variables';
 
 html {
     height: 100%;
@@ -127,12 +129,12 @@ p {
     position: relative;
     z-index: 2;
     background-color: var(--bg-wallet-light);
-    padding: main.$container_padding_m;
+    padding: variables.$container_padding_m;
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     #nav {
-        padding: main.$container_padding_mobile;
+        padding: variables.$container_padding_mobile;
         display: flex !important;
     }
 
@@ -147,16 +149,16 @@ p {
         }
 
         #router_view {
-            padding: main.$container_padding_s;
+            padding: variables.$container_padding_s;
         }
     }
 
     #router_view {
-        padding: main.$container_padding_s;
+        padding: variables.$container_padding_s;
     }
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     .main_cols {
         &[wallet_view] {
             grid-template-columns: 180px 1fr 240px !important;
@@ -164,12 +166,12 @@ p {
     }
 }
 
-@media only screen and (max-width: main.$width_s) {
+@media only screen and (max-width: variables.$width_s) {
     #router_view {
-        padding: main.$container_padding_s;
+        padding: variables.$container_padding_s;
     }
     #nav {
-        padding: main.$container_padding_s;
+        padding: variables.$container_padding_s;
     }
 }
 </style>

@@ -5,9 +5,9 @@
                 <img v-if="$root.theme === 'day'" src="@/assets/LightModeLogo.svg" class="logo" />
                 <img v-else src="@/assets/DarkModeLogo.svg" class="logo" />
                 <span class="desc">
-                    Camino is a fast, high-through put open-source consortium blockchain enabling
-                    the creation of travel related products. Camino’s tech stack and consensus
-                    protocol deliver unmatched speed, security and reliability within the network
+                    Camino is a fast, high-throughput open-source consortium blockchain enabling the
+                    creation of travel-related products. Camino’s tech stack and consensus protocol
+                    deliver unmatched speed, security, and reliability within the network.
                 </span>
             </div>
             <div class="second-section">

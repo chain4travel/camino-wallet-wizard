@@ -3,11 +3,11 @@
         <div class="modal_main">
             <div class="modal_body">
                 <div id="sumsub-websdk-container"></div>
-                <div class="kyc_action">
+                <!-- <div class="kyc_action">
                     <v-btn type="cancel" @click="walletCreated = true" class="submit_but">
                         Done & Next
                     </v-btn>
-                </div>
+                </div> -->
             </div>
             <div class="verification--text">
                 <p>Verification might take a while.</p>
@@ -47,7 +47,7 @@ export default class KycVerification extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../styles/main';
+@use '../styles/abstracts/mixins';
 
 /* .v-stepper__wrapper {
     display: flex;
@@ -91,7 +91,7 @@ export default class KycVerification extends Vue {
         border-radius: var(--border-radius-sm) !important;
         overflow: auto;
         min-height: 200px;
-        @include main.mobile-device {
+        @include mixins.mobile-device {
             max-height: 90vh;
             max-width: none;
             width: 80%;

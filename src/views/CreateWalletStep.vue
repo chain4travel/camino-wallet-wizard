@@ -24,11 +24,15 @@
             <!-- RIGHT -->
             <div class="phrase_disp_col">
                 <template v-if="!isVerified">
-                    <img v-if="$root.theme === 'day'" src="@/assets/keyphrase.png" alt />
-                    <img v-else src="@/assets/keyphrase_night.svg" alt />
+                    <img
+                        v-if="$root.theme === 'day'"
+                        src="@/assets/keyphrase.png"
+                        alt="keyphrase"
+                    />
+                    <img v-else src="@/assets/keyphrase_night.svg" alt="keyphrase_night" />
                 </template>
                 <template v-else>
-                    <img src="@/assets/success.svg" alt />
+                    <img src="@/assets/success.svg" alt="success" />
                 </template>
                 <header v-if="!isVerified">
                     <h1>
@@ -52,15 +56,8 @@
                 </p>
                 <!-- STEP 2a - VERIFY -->
                 <div class="verify_cont" v-if="!isVerified">
-                    <MnemonicCopied
-                        v-model="isSecured"
-                        :explain="$t('create.confirm')"
-                    ></MnemonicCopied>
-                    <VerifyMnemonic
-                        :mnemonic="keyPhrase"
-                        ref="verify"
-                        @complete="complete"
-                    ></VerifyMnemonic>
+                    <MnemonicCopied v-model="isSecured" :explain="$t('create.confirm')" />
+                    <VerifyMnemonic :mnemonic="keyPhrase" ref="verify" @complete="complete" />
                     <button
                         class="but_primary ava_button button_secondary"
                         @click="verifyMnemonic"
@@ -83,13 +80,13 @@
                             </template>
                             <template v-else>
                                 <div>
-                                    <button
+                                    <!-- <button
                                         :disabled="walletType !== 'mnemonic'"
                                         @click="viewPrintModal"
                                         class="but_primary ava_button button_secondary print--button"
                                     >
                                         Print keyphrase
-                                    </button>
+                                    </button> -->
                                     <button
                                         class="button_primary ava_button access generate"
                                         @click="completeFirstStep"
@@ -190,11 +187,17 @@ export default class CreateWalletStep extends Vue {
 </script>
 
 <style lang="scss">
-@use "../styles/main";
+@use "../styles/abstracts/mixins";
+@use "../styles/abstracts/variables";
 
 .print--button {
     margin-right: 15px;
 }
+
+.v-stepper {
+    transform-origin: center top 0px !important;
+}
+
 .steper {
     width: 100vw;
     height: 100vh;
@@ -272,7 +275,7 @@ export default class CreateWalletStep extends Vue {
         }
 
         .verified {
-            background-color: main.$green-light;
+            background-color: variables.$green-light;
             color: #222;
         }
 
@@ -299,40 +302,40 @@ export default class CreateWalletStep extends Vue {
         }
 
         img {
-            width: main.$img-size;
-            height: main.$img-size;
+            width: variables.$img-size;
+            height: variables.$img-size;
             max-height: none;
         }
 
         header {
             h1 {
                 margin-top: 10px;
-                font-size: main.$xl-size;
+                font-size: variables.$xl-size;
                 line-height: 1.25em;
                 font-weight: 400;
             }
 
             p {
-                color: main.$primary-color-light;
+                color: variables.$primary-color-light;
             }
         }
 
         .warn {
-            margin-top: main.$vertical-padding !important;
+            margin-top: variables.$vertical-padding !important;
 
             span {
                 display: block;
-                font-size: main.$s-size;
+                font-size: variables.$s-size;
                 font-weight: 700;
                 text-transform: uppercase;
 
                 &.label {
-                    color: main.$secondary-color;
+                    color: variables.$secondary-color;
                     text-transform: uppercase;
                 }
 
                 &.description {
-                    color: main.$primary-color-light !important;
+                    color: variables.$primary-color-light !important;
                 }
             }
         }
@@ -371,7 +374,7 @@ export default class CreateWalletStep extends Vue {
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .mnemonic_title {
         font-size: 20px;
         font-weight: 700;

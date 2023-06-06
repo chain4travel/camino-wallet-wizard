@@ -2,8 +2,8 @@
     <modal ref="modal" title="Account Settings" class="modal_main" @beforeClose="clear">
         <div class="modal_body">
             <div class="header">
-                <Identicon :value="account.baseAddresses.join('')"></Identicon>
-                <p style="text-align: center">{{ account.name }}</p>
+                <Identicon :value="accountName"></Identicon>
+                <p style="text-align: center">{{ accountName }}</p>
 
                 <p class="err small" style="text-align: center">
                     Clearing your browser cache will remove this account. Make sure you have your
@@ -28,7 +28,11 @@
                 <button @click="deleteAccount" class="ava_button">Delete Account</button>
             </div>
             <template v-else>
-                <component v-if="subComponent" :is="subComponent"></component>
+                <component
+                    v-if="subComponent"
+                    :is="subComponent"
+                    v-bind="[{ accountName: account.name }]"
+                ></component>
                 <button @click="clear">{{ $t('access.cancel') }}</button>
             </template>
         </div>
@@ -60,6 +64,9 @@ export default class AccountSettingsModal extends Vue {
     get account(): iUserAccountEncrypted {
         return this.$store.getters['Accounts/account']
     }
+    get accountName(): string {
+        return this.account?.name ?? 'New Account'
+    }
     open() {
         this.$refs.modal.open()
     }
@@ -85,7 +92,7 @@ export default class AccountSettingsModal extends Vue {
     }
 
     get hasVolatile() {
-        return this.$store.state.volatileWallets.length > 0
+        return this.$store.getters.accountChanged
     }
 }
 </script>

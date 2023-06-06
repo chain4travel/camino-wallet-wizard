@@ -2,14 +2,19 @@
     <transition name="fade">
         <div class="modal_main" v-if="isActive">
             <div class="modal_bg" @click="bgclick" :icy="icy"></div>
-            <div class="modal_body">
-                <div class="modal_topbar">
-                    <h4 class="modal_title">{{ title }}</h4>
-                    <button class="modalClose" @click="close" v-if="can_close">
-                        <fa icon="times"></fa>
-                    </button>
+            <div class="modal_container">
+                <div class="modal_body">
+                    <div class="modal_topbar">
+                        <div class="modal_title">
+                            <h4>{{ title }}</h4>
+                            <p v-if="subtitle" class="modal_subtitle">{{ subtitle }}</p>
+                        </div>
+                        <button class="modalClose" @click="close" v-if="can_close">
+                            <fa icon="times"></fa>
+                        </button>
+                    </div>
+                    <slot></slot>
                 </div>
-                <slot></slot>
             </div>
         </div>
     </transition>
@@ -21,6 +26,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 @Component
 export default class Modal extends Vue {
     @Prop({ default: 'Modal Title' }) title!: string
+    @Prop({ default: '' }) subtitle!: string
     @Prop({ default: true }) can_close!: boolean
     @Prop({ default: false }) icy!: boolean
 
@@ -28,7 +34,6 @@ export default class Modal extends Vue {
 
     public open() {
         this.isActive = true
-        document.body.style.overflow = 'inherit'
     }
 
     bgclick() {
@@ -40,12 +45,11 @@ export default class Modal extends Vue {
     public close() {
         this.$emit('beforeClose')
         this.isActive = false
-        document.body.style.overflow = 'auto'
     }
 }
 </script>
 <style scoped lang="scss">
-@use '../../styles/main';
+@use '../../styles/abstracts/mixins';
 
 .modal_topbar {
     background-color: var(--bg);
@@ -53,7 +57,8 @@ export default class Modal extends Vue {
     color: var(--primary-color);
     border-bottom: 2px solid var(--bg-light);
     position: relative;
-    padding: 10px 22px;
+    margin: 0px 8px;
+    padding: 10px 12px;
     display: flex;
 }
 
@@ -63,6 +68,10 @@ export default class Modal extends Vue {
     flex-grow: 1;
     margin: 0;
     font-weight: lighter;
+}
+
+.modal_subtitle {
+    font-size: 14px;
 }
 
 .modalClose {
@@ -85,7 +94,6 @@ export default class Modal extends Vue {
     display: flex;
     overflow-y: hidden;
 }
-
 .modal_bg {
     position: absolute;
     top: 0;
@@ -107,18 +115,18 @@ export default class Modal extends Vue {
     max-width: 90%;
     min-height: 30px;
     background-color: var(--bg);
-    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
     margin: auto;
     z-index: 2;
     position: absolute;
     inset: 50% auto auto 50%;
     transform: translate(-50%, -50%);
     border-radius: var(--border-radius-lg);
+    border: var(--primary-border-2);
     overflow: hidden;
     max-height: 90%;
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .modal_body {
         position: absolute;
         width: max-content;

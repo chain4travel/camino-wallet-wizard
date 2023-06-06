@@ -1,12 +1,18 @@
-// interface IHistoryParsedBaseTx{
-//     sent:
-//     received:
-// }
+import { ava, bintools } from '@/AVA'
+import { ZeroBN } from '@/constants'
+import { IsOutputDeposited, ITransactionData, RawTx, UTXO } from '@/store/modules/history/types'
 
-import { ITransactionData, UTXO } from '@/store/modules/history/types'
 import { WalletType } from '@/js/wallets/types'
-import { BN } from '@c4tplatform/caminojs'
+
+import { BN, Buffer } from '@c4tplatform/caminojs/dist'
 import { AVMConstants } from '@c4tplatform/caminojs/dist/apis/avm'
+import { PlatformVMConstants, LockedOut } from '@c4tplatform/caminojs/dist/apis/platformvm'
+import {
+    BaseOutput,
+    StandardAmountOutput,
+    StandardTransferableInput,
+    StandardTransferableOutput,
+} from '@c4tplatform/caminojs/dist/common'
 
 // Summary item returned for each transaction
 export interface BaseTxSummary {
@@ -16,13 +22,21 @@ export interface BaseTxSummary {
     collectibles: BaseTxNFTSummary
 }
 
-interface TokenSummaryResult {
-    [assetID: string]: BaseTxAssetSummary
-}
-
 export interface BaseTxNFTSummary {
     received: NFTSummaryResultDict
     sent: NFTSummaryResultDict
+}
+
+export interface BaseTxAssetSummary {
+    amount: BN
+    deposited: BN
+    payload: string | undefined
+    groupNum: number
+    addresses: string[]
+}
+
+interface TokenSummaryResult {
+    [assetID: string]: BaseTxAssetSummary
 }
 
 interface NFTSummaryResultDict {
@@ -32,37 +46,34 @@ interface NFTSummaryResultDict {
     addresses: string[]
 }
 
-// export interface BaseTxNFTSummary {
-//     sent: UTXO[]
-//     received: UTXO[]
-// }
-
-export interface BaseTxAssetSummary {
-    amount: BN
-    payload: string | undefined
-    groupNum: number
-    addresses: string[]
+interface RawAvaxTx extends RawTx {
+    getIns(): StandardTransferableInput[]
+    getOuts(): StandardTransferableOutput[]
 }
 
 // Used with tokens
 function addToDict(
     assetId: string,
     amount: BN,
+    deposited: BN,
     dict: TokenSummaryResult,
-    utxo: UTXO,
+    utxoPayload: string | undefined,
+    utxoGroupID: number,
     addresses: string[]
 ) {
     if (dict[assetId]) {
         dict[assetId].amount = dict[assetId].amount.add(amount)
+        dict[assetId].deposited = dict[assetId].deposited.add(deposited)
 
         let addrDiff = addresses.filter((addr) => !dict[assetId].addresses.includes(addr))
         dict[assetId].addresses.push(...addrDiff)
     } else {
         dict[assetId] = {
-            amount: amount,
-            payload: utxo.payload,
-            groupNum: utxo.groupID,
-            addresses: addresses,
+            amount,
+            deposited,
+            payload: utxoPayload,
+            groupNum: utxoGroupID,
+            addresses,
         }
     }
 }
@@ -133,7 +144,7 @@ function getLossNFT(tx: ITransactionData, wallet: WalletType): NFTSummaryResultD
 
 function getGainNFT(tx: ITransactionData, wallet: WalletType): NFTSummaryResultDict {
     let walletAddrs = wallet.getHistoryAddresses()
-    let addrsStripped = walletAddrs.map((addr) => addr.split('-')[1])
+    let addrsStripped = new Set<string>(walletAddrs.map((addr) => addr.split('-')[1]))
 
     let inputs = tx.inputs || []
     let outputs = tx.outputs
@@ -160,7 +171,7 @@ function getGainNFT(tx: ITransactionData, wallet: WalletType): NFTSummaryResultD
         let owners = utxo.addresses
         let assetID = utxo.assetID
 
-        let intersect = owners.filter((addr) => addrsStripped.includes(addr))
+        let intersect = owners.filter((addr) => addrsStripped.has(addr))
 
         // Did we gain it?
         if (intersect.length > 0) {
@@ -190,7 +201,7 @@ function getLoss(tx: ITransactionData, wallet: WalletType): TokenSummaryResult {
     let outs = tx.outputs
 
     let walletAddrs = wallet.getHistoryAddresses()
-    let addrsStripped = walletAddrs.map((addr) => addr.split('-')[1])
+    let addrsStripped = new Set<string>(walletAddrs.map((addr) => addr.split('-')[1]))
 
     let loss: TokenSummaryResult = {}
 
@@ -205,13 +216,14 @@ function getLoss(tx: ITransactionData, wallet: WalletType): TokenSummaryResult {
 
             let addrs = utxo.addresses
 
-            let intersect = addrs.filter((addr) => addrsStripped.includes(addr))
+            let intersect = addrs.filter((addr) => addrsStripped.has(addr))
 
             if (intersect.length === 0) continue
 
             let assetId = utxo.assetID
             let amount = utxo.amount
             let amountBN = new BN(amount)
+            const depositBN = IsOutputDeposited(utxo.outputType) ? amountBN : ZeroBN
 
             // Get who received this asset
             let receivers: string[] = []
@@ -220,13 +232,68 @@ function getLoss(tx: ITransactionData, wallet: WalletType): TokenSummaryResult {
                     let outAddrs = utxo.addresses
                     // If not a wallet address and not added to receivers
                     let targets = outAddrs.filter(
-                        (addr: string) => !addrsStripped.includes(addr) && !receivers.includes(addr)
+                        (addr: string) => !addrsStripped.has(addr) && !receivers.includes(addr)
                     )
                     receivers.push(...targets)
                 }
             })
 
-            addToDict(assetId, amountBN, loss, utxo, receivers)
+            addToDict(assetId, amountBN, depositBN, loss, utxo.payload, utxo.groupID, receivers)
+        }
+    }
+
+    return loss
+}
+
+function getRawLoss(tx: ITransactionData, wallet: WalletType): TokenSummaryResult {
+    if (!tx.rawTx) return getLoss(tx, wallet)
+
+    let ins = (tx.rawTx as unknown as RawAvaxTx).getIns()
+    let outs = (tx.rawTx as unknown as RawAvaxTx).getOuts()
+
+    let walletAddrs = wallet.getHistoryAddresses()
+    let addrsStripped = new Set<string>(walletAddrs.map((addr) => addr.split('-')[1]))
+
+    let loss: TokenSummaryResult = {}
+
+    if (ins) {
+        for (const input of ins) {
+            const utxo = wallet.getPlatformUTXOSet().getUTXO(input.getUTXOID())
+            const utxoIndex = input.getOutputIdx().readUInt32BE(0)
+
+            let outputType = utxo.getOutput().getTypeID()
+            if (outputType === AVMConstants.NFTXFEROUTPUTID) continue
+
+            let addrs = strippedAddresses(utxo.getOutput().getAddresses())
+            let intersect = addrs.filter((addr) => addrsStripped.has(addr))
+            if (intersect.length === 0) continue
+
+            const assetId = utxo.getAssetID()
+            let amountBN = (utxo.getOutput() as StandardAmountOutput).getAmount()
+            const depositBN = IsRawOutputDeposited(utxo.getOutput()) ? amountBN : ZeroBN
+
+            // Get who received this asset
+            let receivers: string[] = []
+            outs.forEach((out) => {
+                if (out.getAssetID().compare(assetId) === 0) {
+                    let outAddrs = strippedAddresses(out.getAddresses())
+                    // If not a wallet address and not added to receivers
+                    let targets = outAddrs.filter(
+                        (addr: string) => !addrsStripped.has(addr) && !receivers.includes(addr)
+                    )
+                    receivers.push(...targets)
+                }
+            })
+
+            addToDict(
+                bintools.cb58Encode(assetId),
+                amountBN,
+                depositBN,
+                loss,
+                undefined,
+                utxoIndex,
+                receivers
+            )
         }
     }
 
@@ -238,28 +305,27 @@ function getProfit(tx: ITransactionData, wallet: WalletType): TokenSummaryResult
     let ins = tx.inputs || []
 
     let walletAddrs = wallet.getHistoryAddresses()
-    let addrsStripped = walletAddrs.map((addr) => addr.split('-')[1])
+    let addrsStripped = new Set<string>(walletAddrs.map((addr) => addr.split('-')[1]))
 
     let profit: TokenSummaryResult = {}
 
     if (outs) {
         for (let i = 0; i < outs.length; i++) {
             let utxo = outs[i]
-            let outputType = utxo.outputType
-            let isNft = outputType === AVMConstants.NFTXFEROUTPUTID
 
             // Skip NFTs
-            if (isNft) continue
+            if (utxo.outputType === AVMConstants.NFTXFEROUTPUTID) continue
 
             let addrs = utxo.addresses
 
-            let intersect = addrs.filter((addr) => addrsStripped.includes(addr))
+            let intersect = addrs.filter((addr) => addrsStripped.has(addr))
 
             if (intersect.length === 0) continue
 
             let assetId = utxo.assetID
             let amount = utxo.amount
             let amountBN = new BN(amount)
+            const depositBN = IsOutputDeposited(utxo.outputType) ? amountBN : ZeroBN
 
             // Get who sent this to you
             let senders: string[] = []
@@ -269,13 +335,68 @@ function getProfit(tx: ITransactionData, wallet: WalletType): TokenSummaryResult
                     let outAddrs = utxo.addresses
                     // If not a wallet address and not added to senders
                     let targets = outAddrs.filter(
-                        (addr: string) => !addrsStripped.includes(addr) && !senders.includes(addr)
+                        (addr: string) => !addrsStripped.has(addr) && !senders.includes(addr)
                     )
                     senders.push(...targets)
                 }
             })
 
-            addToDict(assetId, amountBN, profit, utxo, senders)
+            addToDict(assetId, amountBN, depositBN, profit, utxo.payload, utxo.groupID, senders)
+        }
+    }
+
+    return profit
+}
+
+function getRawProfit(tx: ITransactionData, wallet: WalletType): TokenSummaryResult {
+    if (!tx.rawTx) return getProfit(tx, wallet)
+
+    let ins = (tx.rawTx as unknown as RawAvaxTx).getIns()
+    let outs = (tx.rawTx as unknown as RawAvaxTx).getOuts()
+
+    let walletAddrs = wallet.getHistoryAddresses()
+    let addrsStripped = new Set<string>(walletAddrs.map((addr) => addr.split('-')[1]))
+
+    let profit: TokenSummaryResult = {}
+
+    if (outs) {
+        for (const out of outs) {
+            const outputType = out.getOutput().getTypeID()
+            // Skip NFTs
+            if (outputType === AVMConstants.NFTXFEROUTPUTID) continue
+            const outIndex = out.getOutput().getOutputID()
+
+            const addrs = strippedAddresses(out.getAddresses())
+            const intersect = addrs.filter((addr) => addrsStripped.has(addr))
+            if (intersect.length === 0) continue
+
+            let assetId = out.getAssetID()
+            let amountBN = (out.getOutput() as StandardAmountOutput).getAmount()
+            const depositBN = IsRawOutputDeposited(out.getOutput()) ? amountBN : ZeroBN
+
+            // Get who sent this to you
+            let senders: string[] = []
+            for (const input of ins) {
+                const utxo = wallet.getPlatformUTXOSet().getUTXO(input.getUTXOID())
+                if (utxo.getAssetID().compare(assetId) === 0) {
+                    let outAddrs = strippedAddresses(utxo.getOutput().getAddresses())
+                    // If not a wallet address and not added to senders
+                    let targets = outAddrs.filter(
+                        (addr: string) => !addrsStripped.has(addr) && !senders.includes(addr)
+                    )
+                    senders.push(...targets)
+                }
+            }
+
+            addToDict(
+                bintools.cb58Encode(assetId),
+                amountBN,
+                depositBN,
+                profit,
+                undefined,
+                outIndex,
+                senders
+            )
         }
     }
 
@@ -284,8 +405,8 @@ function getProfit(tx: ITransactionData, wallet: WalletType): TokenSummaryResult
 
 // Finds the absolute gains and losses for the active wallet given transaction data from the explorer
 function getTransactionSummary(tx: ITransactionData, wallet: WalletType) {
-    let losses = getLoss(tx, wallet)
-    let profits = getProfit(tx, wallet)
+    let losses = getRawLoss(tx, wallet)
+    let profits = getRawProfit(tx, wallet)
 
     let nftSummary = getNFTsSummary(tx, wallet)
 
@@ -307,6 +428,7 @@ function getTransactionSummary(tx: ITransactionData, wallet: WalletType) {
 
         sum.tokens[assetId] = {
             amount: loss.amount.mul(new BN(-1)),
+            deposited: loss.deposited,
             payload: loss.payload,
             groupNum: loss.groupNum,
             addresses: loss.addresses,
@@ -315,12 +437,15 @@ function getTransactionSummary(tx: ITransactionData, wallet: WalletType) {
 
     for (let assetId in profits) {
         let profit = profits[assetId]
+        let sumAsset = sum.tokens[assetId]
 
-        if (sum.tokens[assetId]) {
-            sum.tokens[assetId].amount = sum.tokens[assetId].amount.add(profit.amount)
+        if (sumAsset) {
+            sumAsset.amount = sumAsset.amount.add(profit.amount)
+            sumAsset.deposited = sumAsset.deposited.add(profit.deposited)
         } else {
             sum.tokens[assetId] = {
                 amount: profit.amount,
+                deposited: profit.deposited,
                 payload: profit.payload,
                 groupNum: profit.groupNum,
                 addresses: profit.addresses,
@@ -351,6 +476,17 @@ export function filterDuplicateTransactions(txs: ITransactionData[]) {
         }
     }
     return filtered
+}
+
+function strippedAddresses(addrs: Buffer[]): string[] {
+    return addrs.map((addr) => bintools.addressToString(ava.getHRP(), 'P', addr).slice(2))
+}
+
+function IsRawOutputDeposited(out: BaseOutput): boolean {
+    if (out.getTypeID() === PlatformVMConstants.LOCKEDOUTID) {
+        return !(out as LockedOut).getLockedIDs().getDepositTxID().isEmpty()
+    }
+    return false
 }
 
 export { getTransactionSummary }

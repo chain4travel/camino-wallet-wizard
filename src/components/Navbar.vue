@@ -62,10 +62,13 @@
                             {{ $t('wallet.sidebar.export') }}
                         </router-link>
                         <router-link to="/wallet/earn">{{ $t('wallet.sidebar.earn') }}</router-link>
+                        <router-link to="/wallet/validator">
+                            {{ $t('wallet.sidebar.validator') }}
+                        </router-link>
                         <router-link to="/wallet/studio">
                             {{ $t('wallet.sidebar.studio') }}
                         </router-link>
-                        <router-link to="/wallet/activity">
+                        <router-link to="/wallet/activity" class="wallet_active">
                             {{ $t('wallet.sidebar.activity') }}
                         </router-link>
                         <router-link to="/wallet/keys">
@@ -96,7 +99,7 @@
         </v-navigation-drawer>
     </div>
 </template>
-<script scoped lang="ts">
+<script lang="ts">
 import 'reflect-metadata'
 import { Vue, Component } from 'vue-property-decorator'
 import LanguageSelect from './misc/LanguageSelect/LanguageSelect.vue'
@@ -128,7 +131,7 @@ export default class Navbar extends Vue {
 }
 </script>
 <style scoped lang="scss">
-@use '../styles/main';
+@use '../styles/abstracts/mixins';
 
 img {
     max-height: 25px;
@@ -195,9 +198,6 @@ button {
     display: none;
 }
 
-.mobile_bottom {
-}
-
 .mobile_account_menu {
     display: flex;
     flex-direction: column;
@@ -213,7 +213,7 @@ button {
     margin: 0;
 }
 
-@include main.medium-device {
+@include mixins.medium-device {
     img {
         max-height: 18px;
     }
@@ -224,7 +224,7 @@ button {
     }
 }
 
-@include main.mobile-device {
+@include mixins.mobile-device {
     .lang_web {
         display: none;
     }

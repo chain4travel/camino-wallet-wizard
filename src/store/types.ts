@@ -1,21 +1,25 @@
 import Big from 'big.js'
 
-import { Buffer, BN } from '@c4tplatform/caminojs'
+import { Buffer, BN } from '@c4tplatform/caminojs/dist'
 import AvaAsset from '@/js/AvaAsset'
-import MnemonicWallet from '@/js/wallets/MnemonicWallet'
 import { ITransaction } from '@/components/wallet/transfer/types'
 import { AllKeyFileTypes, AllKeyFileDecryptedTypes } from '@/js/IKeystore'
 import { UTXO } from '@c4tplatform/caminojs/dist/apis/avm'
 import { UTXO as TxUTXO } from './modules/history/types'
-import { WalletNameType, WalletType } from '@/js/wallets/types'
+import { HotWalletType, INetwork, WalletNameType, WalletType } from '@/js/wallets/types'
+import { KeystoreFileKeyType } from '@/js/IKeystore'
+import { ChainIdType } from '@/constants'
 
 export interface RootState {
+    network: INetwork
     isAuth: boolean
+    storedActiveWallet: null | WalletType
     activeWallet: null | WalletType
     wallets: WalletType[]
     address: String | null
     volatileWallets: WalletType[] // will be forgotten when tab is closed
     warnUpdateKeyfile: boolean
+    walletsDeleted: boolean
     prices: priceDict // USD value of 1 native token
 }
 
@@ -49,6 +53,10 @@ export interface IWalletBalanceDict {
     }
 }
 
+export interface IBalanceDict {
+    [assetId: string]: BN
+}
+
 export interface IWalletBalanceItem {
     id: string
     amount: BN
@@ -74,6 +82,7 @@ export interface AssetType {
 }
 
 export interface IssueBatchTxInput {
+    chainId: ChainIdType
     toAddress: string
     memo?: Buffer
     orders: (ITransaction | UTXO)[]
@@ -100,7 +109,7 @@ export interface ImportKeyfileInput {
 
 export interface ExportWalletsInput {
     password: string
-    wallets: MnemonicWallet[]
+    wallets: HotWalletType[]
 }
 
 export type SessionPersistFile = SessionPersistKey[]
@@ -110,8 +119,14 @@ export interface SessionPersistKey {
 }
 
 export interface AccessWalletMultipleInput {
-    type: Extract<'mnemonic' | 'singleton', WalletNameType>
+    name: string
+    type: Extract<KeystoreFileKeyType, WalletNameType>
     key: string
+}
+
+export interface AccessWalletMultipleInputParams {
+    keys: AccessWalletMultipleInput[]
+    activeIndex: number
 }
 
 export interface SaveAccountInput {
@@ -128,10 +143,21 @@ export interface iUserAccountEncrypted {
     name: string
     baseAddresses: string[]
     wallet: AllKeyFileTypes
+    defaultAddress?: string
 }
 
 export interface iUserAccountDecrypted {
     name: string
     baseAddresses: string[]
     wallet: AllKeyFileDecryptedTypes
+}
+
+export interface PlatformBalances {
+    balances: IBalanceDict
+    unlocked: IBalanceDict
+    locked: IBalanceDict
+    lockedStakeable: IBalanceDict
+    bonded: IBalanceDict
+    deposited: IBalanceDict
+    bondedDeposited: IBalanceDict
 }

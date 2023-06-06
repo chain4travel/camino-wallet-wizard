@@ -545,7 +545,7 @@ button .arrow {\
 }
 </script>
 <style scoped lang="scss">
-@use "../styles/main";
+@use '../styles/main';
 
 .saft-view {
     display: flex;

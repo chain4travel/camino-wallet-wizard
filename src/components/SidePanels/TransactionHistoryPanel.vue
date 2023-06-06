@@ -42,9 +42,6 @@ import { AvaNetwork } from '@/js/AvaNetwork'
     },
 })
 export default class TransactionHistoryPanel extends Vue {
-    mounted() {
-        this.getChains()
-    }
     get isExplorer(): boolean {
         let network: AvaNetwork | null = this.$store.state.Network.selectedNetwork
         if (!network) return false
@@ -59,9 +56,6 @@ export default class TransactionHistoryPanel extends Vue {
             return true
         }
         return false
-    }
-    getChains() {
-        this.$store.dispatch('History/getAliasChains')
     }
     get isUpdating(): boolean {
         return this.$store.state.History.isUpdating
@@ -90,17 +84,21 @@ export default class TransactionHistoryPanel extends Vue {
         return false
     }
 
-    get explorerUrl(): string {
+    get explorerUrl(): string | null {
         let addr = this.$store.state.address.split('-')[1]
-        return `https://explorer.avax.network/address/${addr}`
+        let network: AvaNetwork = this.$store.state.Network.selectedNetwork
+        if (network.explorerSiteUrl) {
+            return `${network.explorerSiteUrl}/address/${addr}`
+        }
+        return null
     }
 }
 </script>
 <style scoped lang="scss">
-@use '../../styles/main';
+@use '../../styles/abstracts/mixins';
 
 .tx_history_panel {
-    @include main.component-wrapper;
+    @include mixins.component-wrapper;
     display: grid;
     grid-template-rows: max-content 1fr;
     overflow: auto;
@@ -176,6 +174,6 @@ export default class TransactionHistoryPanel extends Vue {
         opacity: 0;
     }
 }
-@include main.medium-device {
+@include mixins.medium-device {
 }
 </style>
