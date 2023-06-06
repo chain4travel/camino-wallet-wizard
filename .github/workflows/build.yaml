@@ -1,5 +1,9 @@
 name: build-app
-on: [push, pull_request]
+on:
+  workflow_dispatch: 
+  pull_request:
+    branches:
+        - c4t
 jobs:
   yarn-build:
     runs-on: ubuntu-latest
