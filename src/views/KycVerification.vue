@@ -70,6 +70,7 @@ export default class KycVerification extends Vue {
     flex-direction: column;
     align-items: center;
     gap: 8px;
+    margin-top: 1rem;
     p {
         text-align: center;
     }
