@@ -102,8 +102,8 @@
     </v-main>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
 import Navbar from '@/components/SimpleNavbar.vue'
+import { Component, Vue } from 'vue-property-decorator'
 @Component({
     components: { Navbar },
 })
@@ -191,7 +191,7 @@ export default class DefaultLayout extends Vue {}
 
 ul {
     list-style: none;
-    padding: 0;
+    padding: 0 !important;
     margin: 0;
     display: flex;
     flex-direction: column;

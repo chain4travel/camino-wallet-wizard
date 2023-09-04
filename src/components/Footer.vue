@@ -133,11 +133,11 @@ export default class Footer extends Vue {}
 
 ul {
     list-style: none;
-    padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    padding: 0 !important;
 }
 
 a {
