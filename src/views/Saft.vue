@@ -120,16 +120,17 @@
     </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator'
-import SaftCheckbox from '../components/Saft/SaftCheckbox.vue'
-import InputField from '../components/Saft/InputField.vue'
-import MultiSigCheckbox from '../components/Saft/MultiSigCheckbox.vue'
-import { SingletonWallet } from '@/js/wallets/SingletonWallet'
+import { KYC_VARIANT } from '@/constants'
 import MnemonicWallet from '@/js/wallets/MnemonicWallet'
+import { SingletonWallet } from '@/js/wallets/SingletonWallet'
 import { WalletNameType } from '@/js/wallets/types'
 import { generateToken, getPublicKey } from '@/kyc_api'
 import snsWebSdk from '@sumsub/websdk'
 import axios from 'axios'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import InputField from '../components/Saft/InputField.vue'
+import MultiSigCheckbox from '../components/Saft/MultiSigCheckbox.vue'
+import SaftCheckbox from '../components/Saft/SaftCheckbox.vue'
 //@ts-ignore
 const EC = require('elliptic').ec
 
@@ -191,7 +192,7 @@ export default class Saft extends Vue {
     }
     async getNewAccessToken() {
         if (this.privateKeyC) {
-            const result = await generateToken(this.privateKeyC)
+            const result = await generateToken(this.privateKeyC, KYC_VARIANT.KYC_BASIC)
             return result.access_token
         }
         return ''

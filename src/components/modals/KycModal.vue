@@ -47,14 +47,15 @@
     </div>
 </template>
 <script lang="ts">
-import 'reflect-metadata'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import Modal from '@/components/modals/Modal.vue'
+import { KYC_VARIANT } from '@/constants'
+import MnemonicWallet from '@/js/wallets/MnemonicWallet'
+import { SingletonWallet } from '@/js/wallets/SingletonWallet'
+import { WalletNameType, WalletType } from '@/js/wallets/types'
 import { generateToken } from '@/kyc_api'
 import snsWebSdk from '@sumsub/websdk'
-import MnemonicWallet from '@/js/wallets/MnemonicWallet'
-import { WalletType, WalletNameType } from '@/js/wallets/types'
-import { SingletonWallet } from '@/js/wallets/SingletonWallet'
+import 'reflect-metadata'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 interface UserData {
     email: string
@@ -337,7 +338,7 @@ button .arrow {\
 
     async getNewAccessToken() {
         if (this.privateKeyC) {
-            const result = await generateToken(this.privateKeyC)
+            const result = await generateToken(this.privateKeyC, KYC_VARIANT.KYC_BASIC)
             return result.access_token
         }
         return ''
