@@ -44,10 +44,7 @@
                     <h1>
                         {{ $t('create.success_title') }}
                     </h1>
-                    <p>
-                        it's time to enter some personal data se we can prepare your SAFT agreement
-                    </p>
-                    <b>Please go to the following step.</b>
+                    <p>In the next step, you will be asked to fill in your personal data</p>
                     <!-- <p>{{ $t('create.success_desc') }}</p> -->
                 </header>
                 <p class="warn" v-if="!isVerified">

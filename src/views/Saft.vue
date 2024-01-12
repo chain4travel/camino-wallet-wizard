@@ -156,7 +156,12 @@
                     <p>
                         {{ $t('wizard.success.thank_you_note') }}
                         <br />
+                        <br />
                         {{ $t('wizard.success.thank_you_note2') }}
+                        <br />
+                        <br />
+                        {{ $t('wizard.success.thank_you_note3') }}
+                        <br />
                         <br />
                         {{ $t('wizard.success.contact_us1') }}
                         <a href="mailto:hello@camino.network">hello@camino.network</a>
@@ -678,7 +683,7 @@ img {
     gap: 20px;
     align-items: center;
     flex-direction: column;
-    max-width: 600px;
+    max-width: 700px;
 }
 
 .success_content {
