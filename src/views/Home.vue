@@ -1,17 +1,17 @@
 <template>
     <div class="home" v-if="!starting">
         <div class="home--wrapper">
-            <h2 class="content--title">Camino Institutional Sale Wizard</h2>
+            <h2 class="content--title">Camino Network Public Sale Wizard</h2>
             <div class="content">
                 <div class="content--desc">
                     <span>
-                        Welcome to the Camino Institutional Sale Wizard.
+                        Welcome to the Camino Network Public Sale.
                         <br />
                         <br />
-                        This wizard guides you through the process of
+                        The following wizard will guide you through the following steps:
                         <ul>
-                            <li>Creating your wallet</li>
-                            <li>Filling in your personal & company data</li>
+                            <li>Creating your Camino Network wallet</li>
+                            <li>Filling in your personal / company data</li>
                             <li>
                                 KYC
                                 <small>(Know-Your-Customer) / Identity verification</small>
@@ -21,19 +21,28 @@
                         For security reasons, this wizard does not save any data.
                         <br />
                         <br />
-                        Therefore, please complete the wizard in one session which will take no
-                        longer than 15 minutes.
+                        Please complete the wizard in one session. This will take no longer than 15
+                        minutes.
                         <br />
                         <br />
-                        <span>If you have any questions or remarks, please contact</span>
-                        <a href="mailto:investors@camino.network" class="presale">
-                            investors@camino.network
+                        <span>If you have any questions or remarks, please contac</span>
+                        <a href="mailto:hello@camino.network" class="presale">
+                            hello@camino.network
                         </a>
                     </span>
                 </div>
             </div>
-            <div class="access-create">Click Start to start the Wizard</div>
-            <v-btn @click="goToStepper" class="button_primary submit_but">Start</v-btn>
+            <div style="display: flex; flex-direction: row; width: 100%">
+                <v-checkbox class="checkbox" v-model="accept" style="width: max-content" />
+                <div slot="label" style="font-size: 12px; margin-top: 16px; padding-top: 8px">
+                    I accept the
+                    <a href="/legal">Terms & Conditions</a>
+                </div>
+            </div>
+
+            <v-btn @click="goToStepper" class="button_primary submit_but" :disabled="!accept">
+                Start
+            </v-btn>
         </div>
     </div>
     <HomeNextStep v-else />
@@ -50,6 +59,7 @@ import HomeNextStep from './HomeNextStep.vue'
 })
 export default class Home extends Vue {
     starting = false
+    accept = false
     mounted() {
         this.starting = false
         localStorage.removeItem('Email')
@@ -102,6 +112,7 @@ export default class Home extends Vue {
     }
 
     .content {
+        width: 100%;
         &--title {
             font-size: 2.75rem;
             color: var(--text-color);
@@ -110,6 +121,7 @@ export default class Home extends Vue {
         &--desc {
             font-size: 1.125rem;
             line-height: 1.5;
+            width: 100%;
         }
     }
 

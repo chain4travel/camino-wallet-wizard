@@ -1,27 +1,25 @@
 <template>
     <div class="home" v-if="!starting">
         <div class="home--wrapper">
-            <h2 class="content--title">Camino Institutional Sale Wizard</h2>
+            <h2 class="content--title">Camino Network Public Sale Wizard</h2>
             <div class="content">
                 <span class="content--desc">
-                    In the first step, a key phrase will be created.
+                    As a first step, your key phrase will be created.
                     <br />
                     <br />
                     The key phrase consists of 24 random words. These words in their specific order
-                    represent the unique key to your wallet and Camino tokens.
+                    represent the unique key to your wallet and Camino (CAM) tokens.
                     <br />
                     <br />
-                    The Camino Network Foundation or Chain4Travel AG will never save your key phrase
-                    and will never ask you for your key phrase.
+                    The Camino Network Foundation does not and will never save your key phrase or
+                    ask you for your key phrase.
                     <br />
                     <br />
                     <div class="attention">ATTENTION</div>
-                    Anyone who knows your key phrase has full, unlimited control over your tokens,
-                    so please keep the key phrase in one or more secure locations that only you have
+                    Anyone who knows your key phrase has full, unlimited control over your tokens.
+                    Please keep the key phrase in one or more secure locations that only you have
                     access to.
                     <div class="text--bold">
-                        <span>Keep it in one or more secure locations.</span>
-                        <br />
                         <span>Do not share it with anyone.</span>
                     </div>
                 </span>
@@ -102,6 +100,7 @@ export default class Home extends Vue {
     }
 
     .content {
+        width: 100%;
         &--title {
             font-size: 2.75rem;
             color: var(--text-color);
@@ -110,6 +109,7 @@ export default class Home extends Vue {
         &--desc {
             font-size: 1.125rem;
             line-height: 1.5;
+            width: 100%;
         }
     }
 
