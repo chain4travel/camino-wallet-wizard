@@ -108,7 +108,7 @@
     },
     "wizard": {
         "title": "Please fill out the form below.",
-        "subtitle": "This data will be used to create your purchase agreement.",
+        "subtitle": "This data will be used to create your invoice. The invoice will be provided via email. You can choose your payment currency of choice below.",
         "send": "Send & Next",
         "agree": "I agree that Chain4Travel and the Camino Network Foundation may use my data internally and for verification purposes with Chain4Travel’s partner Sumsub. *",
         "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
@@ -117,12 +117,15 @@
             "surname": "Surname must at least contain two and must not exceed 64 letters",
             "city": "City name must at least contain two and must not exceed 64 letters",
             "email": "Please enter a correct email address",
-            "phone": "Please enter a correct phone number"
+            "phone": "Please enter a correct phone number",
+            "purchaseAmount": "Please enter a correct purchase amount"
         },
         "success": {
             "dear": "Dear",
-            "thank_you_note": "Thank you for enabling us to prepare your token agreement.",
-            "thank_you_note2": "Next, we will guide you through the verification process.",
+            "thank_you_note": "Thank you for participating in the Camino Network Public Sale.",
+            "thank_you_note2": "Your invoice will be provided via email. Delivery of tokens can take up to 10 business days.",
+            "contact_us1": "Please do not hesitate to contact",
+            "contact_us2": "in case you have any questions.",
             "next": "Please have your id document at hand.",
             "start": "Start Verification Process"
         }

@@ -5,7 +5,7 @@
             <h1 class="header-text">{{ $t('wizard.subtitle') }}</h1>
             <form @submit.prevent="submitSaftForm">
                 <InputField
-                    label="Company Name (only if Company is buying Camino Tokens)"
+                    label="Company Name (please only provide if the company is the buyer)"
                     :error_message="$t('wizard.errors.company')"
                     placeholder="Company Name"
                     @change="handleChange"
@@ -56,7 +56,7 @@
                 />
                 <div class="input_box">
                     <label>
-                        Country
+                        Country of Residency
                         <sup>&#42;</sup>
                     </label>
                     <country-select
@@ -66,7 +66,16 @@
                         class="single_line_input hover_border"
                         removePlaceholder
                         countryName
+                        required
                     />
+                    <!-- whiteList="['DE', 'CH']" -->
+                </div>
+                <div
+                    style="margin-bottom: 10px; margin-top: 5px; font-size: 12px"
+                    class="discalmer-text"
+                >
+                    Unfortunately, due to local restrictions, some countries are excluded from the
+                    public sale. Please find more information in the Terms & Conditions
                 </div>
                 <InputField
                     label="Phone"
@@ -84,6 +93,44 @@
                     @change="handleChange"
                     required
                 />
+
+                <InputField
+                    label="Purchase Amount (in CHF) (min. 1000)"
+                    :error_value="error.purchaseAmount"
+                    :error_message="$t('wizard.errors.purchaseAmount')"
+                    placeholder="Purchase Amount"
+                    @change="handleChange"
+                    type="number"
+                    min="1000"
+                    step="1"
+                    pattern="[0-9]*"
+                    inputmode="numeric"
+                    required
+                />
+
+                <div>
+                    <label>
+                        Currency
+                        <sup>&#42;</sup>
+                    </label>
+                    <select
+                        v-model="user.preferredCurrency"
+                        @change="handleChange"
+                        name="currency"
+                        id="currency"
+                        class="single_line_input hover_border"
+                        required
+                    >
+                        <option value="" disabled selected>Select Currency</option>
+                        <option value="eur">EUR</option>
+                        <option value="chf">CHF</option>
+                        <option value="usd">USD</option>
+                        <option value="usdc">USDC</option>
+                        <option value="btc">BTC</option>
+                        <option value="eth">ETH</option>
+                    </select>
+                </div>
+
                 <div class="form_actions">
                     <SaftCheckbox v-model="user.agree" :explain="$t('wizard.agree')" required />
                     <v-btn
@@ -110,6 +157,10 @@
                         {{ $t('wizard.success.thank_you_note') }}
                         <br />
                         {{ $t('wizard.success.thank_you_note2') }}
+                        <br />
+                        {{ $t('wizard.success.contact_us1') }}
+                        <a href="mailto:hello@camino.network">hello@camino.network</a>
+                        {{ $t('wizard.success.contact_us2') }}
                     </p>
                     <v-btn @click="completeSaftStep" class="button_secondary submit_but">
                         {{ $t('wizard.success.start') }}
@@ -147,6 +198,8 @@ interface User {
     phone: string
     agree: boolean
     multisig: boolean
+    purchaseAmount: number
+    preferredCurrency: string
 }
 
 @Component({
@@ -156,6 +209,7 @@ export default class Saft extends Vue {
     nameRegex = /^([^<>()|[\]\\.,;:@\\"0-9]|(\\".+\\")){2,64}$/
     emailRegex = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
+    purchaseAmountRegex = /^(?:1000(?:[.,]0*)?|[1-9]\d{3,}(?:[.,]\d+)?)$/
     isLoading = false
     background = ''
     error: {
@@ -164,12 +218,16 @@ export default class Saft extends Vue {
         city: boolean
         email: boolean
         phone: boolean
+        purchaseAmount: boolean
+        preferredCurrency: boolean
     } = {
         name: false,
         surname: false,
         city: false,
         email: false,
         phone: false,
+        purchaseAmount: false,
+        preferredCurrency: false,
     }
     submitted: boolean = false
     user: User = {
@@ -185,6 +243,8 @@ export default class Saft extends Vue {
         phone: '',
         agree: false,
         multisig: false,
+        purchaseAmount: 0,
+        preferredCurrency: '',
     }
     created() {
         localStorage.removeItem('Email')
@@ -465,7 +525,7 @@ button .arrow {\
     }
     handleChange({ value, type }: { value: string; type: string }) {
         switch (type) {
-            case 'company name (only if company is buying camino tokens)':
+            case 'company name (please only provide if the company is the buyer)':
                 this.user.company = value
                 break
             case 'name':
@@ -497,6 +557,13 @@ button .arrow {\
             case 'zip code':
                 this.user.zip = value
                 break
+            case 'purchase amount (in chf) (min. 1000)':
+                this.user.purchaseAmount = parseInt(value)
+                this.error.purchaseAmount = !this.purchaseAmountRegex.test(value)
+                break
+            case 'currency':
+                this.user.preferredCurrency = value
+                break
             default:
                 break
         }
@@ -512,6 +579,7 @@ button .arrow {\
             !this.user.country ||
             !this.user.email ||
             !this.user.agree ||
+            !this.user.purchaseAmount ||
             this.error.name ||
             this.error.surname ||
             this.error.city ||
@@ -621,6 +689,13 @@ img {
     .v-btn {
         max-width: 350px;
     }
+}
+
+.discalmer-text {
+    color: var(--warning);
+    margin-bottom: 10px;
+    margin-top: 5px;
+    font-size: 12px;
 }
 
 .form_actions {
