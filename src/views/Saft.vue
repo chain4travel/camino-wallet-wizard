@@ -62,13 +62,12 @@
                     <country-select
                         v-model="user.country"
                         :country="user.country"
-                        topCountry="DE"
                         class="single_line_input hover_border"
                         removePlaceholder
                         countryName
+                        whiteList="['AX','AL','AD','AO','AI','AG','AM','AR','AW','AT','AU','AZ','BS','BH','BB','BE','BZ','BJ','BM','BT','BQ','BW','BR','BN','BG','BF','KH','CA','CV','KY','CX','CK','CC','CO','KM','CR','CL','HR','CY','CW','CZ','DK','DJ','DM','DO','EC','EE','SV','GQ','SZ','FK','FO','FM','FJ','FI','FR','GF','GL','DE','GM','GE','GR','GD','GP','GU','GT','GG','GY','HN','HK','HU','IS','IN','ID','IE','IL','IT','JM','JP','JE','JO','KZ','KE','KI','XK','KW','KG','LV','LA','LT','LU','MO','MQ','YT','MG','MW','MY','MV','MT','MH','MR','MU','MX','MC','MN','MS''MZ''NA''NR''NZ''NC''NU''NF''MP''NO''OM''PK''PW''PS''PA''PY''PG''PE''PH''PL''PF''PT''PR''RE''RO''RW''BL''MF''SH''PM''SX''KN''LC''VC''WS''SM''ST''SA''SN''SC''SG''SK''SI''SB''KR''ZA''ES''SR''SE''CH''TJ''TW''TH''TL''NL''TG''TK''TO''TT''TC''TV''TR''UG''AE''GB''TZ''UY''UZ''VN''VU''VI''WF''ZM']"
                         required
                     />
-                    <!-- whiteList="['DE', 'CH']" -->
                 </div>
                 <div
                     style="margin-bottom: 10px; margin-top: 5px; font-size: 12px"
@@ -150,7 +149,7 @@
         </template>
         <template v-else>
             <div class="success_body">
-                <img src="@/assets/success.svg" alt />
+                <img src="@/assets/success.svg" alt="" />
                 <div class="success_content">
                     <span>{{ $t('wizard.success.dear') }} {{ user.name }}</span>
                     <p>
@@ -187,8 +186,6 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import InputField from '../components/Saft/InputField.vue'
 import MultiSigCheckbox from '../components/Saft/MultiSigCheckbox.vue'
 import SaftCheckbox from '../components/Saft/SaftCheckbox.vue'
-//@ts-ignore
-const EC = require('elliptic').ec
 
 interface User {
     company: string
