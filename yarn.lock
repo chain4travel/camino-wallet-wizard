@@ -1438,7 +1438,7 @@
 "@c4tplatform/camino-wallet-sdk@file:camino-wallet-sdk":
   version "0.0.2"
   dependencies:
-    "@c4tplatform/caminojs" "file:../../../Library/Caches/Yarn/v6/npm-@c4tplatform-camino-wallet-sdk-0.0.2-01c2734e-8937-4845-9178-452edc06a939-1685927746888/node_modules/@c4tplatform/camino-wallet-sdk/caminojs"
+    "@c4tplatform/caminojs" "file:../../../Library/Caches/Yarn/v6/npm-@c4tplatform-camino-wallet-sdk-0.0.2-f991c45e-52bc-4619-8f6d-1a1e744a1d42-1705595554418/node_modules/@c4tplatform/camino-wallet-sdk/caminojs"
     "@ethereumjs/tx" "^4.0.2"
     "@ledgerhq/hw-app-eth" "^6.12.2"
     "@ledgerhq/hw-transport" "^6.19.0"
@@ -1512,6 +1512,11 @@
   dependencies:
     exec-sh "^0.3.2"
     minimist "^1.2.0"
+
+"@coders-tm/vue-number-format@^2.20.0":
+  version "2.20.0"
+  resolved "https://registry.yarnpkg.com/@coders-tm/vue-number-format/-/vue-number-format-2.20.0.tgz#615395c1f1ec60cd56f1f82d3b1d34e7f05607f2"
+  integrity sha512-MtSJkWLvNl6sm5kHg2iMCvK1I66hjJVCJt3rG9oS6AdVlUVVRbwojJA+tNDM0wy4/cwTcjB9bt5vXNXIJgXLkA==
 
 "@cypress/listr-verbose-renderer@^0.4.1":
   version "0.4.1"

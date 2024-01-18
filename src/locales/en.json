@@ -110,7 +110,7 @@
         "title": "Please fill out the form below.",
         "subtitle": "This data will be used to create your invoice. The invoice will be provided via email. You can choose your payment currency of choice below.",
         "send": "Send & Next",
-        "agree": "I agree that Chain4Travel and the Camino Network Foundation may use my data internally and for verification purposes with Chain4Travel’s partner Sumsub. *",
+        "agree": "I agree that the Camino Network Foundation and Chain4Travel may use my data internally and for verification purposes with their partner Sumsub. *",
         "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
         "errors": {
             "name": "Name must at least contain two and must not exceed 64 letters",

@@ -7,10 +7,6 @@
                 <img v-else src="@/assets/DarkModeLogo.svg" class="logo" />
             </div>
             <v-spacer></v-spacer>
-
-            <div class="buts_right">
-                <DayNightToggle class="action_but"></DayNightToggle>
-            </div>
         </div>
     </div>
 </template>
@@ -82,10 +78,6 @@ button {
         font-size: 11px;
         font-weight: 700;
 
-        &:hover {
-            opacity: 0.7;
-        }
-
         img {
             width: 120px;
             height: 36px;
@@ -131,9 +123,6 @@ button {
 
 .mobile_right {
     display: none;
-}
-
-.mobile_bottom {
 }
 
 .mobile_account_menu {

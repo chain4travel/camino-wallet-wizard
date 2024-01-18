@@ -81,9 +81,9 @@ select {
         .small_text {
             color: var(--secondary-color);
         }
-    }
-    .error_message {
-        color: var(--error);
+        .error_message {
+            color: var(--error);
+        }
     }
 }
 </style>

@@ -14,11 +14,25 @@
                 <saft
                     @changestep="changeStep"
                     @getVerificationStatus="getVerificationStatus"
+                    :name="name"
+                    :surname="surname"
+                    :email="email"
+                    :phone="phone"
+                    @update:name="name = $event"
+                    @update:surname="surname = $event"
+                    @update:phone="phone = $event"
+                    @update:email="email = $event"
                 ></saft>
             </v-stepper-content>
 
             <v-stepper-content step="3" key="3">
-                <kyc-verification :verificationCompleted="verificationCompleted" />
+                <kyc-verification
+                    :verificationCompleted="verificationCompleted"
+                    :name="name"
+                    :surname="surname"
+                    :email="email"
+                    :phone="phone"
+                />
             </v-stepper-content>
         </v-stepper-items>
     </v-stepper>
@@ -58,6 +72,12 @@ export default class CreateWallet extends Vue {
     isSecured: boolean = false
     isVerified: boolean = false
     verificationCompleted = false
+
+    name: string = ''
+    surname: string = ''
+    email: string = ''
+    phone: string = ''
+
     created() {
         this.createKey()
     }
