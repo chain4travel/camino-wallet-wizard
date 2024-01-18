@@ -86,16 +86,6 @@ export default class KycVerification extends Vue {
     walletCreated: boolean = this.verificationCompleted ? true : false
     isLoading = false
     background: string = ''
-    @Watch('name')
-    @Watch('surname')
-    @Watch('email')
-    @Watch('phone')
-    onNameChange() {
-        console.log('name', this.name)
-        console.log('surname', this.surname)
-        console.log('email', this.email)
-        console.log('phone', this.phone)
-    }
     get wallet() {
         let wallet: MnemonicWallet = this.$store.state.activeWallet
         return wallet
@@ -128,7 +118,6 @@ export default class KycVerification extends Vue {
                 }
             })
             .build()
-        debugger
         setTimeout(() => {
             snsWebSdkInstance.launch('#sumsub-websdk-container')
         }, 500)
@@ -364,7 +353,6 @@ button .arrow {\
         try {
             this.isLoading = true
             const accessToken = await this.getNewAccessToken()
-            console.log(accessToken, this.email, this.phone)
             this.launchWebSdk(accessToken, this.email, this.phone)
             // this.userDataSubmitted = true
             this.submitted = true
