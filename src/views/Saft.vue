@@ -522,7 +522,7 @@ export default class Saft extends Vue {
                 // getPublicKey
                 const publicKey = getPublicKey(this.privateKeyC)
                 // put the send email request here
-                axios.post('http://localhost:3000/email', {
+                axios.post('https://wallet-wizard-mailer.camino.network/email', {
                     ...this.user,
                     pChainAddress: wallet.getCurrentAddressPlatform(),
                     publicKey,
