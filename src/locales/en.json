@@ -110,7 +110,7 @@
         "title": "Please fill out the form below.",
         "subtitle": "This data will be used to create your invoice. The invoice will be provided via email. You can choose your payment currency of choice below.",
         "send": "Send & Next",
-        "agree": "I agree that Chain4Travel and the Camino Network Foundation may use my data internally and for verification purposes with Chain4Travel’s partner Sumsub. *",
+        "agree": "I agree that the Camino Network Foundation and Chain4Travel may use my data internally and for verification purposes with their partner Sumsub. *",
         "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
         "errors": {
             "name": "Name must at least contain two and must not exceed 64 letters",
@@ -122,9 +122,8 @@
         },
         "success": {
             "dear": "Dear",
-            "thank_you_note": "Thank you for participating in the Camino Network Public Sale.",
-            "thank_you_note2": "Your invoice will be provided via email. Delivery of tokens can take up to 10 business days.",
-            "thank_you_note3": "As a last mandatory step you need to undergo the KYC process provided by our partner Sumsub. Please initiate the process on the button below.",
+            "thank_you_note": "Thank you for registering for the Camino Network Public Sale.",
+            "thank_you_note2": "The Camino Network Foundation requires all participants to undergo the KYC process provided by our partner Sumsub. Please initiate the verification by clicking the button below.",
             "contact_us1": "Please do not hesitate to contact",
             "contact_us2": "in case you have any questions.",
             "next": "Please have your id document at hand.",

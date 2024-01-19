@@ -1,6 +1,6 @@
 <template>
     <div class="saft-view">
-        <template v-if="!submitted">
+        <template>
             <h1 class="header-text">{{ $t('wizard.title') }}</h1>
             <h1 class="header-text">{{ $t('wizard.subtitle') }}</h1>
             <form @submit.prevent="submitSaftForm">
@@ -65,7 +65,7 @@
                         class="single_line_input hover_border"
                         removePlaceholder
                         countryName
-                        whiteList="['AX','AL','AD','AO','AI','AG','AM','AR','AW','AT','AU','AZ','BS','BH','BB','BE','BZ','BJ','BM','BT','BQ','BW','BR','BN','BG','BF','KH','CA','CV','KY','CX','CK','CC','CO','KM','CR','CL','HR','CY','CW','CZ','DK','DJ','DM','DO','EC','EE','SV','GQ','SZ','FK','FO','FM','FJ','FI','FR','GF','GL','DE','GM','GE','GR','GD','GP','GU','GT','GG','GY','HN','HK','HU','IS','IN','ID','IE','IL','IT','JM','JP','JE','JO','KZ','KE','KI','XK','KW','KG','LV','LA','LT','LU','MO','MQ','YT','MG','MW','MY','MV','MT','MH','MR','MU','MX','MC','MN','MS''MZ''NA''NR''NZ''NC''NU''NF''MP''NO''OM''PK''PW''PS''PA''PY''PG''PE''PH''PL''PF''PT''PR''RE''RO''RW''BL''MF''SH''PM''SX''KN''LC''VC''WS''SM''ST''SA''SN''SC''SG''SK''SI''SB''KR''ZA''ES''SR''SE''CH''TJ''TW''TH''TL''NL''TG''TK''TO''TT''TC''TV''TR''UG''AE''GB''TZ''UY''UZ''VN''VU''VI''WF''ZM']"
+                        :whiteList="whiteList"
                         required
                     />
                 </div>
@@ -73,8 +73,10 @@
                     style="margin-bottom: 10px; margin-top: 5px; font-size: 12px"
                     class="discalmer-text"
                 >
-                    Unfortunately, due to local restrictions, some countries are excluded from the
-                    public sale. Please find more information in the Terms & Conditions
+                    Due to local restrictions, some countries are excluded from the public sale.
+                    Please find more information in the
+                    <a href="/legal" target="_blank">Terms & Conditions</a>
+                    .
                 </div>
                 <InputField
                     label="Phone"
@@ -93,19 +95,23 @@
                     required
                 />
 
-                <InputField
-                    label="Purchase Amount (in CHF) (min. 1000)"
-                    :error_value="error.purchaseAmount"
-                    :error_message="$t('wizard.errors.purchaseAmount')"
-                    placeholder="Purchase Amount"
-                    @change="handleChange"
-                    type="number"
-                    min="1000"
-                    step="1"
-                    pattern="[0-9]*"
-                    inputmode="numeric"
-                    required
-                />
+                <div>
+                    <label>
+                        Purchase Amount
+                        <small class="small_text">(in CHF) (min. 1,000)</small>
+                        <sup>&#42;</sup>
+                    </label>
+                    <vue-number
+                        class="single_line_input"
+                        v-model="user.purchaseAmount"
+                        v-bind="number"
+                    ></vue-number>
+                    <div class="secondary_text">
+                        <small class="error_message" v-if="error.purchaseAmount != ''">
+                            {{ error.purchaseAmount }}
+                        </small>
+                    </div>
+                </div>
 
                 <div>
                     <label>
@@ -121,12 +127,13 @@
                         required
                     >
                         <option value="" disabled selected>Select Currency</option>
-                        <option value="eur">EUR</option>
-                        <option value="chf">CHF</option>
-                        <option value="usd">USD</option>
-                        <option value="usdc">USDC</option>
-                        <option value="btc">BTC</option>
-                        <option value="eth">ETH</option>
+                        <option value="EUR">EUR</option>
+                        <option value="CHF">CHF</option>
+                        <option value="USD">USD</option>
+                        <option value="USDC">USDC</option>
+                        <option value="USDT">USDT</option>
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
                     </select>
                 </div>
 
@@ -147,31 +154,6 @@
                 </div>
             </form>
         </template>
-        <template v-else>
-            <div class="success_body">
-                <img src="@/assets/success.svg" alt="" />
-                <div class="success_content">
-                    <span>{{ $t('wizard.success.dear') }} {{ user.name }}</span>
-                    <p>
-                        {{ $t('wizard.success.thank_you_note') }}
-                        <br />
-                        <br />
-                        {{ $t('wizard.success.thank_you_note2') }}
-                        <br />
-                        <br />
-                        {{ $t('wizard.success.thank_you_note3') }}
-                        <br />
-                        <br />
-                        {{ $t('wizard.success.contact_us1') }}
-                        <a href="mailto:hello@camino.network">hello@camino.network</a>
-                        {{ $t('wizard.success.contact_us2') }}
-                    </p>
-                    <v-btn @click="completeSaftStep" class="button_secondary submit_but">
-                        {{ $t('wizard.success.start') }}
-                    </v-btn>
-                </div>
-            </div>
-        </template>
     </div>
 </template>
 <script lang="ts">
@@ -186,6 +168,8 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import InputField from '../components/Saft/InputField.vue'
 import MultiSigCheckbox from '../components/Saft/MultiSigCheckbox.vue'
 import SaftCheckbox from '../components/Saft/SaftCheckbox.vue'
+import { component as VueNumber } from '@coders-tm/vue-number-format'
+import { Prop } from 'vue-property-decorator'
 
 interface User {
     company: string
@@ -205,22 +189,214 @@ interface User {
 }
 
 @Component({
-    components: { SaftCheckbox, InputField, MultiSigCheckbox },
+    components: { SaftCheckbox, InputField, MultiSigCheckbox, VueNumber },
 })
 export default class Saft extends Vue {
+    @Prop() name!: string
+    @Prop() email!: string
+    @Prop() phone!: string
+    @Prop() surname!: string
     nameRegex = /^([^<>()|[\]\\.,;:@\\"0-9]|(\\".+\\")){2,64}$/
     emailRegex = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
     purchaseAmountRegex = /^(?:1000(?:[.,]0*)?|[1-9]\d{3,}(?:[.,]\d+)?)$/
     isLoading = false
     background = ''
+    price = 123.45
+    number = {
+        decimal: '.',
+        separator: ',',
+        prefix: '',
+        precision: 4,
+        masked: false,
+    }
+    whiteList = [
+        'AX',
+        'AL',
+        'AD',
+        'AO',
+        'AI',
+        'AG',
+        'AM',
+        'AR',
+        'AW',
+        'AT',
+        'AU',
+        'AZ',
+        'BS',
+        'BH',
+        'BB',
+        'BE',
+        'BZ',
+        'BJ',
+        'BM',
+        'BT',
+        'BQ',
+        'BW',
+        'BR',
+        'BN',
+        'BG',
+        'BF',
+        'KH',
+        'CA',
+        'CV',
+        'KY',
+        'CX',
+        'CK',
+        'CC',
+        'CO',
+        'KM',
+        'CR',
+        'CL',
+        'HR',
+        'CY',
+        'CW',
+        'CZ',
+        'DK',
+        'DJ',
+        'DM',
+        'DO',
+        'EC',
+        'EE',
+        'SV',
+        'GQ',
+        'SZ',
+        'FK',
+        'FO',
+        'FM',
+        'FJ',
+        'FI',
+        'FR',
+        'GF',
+        'GL',
+        'DE',
+        'GM',
+        'GE',
+        'GR',
+        'GD',
+        'GP',
+        'GU',
+        'GT',
+        'GG',
+        'GY',
+        'HN',
+        'HK',
+        'HU',
+        'IS',
+        'IN',
+        'ID',
+        'IE',
+        'IL',
+        'IT',
+        'JM',
+        'JP',
+        'JE',
+        'JO',
+        'KZ',
+        'KE',
+        'KI',
+        'XK',
+        'KW',
+        'KG',
+        'LV',
+        'LA',
+        'LT',
+        'LU',
+        'MO',
+        'MQ',
+        'YT',
+        'MG',
+        'MW',
+        'MY',
+        'MV',
+        'MT',
+        'MH',
+        'MR',
+        'MU',
+        'MX',
+        'MC',
+        'MN',
+        'MS',
+        'MZ',
+        'NA',
+        'NR',
+        'NZ',
+        'NC',
+        'NU',
+        'NF',
+        'MP',
+        'NO',
+        'OM',
+        'PK',
+        'PW',
+        'PS',
+        'PA',
+        'PY',
+        'PG',
+        'PE',
+        'PH',
+        'PL',
+        'PF',
+        'PT',
+        'PR',
+        'RE',
+        'RO',
+        'RW',
+        'BL',
+        'MF',
+        'SH',
+        'PM',
+        'SX',
+        'KN',
+        'LC',
+        'VC',
+        'WS',
+        'SM',
+        'ST',
+        'SA',
+        'SN',
+        'SC',
+        'SG',
+        'SK',
+        'SI',
+        'SB',
+        'KR',
+        'ZA',
+        'ES',
+        'SR',
+        'SE',
+        'CH',
+        'TJ',
+        'TW',
+        'TH',
+        'TL',
+        'NL',
+        'TG',
+        'TK',
+        'TO',
+        'TT',
+        'TC',
+        'TV',
+        'TR',
+        'UG',
+        'AE',
+        'GB',
+        'TZ',
+        'UY',
+        'UZ',
+        'VN',
+        'VU',
+        'VI',
+        'WF',
+        'ZM',
+    ]
     error: {
         name: boolean
         surname: boolean
         city: boolean
         email: boolean
         phone: boolean
-        purchaseAmount: boolean
+        purchaseAmount: string
         preferredCurrency: boolean
     } = {
         name: false,
@@ -228,7 +404,7 @@ export default class Saft extends Vue {
         city: false,
         email: false,
         phone: false,
-        purchaseAmount: false,
+        purchaseAmount: '',
         preferredCurrency: false,
     }
     submitted: boolean = false
@@ -252,13 +428,6 @@ export default class Saft extends Vue {
         localStorage.removeItem('Email')
         localStorage.removeItem('Phone')
     }
-    async getNewAccessToken() {
-        if (this.privateKeyC) {
-            const result = await generateToken(this.privateKeyC, KYC_VARIANT.KYC_BASIC)
-            return result.access_token
-        }
-        return ''
-    }
     get walletType(): WalletNameType {
         return this.wallet.type
     }
@@ -266,264 +435,16 @@ export default class Saft extends Vue {
         let wallet: MnemonicWallet = this.$store.state.activeWallet
         return wallet
     }
-    launchWebSdk(accessToken: string, applicantEmail: any, applicantPhone: any) {
-        let snsWebSdkInstance = snsWebSdk
-            .init(accessToken, () => this.getNewAccessToken())
-            .withConf({
-                email: applicantEmail,
-                phone: applicantPhone,
-                uiConf: {
-                    customCssStr: this.background,
-                },
-            })
-            .withOptions({ addViewportTag: false, adaptIframeHeight: true })
-            .on('idCheck.applicantStatus', async (applicantStatus) => {
-                await this.$store.dispatch('Accounts/updateKycStatus')
-                if (applicantStatus.reviewStatus === 'completed') {
-                    // this.verficationCompleted = true
-                }
-            })
-            .build()
-        snsWebSdkInstance.launch('#sumsub-websdk-container')
-    }
-    @Watch('$root.theme', { immediate: true })
-    onthemechange(val: string) {
-        if (val === 'night') {
-            this.background =
-                ".step.active .line, .step.active .bullet:before, .radio-item .checkmark:after, .step.active.pending .bullet:before {\
-    background-color: #149ded;\
-}\
-.accent {\
-    color: #149ded;\
-}\
-.step .title, .title  {\
-    color: #f5f5f5;\
-}\
-.step.active .title {\
-    color: #149ded;\
-    font-size: 14px;\
-    font-weight: 400;\
-}\
-section {\
-    border-radius: 12px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-    background-color: #1e293b;\
-}\
-p , h3, h2, label, .markdown-instructions li , .markdown-instructions p,.line-form .line-form-item > .phone-input,\
-.line-form .line-form-item > input{\
-    color : #f5f5f5 !important;\
-    font-size : 14px;\
-}\
-.document-examples, .upload {\
-    gap : 10px;\
-}\
-.upload-payment-item {\
-    margin : 0px;\
-}\
-.upload-payment-item .upload-item , .mobile-button{\
-    border: 1px solid rgba(203, 213, 225, 0.12);\
-    border-radius: 7px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-}\
- .mobile-button h3{\
-    color : #149ded !important;\
- }\
- button.submit,\
-button[type='submit'] {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    background-image: none;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-button:active:not(:disabled):not(.disabled),\
-button:hover:not(:disabled):not(.disabled):not(:active) {\
-    box-shadow: none;\
-}\
-button.submit:active:not(:disabled),\
-button.submit:hover:not(:disabled):not(.disabled):not(:active),\
-button[type='submit']:active:not(:disabled),\
-button[type='submit']:hover:not(:disabled):not(.disabled):not(:active) {\
-     background-image: none;\
-}\
-button {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    font-weight: 600;\
-    text-align: center;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-.line-form .line-form-item > span {\
-    border-bottom: none;\
-}\
-button.submit .arrow, button[type=submit] .arrow {\
-    margin-right: 0;\
-    margin-left: 5px;\
-}\
-button .arrow {\
-    margin-right: 5px;\
-}\
-.upload-item h4.requiredDoc:after {\
-    color: #149ded;\
-}\
-.popup {\
-    background: #1e293b !important;\
-}\
-.popup .message-content p {\
-    color: #f5f5f5 !important;\
-}\
-.step.pending .bullet {\
-    background-color: #f5f5f5;\
-    background-image: none;\
-    border-color: #f5f5f5;\
-}\
-.step.pending .line , .step.active .line, .step.success .line{\
-    background-color: #149ded;\
-}\
-.step.success .bullet {\
-    background-color: #149ded;\
-    border-color: #f5f5f5;\
-}\
-.error-message.warn {\
-    background-color: #0f172a;\
-}\
-.radio-item input:disabled~.checkmark:after {\
-  background-color: #149ded;\
-}\
-.document-status {\
-    background-color: transparent !important;\
-}\
-"
-            // 'body {background-color: var(--secondary-color) !important; min-height: 450px !important;} .line {background-color: black !important;}'
-        } else {
-            this.background =
-                ".step.active .line, .step.active .bullet:before, .radio-item .checkmark:after, .step.active.pending .bullet:before {\
-    background-color: #149ded;\
-}\
-.accent {\
-    color: #149ded;\
-}\
-.step .title, .title  {\
-    color: #0f172a;\
-}\
-.step.active .title {\
-    color: #149ded;\
-    font-size: 14px;\
-    font-weight: 400;\
-}\
-section {\
-    border-radius: 12px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-    background-color: transparent;\
-}\
-p , h3, h2, label, .markdown-instructions li , .markdown-instructions p,.line-form .line-form-item > .phone-input,\
-.line-form .line-form-item > input{\
-    color : #0f172a !important;\
-    font-size : 14px;\
-}\
-.document-examples, .upload {\
-    gap : 10px;\
-}\
-.upload-payment-item {\
-    margin : 0px;\
-}\
-.upload-payment-item .upload-item , .mobile-button{\
-    border: 1px solid rgba(203, 213, 225, 0.12);\
-    border-radius: 7px;\
-    box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px;\
-}\
- .mobile-button h3{\
-    color : #149ded !important;\
- }\
- button.submit,\
-button[type='submit'] {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    background-image: none;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-button:active:not(:disabled):not(.disabled),\
-button:hover:not(:disabled):not(.disabled):not(:active) {\
-    box-shadow: none;\
-}\
-button.submit:active:not(:disabled),\
-button.submit:hover:not(:disabled):not(.disabled):not(:active),\
-button[type='submit']:active:not(:disabled),\
-button[type='submit']:hover:not(:disabled):not(.disabled):not(:active) {\
-     background-image: none;\
-}\
-button {\
-    border-radius: 12px;\
-    background-color: transparent;\
-    font-weight: 600;\
-    text-align: center;\
-    color: #149ded;\
-    border: 1px solid #149ded;\
-}\
-.line-form .line-form-item > span {\
-    border-bottom: none;\
-}\
-button.submit .arrow, button[type=submit] .arrow {\
-    margin-right: 0;\
-    margin-left: 5px;\
-}\
-button .arrow {\
-    margin-right: 5px;\
-}\
-.upload-item h4.requiredDoc:after {\
-    color: #149ded;\
-}\
-.popup {\
-    background: #e2e8f0 !important;\
-}\
-.popup .message-content p {\
-    color: #0f172a !important;\
-}\
-.step.pending .bullet {\
-    background-color: #0f172a;\
-    background-image: none;\
-    border-color: #0f172a;\
-}\
-.step.pending .line , .step.active .line, .step.success .line{\
-    background-color: #149ded;\
-}\
-.step.success .bullet {\
-    background-color: #149ded;\
-    border-color: #0f172a;\
-}\
-.error-message.warn {\
-    background-color: transparent;\
-}\
-.radio-item input:disabled~.checkmark:after {\
-  background-color: #149ded;\
-}\
-.document-status {\
-    background-color: transparent !important;\
-}\
-"
-        }
-    }
-    async submitUserData() {
-        // if (!this.userData.email || !this.userData.phone) return
-        try {
-            this.isLoading = true
-            const accessToken = await this.getNewAccessToken()
-            this.launchWebSdk(accessToken, this.user.email, this.user.phone)
-            // this.userDataSubmitted = true
-        } finally {
-            this.isLoading = false
-        }
+    @Watch('user.purchaseAmount')
+    onPurchaseAmountChange() {
+        if (this.user.purchaseAmount < 1000)
+            this.error.purchaseAmount = 'Purchase amount must be at least 1000'
+        else this.error.purchaseAmount = ''
     }
     get privateKeyC(): string | null {
         if (this.walletType === 'ledger') return null
         let wallet = this.wallet as SingletonWallet | MnemonicWallet
         return wallet.ethKey
-    }
-    async completeSaftStep() {
-        await this.submitUserData()
-        this.$emit('changestep', 3)
     }
     handleChange({ value, type }: { value: string; type: string }) {
         switch (type) {
@@ -559,10 +480,6 @@ button .arrow {\
             case 'zip code':
                 this.user.zip = value
                 break
-            case 'purchase amount (in chf) (min. 1000)':
-                this.user.purchaseAmount = parseInt(value)
-                this.error.purchaseAmount = !this.purchaseAmountRegex.test(value)
-                break
             case 'currency':
                 this.user.preferredCurrency = value
                 break
@@ -582,10 +499,12 @@ button .arrow {\
             !this.user.email ||
             !this.user.agree ||
             !this.user.purchaseAmount ||
+            this.user.purchaseAmount < 1000 ||
             this.error.name ||
             this.error.surname ||
             this.error.city ||
-            this.error.email
+            this.error.email ||
+            this.error.purchaseAmount != ''
         )
     }
 
@@ -612,6 +531,11 @@ button .arrow {\
             }
         }
         this.submitted = true
+        this.$emit('update:name', this.user.name)
+        this.$emit('update:surname', this.user.surname)
+        this.$emit('update:email', this.user.email)
+        this.$emit('update:phone', this.user.phone)
+        this.$emit('changestep', 3)
     }
 }
 </script>
@@ -694,7 +618,7 @@ img {
 }
 
 .discalmer-text {
-    color: var(--warning);
+    color: #fa6602;
     margin-bottom: 10px;
     margin-top: 5px;
     font-size: 12px;
@@ -723,5 +647,14 @@ sup {
     text-transform: capitalize !important;
     color: #fff !important;
     font-size: 1rem !important;
+}
+
+.secondary_text {
+    display: flex;
+    flex-direction: column;
+    margin-top: 4px;
+    .error_message {
+        color: var(--error);
+    }
 }
 </style>
