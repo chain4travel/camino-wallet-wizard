@@ -36,7 +36,7 @@
                 <v-checkbox class="checkbox" v-model="accept" style="width: max-content" />
                 <div slot="label" style="font-size: 12px; margin-top: 16px; padding-top: 8px">
                     I accept the
-                    <a href="/legal">Terms & Conditions</a>
+                    <a href="/legal" target="_blank">Terms & Conditions</a>
                 </div>
             </div>
 

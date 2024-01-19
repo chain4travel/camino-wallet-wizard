@@ -75,7 +75,7 @@
                 >
                     Due to local restrictions, some countries are excluded from the public sale.
                     Please find more information in the
-                    <a href="/legal">Terms & Conditions</a>
+                    <a href="/legal" target="_blank">Terms & Conditions</a>
                     .
                 </div>
                 <InputField

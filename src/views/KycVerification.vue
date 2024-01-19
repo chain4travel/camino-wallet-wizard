@@ -2,7 +2,6 @@
     <div>
         <template v-if="!submitted">
             <div class="success_body">
-                <img src="@/assets/success.svg" alt="" />
                 <div class="success_content">
                     <span>{{ $t('wizard.success.dear') }} {{ name }} {{ surname }}</span>
                     <p>
@@ -10,9 +9,6 @@
                         <br />
                         <br />
                         {{ $t('wizard.success.thank_you_note2') }}
-                        <br />
-                        <br />
-                        {{ $t('wizard.success.thank_you_note3') }}
                         <br />
                         <br />
                         {{ $t('wizard.success.contact_us1') }}
@@ -454,10 +450,10 @@ h1 {
     // width: 100%;
     height: 48px !important;
     border-radius: 12px !important;
-    background-color: #0085ff !important;
     text-transform: capitalize !important;
     color: #fff !important;
     font-size: 1rem !important;
+    border: none !important;
 }
 
 .KYCform {
@@ -506,6 +502,25 @@ h1 {
 }
 .line-form .line-form-item > span {
     border-bottom: none;
+}
+
+.success_body {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-direction: column;
+    max-width: 700px;
+}
+
+.success_content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    text-align: center;
+    .v-btn {
+        max-width: 350px;
+    }
 }
 
 button {
