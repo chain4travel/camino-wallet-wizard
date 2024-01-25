@@ -15,9 +15,12 @@
                         <a href="mailto:hello@camino.network">hello@camino.network</a>
                         {{ $t('wizard.success.contact_us2') }}
                     </p>
-                    <v-btn @click="completeSaftStep" class="ava_button button_secondary submit_but">
+                    <button
+                        @click="completeSaftStep"
+                        class="ava_button button_secondary submit_but"
+                    >
                         {{ $t('wizard.success.start') }}
-                    </v-btn>
+                    </button>
                 </div>
             </div>
         </template>
@@ -410,16 +413,6 @@ button .arrow {\
         border-radius: var(--border-radius-sm) !important;
         overflow: auto;
         min-height: 200px;
-        @include mixins.mobile-device {
-            max-height: 90vh;
-            max-width: none;
-            width: 80%;
-            min-height: fit-content;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
     }
 
     .modal_bg {
@@ -538,5 +531,11 @@ input {
     padding: 10px 10px;
     font-size: 13px;
     outline: none;
+}
+@include mixins.mobile-device {
+    .success_content,
+    .verification--text {
+        font-size: 14px;
+    }
 }
 </style>

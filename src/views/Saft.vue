@@ -541,6 +541,7 @@ export default class Saft extends Vue {
 </script>
 <style scoped lang="scss">
 @use '../styles/main';
+@use "../styles/abstracts/mixins";
 
 .saft-view {
     display: flex;
@@ -655,6 +656,20 @@ sup {
     margin-top: 4px;
     .error_message {
         color: var(--error);
+    }
+}
+
+@include mixins.mobile-device {
+    .header-text {
+        font-size: 16px;
+    }
+    label {
+        font-size: 13px;
+    }
+    select,
+    input,
+    .v-number {
+        font-size: 12px;
     }
 }
 </style>

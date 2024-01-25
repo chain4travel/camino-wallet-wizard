@@ -229,21 +229,37 @@ a {
 }
 
 @media (max-width: 600px) {
+    .logo {
+        max-height: 30px;
+    }
+
     .footer-content {
         grid-template-columns: 1fr;
     }
 
     .first-section {
         align-items: center;
+        .desc {
+            font-size: 0.875rem;
+            text-align: center;
+        }
     }
 
     .second-section {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+        h3 {
+            font-size: 1.125rem;
+        }
     }
 
     li,
     .list-heading {
         text-align: center;
+    }
+
+    li {
+        font-size: 0.875rem;
     }
 }
 </style>

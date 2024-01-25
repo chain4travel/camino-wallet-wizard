@@ -224,8 +224,8 @@ export default class CreateWallet extends Vue {
     height: auto;
     max-width: 1100px;
     padding: 15px !important;
-    padding-top: 50px !important;
-    padding-bottom: 50px !important;
+    padding-top: 50px;
+    padding-bottom: 50px;
     border: none !important;
     display: flex;
     flex-direction: column;
@@ -385,27 +385,42 @@ export default class CreateWallet extends Vue {
 }
 
 @include mixins.mobile-device {
+    .steper__body {
+        margin-top: 0px;
+    }
     .steper .cols {
         display: block;
     }
     .steper .phrase_disp_col {
-        padding: 30px 0;
+        max-width: 560px;
         align-items: center;
         text-align: center;
+        padding: 0;
+        padding-top: 20px;
+        padding-bottom: 20px;
 
         img {
-            width: variables.$img-size-mobile;
-            height: variables.$img-size-mobile;
+            display: none;
         }
 
         header {
-            h1 {
-                font-size: variables.$xl-size-mobile;
-            }
+            display: none;
+        }
+
+        .success_header {
+            display: flex;
         }
 
         .warn {
-            margin-top: variables.$vertical-padding-mobile !important;
+            margin-top: 0px !important;
+            span {
+                font-size: 12px;
+            }
+        }
+
+        .checkbox {
+            display: flex;
+            justify-content: center;
         }
 
         .access_cont {
@@ -425,6 +440,11 @@ export default class CreateWallet extends Vue {
                 }
             }
         }
+    }
+
+    .phrase_raw {
+        padding: 15px 0px;
+        font-size: 14px;
     }
 }
 

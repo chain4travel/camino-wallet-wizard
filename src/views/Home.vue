@@ -1,5 +1,12 @@
 <template>
     <div class="home" v-if="!starting">
+        <div class="not-mobile-friendly warning">
+            <span>
+                <strong>DISCLAIMER:</strong>
+                Wallet creation should be done on mobile. We advise you to use a desktop browser to
+                create a wallet.
+            </span>
+        </div>
         <div class="home--wrapper">
             <h2 class="content--title">Camino Network Public Sale Wizard</h2>
             <div class="content">
@@ -25,7 +32,7 @@
                         minutes.
                         <br />
                         <br />
-                        <span>If you have any questions or remarks, please contac</span>
+                        <span>If you have any questions or remarks, please contact</span>
                         <a href="mailto:hello@camino.network" class="presale">
                             hello@camino.network
                         </a>
@@ -34,7 +41,7 @@
             </div>
             <div style="display: flex; flex-direction: row; width: 100%">
                 <v-checkbox class="checkbox" v-model="accept" style="width: max-content" />
-                <div slot="label" style="font-size: 12px; margin-top: 16px; padding-top: 8px">
+                <div class="label" slot="label">
                     I accept the
                     <a href="/legal" target="_blank">Terms & Conditions</a>
                 </div>
@@ -149,23 +156,62 @@ export default class Home extends Vue {
         color: #fff !important;
         font-size: 1rem !important;
     }
+
+    .label {
+        font-size: 12px;
+        margin-top: 16px;
+        padding-top: 8px;
+    }
+    .not-mobile-friendly {
+        display: flex;
+        border-radius: 8px;
+        max-width: 800px;
+        width: -moz-available;
+        width: -webkit-fill-available;
+        width: stretch;
+        margin: 0px 10px 20px 10px;
+        padding: 10px;
+
+        span {
+            font-size: 14px;
+            width: 100%;
+        }
+    }
 }
 
-/* ==========================================
-   Nav
-   ========================================== */
+@media only screen and (max-width: 900px) {
+    .home {
+        padding: 10px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        &--wrapper {
+            padding: 20px;
+            gap: 1rem;
+        }
+        .content {
+            &--title {
+                font-size: 28px;
+            }
+            &--desc {
+                font-size: 14px;
+            }
+            &--access-create {
+                font-size: 14px;
+            }
+        }
+        .label {
+            font-size: 12px;
+            margin-top: 10px;
+            padding-top: 4px;
+        }
+        .v-input {
+            margin-top: 8px;
+            padding-top: 4px;
+        }
+    }
 
-@include mixins.mobile-device {
-    .content {
-        &--title {
-            font-size: 18px;
-        }
-        &--desc {
-            font-size: 16px;
-        }
-        &--access-create {
-            font-size: 14px;
-        }
+    .not-mobile-friendly {
+        max-width: 600px !important;
     }
 }
 </style>
