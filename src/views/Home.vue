@@ -1,6 +1,6 @@
 <template>
     <div class="home" v-if="!starting">
-        <div class="not-mobile-friendly warning">
+        <div class="not-mobile-friendly warning" v-if="$isMobile()">
             <span>
                 <strong>DISCLAIMER:</strong>
                 Wallet creation should be done on mobile. We advise you to use a desktop browser to
