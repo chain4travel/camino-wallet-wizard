@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="checkbox">
         <v-checkbox :label="explain" v-model="localValue" @change="change" class="checkbox" />
     </div>
 </template>
@@ -45,6 +45,15 @@ export default {
 
     .v-input--selection-controls__ripple {
         color: var(--secondary-color) !important;
+    }
+}
+</style>
+
+<style scoped lang="scss">
+@use '../../styles/abstracts/mixins';
+@include mixins.mobile-device {
+    .v-input--selection-controls {
+        margin-top: 0px !important;
     }
 }
 </style>

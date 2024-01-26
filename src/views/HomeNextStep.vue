@@ -145,20 +145,25 @@ export default class Home extends Vue {
     font-weight: 700;
 }
 
-/* ==========================================
-   Nav
-   ========================================== */
-
-@include mixins.mobile-device {
-    .content {
-        &--title {
-            font-size: 18px;
+@media only screen and (max-width: 900px) {
+    .home {
+        padding: 10px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        &--wrapper {
+            gap: 1rem;
+            padding: 20px;
         }
-        &--desc {
-            font-size: 16px;
-        }
-        &--access-create {
-            font-size: 14px;
+        .content {
+            &--title {
+                font-size: 28px;
+            }
+            &--desc {
+                font-size: 14px;
+            }
+            .access-create {
+                font-size: 12px;
+            }
         }
     }
 }

@@ -232,9 +232,9 @@ h3 {
     .mnemonic_body {
         padding: 15px 30px;
         width: 100%;
-        overflow-y: scroll;
+        overflow-y: auto;
         position: relative;
-        height: 60vh;
+        height: fit-content;
     }
 
     .words {

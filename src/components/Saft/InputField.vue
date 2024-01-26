@@ -54,9 +54,10 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+@use "../../styles/abstracts/mixins";
 label {
     color: var(--primary-color);
-    font-size: 15px;
+    font-size: 14px;
     margin-bottom: 4px !important;
     sup {
         font-size: 18px;
@@ -84,6 +85,17 @@ select {
         .error_message {
             color: var(--error);
         }
+    }
+}
+
+@include mixins.mobile-device {
+    label {
+        font-size: 13px;
+    }
+    select,
+    input,
+    .v-number {
+        font-size: 12px;
     }
 }
 </style>

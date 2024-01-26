@@ -2,6 +2,13 @@
     <div class="stage_2">
         <div class="cols">
             <!-- LEFT -->
+            <h1
+                v-if="isVerified"
+                style="text-align: center; margin-bottom: 30px"
+                class="mobile_success"
+            >
+                {{ $t('create.success_title') }}
+            </h1>
             <div class="mneumonic_disp_col">
                 <div class="mnemonic_disp">
                     <span class="mnemonic_title">Your mnemonic key phrase</span>
@@ -22,7 +29,13 @@
                 </div>
             </div>
             <!-- RIGHT -->
-            <div class="phrase_disp_col">
+            <div
+                class="phrase_disp_col"
+                :style="{
+                    paddingTop: isVerified ? '0px' : '30px',
+                    paddingBottom: !isVerified ? '0px' : '30px',
+                }"
+            >
                 <template v-if="!isVerified">
                     <img
                         v-if="$root.theme === 'day'"
@@ -32,7 +45,7 @@
                     <img v-else src="@/assets/keyphrase_night.svg" alt="keyphrase_night" />
                 </template>
                 <template v-else>
-                    <img src="@/assets/success.svg" alt="success" />
+                    <img src="@/assets/success.svg" alt="success" style="margin-bottom: 14px" />
                 </template>
                 <header v-if="!isVerified">
                     <h1>
@@ -41,9 +54,9 @@
                     <p>{{ $t('create.mnemonic_desc') }}</p>
                 </header>
                 <header class="success_header" v-else>
-                    <h1>
+                    <!-- <h1>
                         {{ $t('create.success_title') }}
-                    </h1>
+                    </h1> -->
                     <p>In the next step, you will be asked to fill in your personal data</p>
                     <!-- <p>{{ $t('create.success_desc') }}</p> -->
                 </header>
@@ -195,6 +208,10 @@ export default class CreateWalletStep extends Vue {
     transform-origin: center top 0px !important;
 }
 
+.mobile_success {
+    display: none;
+}
+
 .steper {
     width: 100vw;
     height: 100vh;
@@ -263,7 +280,7 @@ export default class CreateWalletStep extends Vue {
             padding: 14px 24px;
             text-align: justify;
             border-radius: var(--border-radius-sm);
-            margin: 30px 0px !important;
+            margin: 30px 0px;
         }
 
         .mnemonic_display {
@@ -347,7 +364,6 @@ export default class CreateWalletStep extends Vue {
             .submit {
                 display: flex;
                 flex-direction: row;
-                margin-top: 14px;
                 text-align: left;
                 > div {
                     display: flex;
@@ -372,6 +388,9 @@ export default class CreateWalletStep extends Vue {
 }
 
 @include mixins.mobile-device {
+    .mobile_success {
+        display: block;
+    }
     .mnemonic_title {
         font-size: 20px;
         font-weight: 700;

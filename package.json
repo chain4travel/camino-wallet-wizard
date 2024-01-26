@@ -98,6 +98,7 @@
         "vue-datetime": "1.0.0-beta.14",
         "vue-i18n": "8.15.4",
         "vue-meta": "2.4.0",
+        "vue-mobile-detection": "1",
         "vue-property-decorator": "8.4.2",
         "vue-router": "3.1.3",
         "vue-virtual-scroll-list": "^2.3.2",

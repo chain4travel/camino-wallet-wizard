@@ -1,19 +1,25 @@
-import Vue from 'vue'
-import VueMeta from 'vue-meta'
+import 'vue-datetime/dist/vue-datetime.css'
+
 import App from './App.vue'
-import router from './router'
-import store from './store'
+// Extending Big.js with a helper function
+import Big from 'big.js'
+import BootstrapVue from 'bootstrap-vue'
 //@ts-ignore
 import { Datetime } from 'vue-datetime'
-import 'vue-datetime/dist/vue-datetime.css'
-import vuetify from './plugins/vuetify'
+import Vue from 'vue'
+import VueMeta from 'vue-meta'
+import VueMobileDetection from 'vue-mobile-detection'
 import i18n from './plugins/i18n'
+import router from './router'
+import store from './store'
 // @ts-ignores
 import vueCountryRegionSelect from 'vue-country-region-select'
+import vuetify from './plugins/vuetify'
 Vue.use(VueMeta)
 Vue.use(BootstrapVue)
 Vue.component('DateTime', Datetime)
 Vue.use(vueCountryRegionSelect)
+Vue.use(VueMobileDetection)
 Vue.config.productionTip = false
 
 const app = new Vue({
@@ -50,10 +56,6 @@ if (window.Cypress) {
     // @ts-ignore
     window.app = app
 }
-
-// Extending Big.js with a helper function
-import Big from 'big.js'
-import BootstrapVue from 'bootstrap-vue'
 
 declare module 'big.js' {
     interface Big {
