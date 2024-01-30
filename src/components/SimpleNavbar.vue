@@ -7,6 +7,9 @@
                 <img v-else src="@/assets/DarkModeLogo.svg" class="logo" />
             </div>
             <v-spacer></v-spacer>
+            <div class="buts_right">
+                <DayNightToggle class="action_but"></DayNightToggle>
+            </div>
         </div>
     </div>
 </template>

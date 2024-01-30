@@ -2,9 +2,9 @@
     <div class="home" v-if="!starting">
         <div class="not-mobile-friendly warning" v-if="$isMobile()">
             <span>
-                <strong>DISCLAIMER:</strong>
-                Wallet creation should be done on mobile. We advise you to use a desktop browser to
-                create a wallet.
+                <strong>Please note:</strong>
+                For an enhanced user experience and safety, this tool is optimized for desktop use,
+                and we recommend avoiding its use on mobile devices.
             </span>
         </div>
         <div class="home--wrapper">
@@ -43,7 +43,12 @@
                 <v-checkbox class="checkbox" v-model="accept" style="width: max-content" />
                 <div class="label" slot="label">
                     I accept the
-                    <a href="/legal" target="_blank">Terms & Conditions</a>
+                    <a
+                        href="https://camino.network/static/docs/Terms_and_Conditions_of_Use_Public_Sale_2024.pdf"
+                        target="_blank"
+                    >
+                        Terms & Conditions
+                    </a>
                 </div>
             </div>
 
