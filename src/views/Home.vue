@@ -1,6 +1,6 @@
 <template>
     <div class="home" v-if="!starting">
-        <div class="not-mobile-friendly warning" v-if="$isMobile()">
+        <div class="not-mobile-friendly please_note" v-if="$isMobile()">
             <span>
                 <strong>Please note:</strong>
                 For an enhanced user experience and safety, this tool is optimized for desktop use,
@@ -181,6 +181,10 @@ export default class Home extends Vue {
             font-size: 14px;
             width: 100%;
         }
+    }
+    .please_note {
+        background-color: #ecce73 !important;
+        color: #000 !important;
     }
 }
 
