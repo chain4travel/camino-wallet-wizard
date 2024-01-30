@@ -75,7 +75,12 @@
                 >
                     Due to local restrictions, some countries are excluded from the public sale.
                     Please find more information in the
-                    <a href="/legal" target="_blank">Terms & Conditions</a>
+                    <a
+                        href="https://camino.network/static/docs/Terms_and_Conditions_of_Use_Public_Sale_2024.pdf"
+                        target="_blank"
+                    >
+                        Terms & Conditions
+                    </a>
                     .
                 </div>
                 <InputField
