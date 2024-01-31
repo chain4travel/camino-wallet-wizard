@@ -120,7 +120,7 @@
 
                 <div>
                     <label>
-                        Currency
+                        Preferred Payment Currency
                         <sup>&#42;</sup>
                     </label>
                     <select
@@ -485,7 +485,7 @@ export default class Saft extends Vue {
             case 'zip code':
                 this.user.zip = value
                 break
-            case 'currency':
+            case 'preferred payment currency':
                 this.user.preferredCurrency = value
                 break
             default:
