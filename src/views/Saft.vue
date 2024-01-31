@@ -84,14 +84,6 @@
                     .
                 </div>
                 <InputField
-                    label="Phone"
-                    :error_value="error.phone"
-                    :error_message="$t('wizard.errors.phone')"
-                    placeholder="Phone Number"
-                    @change="handleChange"
-                    required
-                />
-                <InputField
                     label="Email"
                     :error_value="error.email"
                     :error_message="$t('wizard.errors.email')"
@@ -120,7 +112,7 @@
 
                 <div>
                     <label>
-                        Currency
+                        Preferred Payment Currency
                         <sup>&#42;</sup>
                     </label>
                     <select
@@ -472,10 +464,6 @@ export default class Saft extends Vue {
                 this.user.email = value
                 this.error.email = !this.emailRegex.test(value)
                 break
-            case 'phone':
-                this.user.phone = value
-                this.error.phone = !this.phoneRegex.test(value)
-                break
             case 'street':
                 this.user.street = value
                 break
@@ -485,7 +473,7 @@ export default class Saft extends Vue {
             case 'zip code':
                 this.user.zip = value
                 break
-            case 'currency':
+            case 'preferred payment currency':
                 this.user.preferredCurrency = value
                 break
             default:
