@@ -98,11 +98,39 @@
                         <small class="small_text">(in CHF) (min. 1,000)</small>
                         <sup>&#42;</sup>
                     </label>
-                    <vue-number
-                        class="single_line_input"
-                        v-model="user.purchaseAmount"
-                        v-bind="number"
-                    ></vue-number>
+                    <div class="purshace_inputs">
+                        <vue-number
+                            class="single_line_input"
+                            v-model="user.purchaseAmount"
+                            v-bind="number"
+                        ></vue-number>
+                        <span v-if="user.purchaseAmount && error.purchaseAmount === ''">=</span>
+                        <div
+                            class="purchased_amount"
+                            :style="{
+                                display:
+                                    user.purchaseAmount && error.purchaseAmount === ''
+                                        ? 'flex'
+                                        : 'none',
+                            }"
+                        >
+                            <span style="display: flex; align-items: center">
+                                {{ formattedPurchaseAmount }}
+                                <img class="cam_icon" src="@/assets/cam.svg" alt="cam" />
+                            </span>
+                            +
+                            <span style="display: flex; align-items: center">
+                                {{ formattedReward }}
+                                <img
+                                    class="cam_icon"
+                                    src="@/assets/cam.svg"
+                                    alt="cam"
+                                    style="margin-right: 5px"
+                                />
+                                Reward
+                            </span>
+                        </div>
+                    </div>
                     <div class="secondary_text">
                         <small class="error_message" v-if="error.purchaseAmount != ''">
                             {{ error.purchaseAmount }}
@@ -432,6 +460,25 @@ export default class Saft extends Vue {
         let wallet: MnemonicWallet = this.$store.state.activeWallet
         return wallet
     }
+
+    get formattedPurchaseAmount(): string {
+        const amount = this.user.purchaseAmount / 0.15
+        const result = amount.toFixed(2).endsWith('.00')
+            ? Math.floor(amount)
+            : Number(amount.toFixed(2))
+
+        return new Intl.NumberFormat('en-US').format(result)
+    }
+
+    get formattedReward(): string {
+        const reward = (this.user.purchaseAmount / 0.15) * 0.06
+        const result = reward.toFixed(2).endsWith('.00')
+            ? Math.floor(reward)
+            : Number(reward.toFixed(2))
+
+        return new Intl.NumberFormat('en-US').format(result)
+    }
+
     @Watch('user.purchaseAmount')
     onPurchaseAmountChange() {
         if (this.user.purchaseAmount < 1000)
@@ -555,6 +602,9 @@ form {
     text-align: left;
     border: var(--primary-border);
     border-width: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     input,
     select {
         background-color: var(--bg-light) !important;
@@ -652,6 +702,33 @@ sup {
     }
 }
 
+.purshace_inputs {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.purchased_amount {
+    background-color: var(--bg-light) !important;
+    border-radius: 8px !important;
+    margin-top: 4px;
+    display: block;
+    width: 100%;
+    padding: 5px 12px;
+    border: 1px solid var(--bg-light);
+    border-radius: 3px;
+    color: var(--primary-color);
+    padding: 12px;
+    gap: 5px;
+}
+
+.cam_icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+}
+
 @include mixins.mobile-device {
     .header-text {
         font-size: 16px;
@@ -661,8 +738,16 @@ sup {
     }
     select,
     input,
-    .v-number {
+    .v-number,
+    .purshace_inputs {
         font-size: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .purshace_inputs {
+        flex-direction: column;
+        gap: 10px;
     }
 }
 </style>
