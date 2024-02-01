@@ -67,6 +67,7 @@ import MnemonicWallet from '@/js/wallets/MnemonicWallet'
 import { SingletonWallet } from '@/js/wallets/SingletonWallet'
 import { WalletNameType } from '@/js/wallets/types'
 import snsWebSdk from '@sumsub/websdk'
+import axios from 'axios'
 
 @Component({
     components: {
@@ -81,6 +82,7 @@ export default class KycVerification extends Vue {
     @Prop() surname!: string
     @Prop() email!: string
     @Prop() phone!: string
+    @Prop() purchaseAmount!: number
     submitted: boolean = false
     walletCreated: boolean = this.verificationCompleted ? true : false
     isLoading = false
@@ -91,6 +93,23 @@ export default class KycVerification extends Vue {
     }
     get walletType(): WalletNameType {
         return this.wallet.type
+    }
+    get formattedPurchaseAmount(): string {
+        const amount = this.purchaseAmount / 0.15
+        const result = amount.toFixed(2).endsWith('.00')
+            ? Math.floor(amount)
+            : Number(amount.toFixed(2))
+
+        return new Intl.NumberFormat('en-US').format(result)
+    }
+
+    get formattedReward(): string {
+        const reward = (this.purchaseAmount / 0.15) * 0.06
+        const result = reward.toFixed(2).endsWith('.00')
+            ? Math.floor(reward)
+            : Number(reward.toFixed(2))
+
+        return new Intl.NumberFormat('en-US').format(result)
     }
     async getNewAccessToken() {
         if (this.privateKeyC) {
@@ -114,6 +133,11 @@ export default class KycVerification extends Vue {
                 await this.$store.dispatch('Accounts/updateKycStatus')
                 if (applicantStatus.reviewStatus === 'completed') {
                     // this.verficationCompleted = true
+                    console.log('completed')
+                    axios.post('http://localhost:3000/kyc', {
+                        purchasedAmount: `${this.formattedPurchaseAmount} CAM`,
+                        rewardAmount: `${this.formattedReward} CAM`,
+                    })
                 }
             })
             .build()

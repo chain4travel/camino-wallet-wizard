@@ -22,6 +22,7 @@
                     @update:surname="surname = $event"
                     @update:phone="phone = $event"
                     @update:email="email = $event"
+                    @update:purchaseAmount="purchaseAmount = $event"
                 ></saft>
             </v-stepper-content>
 
@@ -32,6 +33,7 @@
                     :surname="surname"
                     :email="email"
                     :phone="phone"
+                    :purchaseAmount="purchaseAmount"
                 />
             </v-stepper-content>
         </v-stepper-items>
@@ -77,6 +79,7 @@ export default class CreateWallet extends Vue {
     surname: string = ''
     email: string = ''
     phone: string = ''
+    purchaseAmount: number = 0
 
     created() {
         this.createKey()
