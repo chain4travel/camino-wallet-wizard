@@ -135,6 +135,7 @@ export default class KycVerification extends Vue {
                     // this.verficationCompleted = true
                     console.log('completed')
                     axios.post('http://localhost:3000/kyc', {
+                        name: `${this.name} ${this.surname}`,
                         purchasedAmount: `${this.formattedPurchaseAmount} CAM`,
                         rewardAmount: `${this.formattedReward} CAM`,
                     })
