@@ -12,7 +12,7 @@
                         <br />
                         <br />
                         {{ $t('wizard.success.contact_us1') }}
-                        <a href="mailto:hello@camino.network">hello@camino.network</a>
+                        <a href="mailto:publicsale@camino.network">publicsale@camino.network</a>
                         {{ $t('wizard.success.contact_us2') }}
                     </p>
                     <button
@@ -43,8 +43,8 @@
                         <p>You will receive your result via Email.</p>
                         <p>
                             If you don't receive your result within 24 hours, please contact
-                            <a href="mailto:hello@camino.network" class="presale">
-                                hello@camino.network
+                            <a href="mailto:publicsale@camino.network" class="presale">
+                                publicsale@camino.network
                             </a>
                         </p>
                     </div>
