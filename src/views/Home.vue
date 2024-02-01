@@ -32,10 +32,16 @@
                         minutes.
                         <br />
                         <br />
-                        <span>If you have any questions or remarks, please contact</span>
-                        <a href="mailto:hello@camino.network" class="presale">
-                            hello@camino.network
-                        </a>
+                        <span>
+                            <div class="attention">ATTENTION</div>
+                            <p>
+                                If you have an exiting KYC verified Camino Wallet or have any
+                                questions, please contact
+                                <a href="mailto:publicsale@camino.network" class="presale">
+                                    publicsale@camino.network
+                                </a>
+                            </p>
+                        </span>
                     </span>
                 </div>
             </div>
@@ -185,6 +191,12 @@ export default class Home extends Vue {
     .please_note {
         background-color: #ecce73 !important;
         color: #000 !important;
+    }
+
+    .attention {
+        color: #e84970;
+        text-transform: uppercase;
+        font-weight: 700;
     }
 }
 

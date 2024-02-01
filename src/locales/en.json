@@ -108,7 +108,7 @@
     },
     "wizard": {
         "title": "Please fill out the form below.",
-        "subtitle": "This data will be used to create your invoice. The invoice will be provided via email. You can choose your payment currency of choice below.",
+        "subtitle": "This data will be used to create your invoice. The invoice will be provided via email within 24h. You can choose your payment currency of choice below.",
         "send": "Send & Next",
         "agree": "I agree that the Camino Network Foundation and Chain4Travel may use my data internally and for verification purposes with their partner Sumsub. *",
         "multisig": "Yes, I want to share control over my tokens. Please get in contact with me.",
