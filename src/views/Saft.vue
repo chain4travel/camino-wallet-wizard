@@ -103,6 +103,7 @@
                             class="single_line_input"
                             v-model="user.purchaseAmount"
                             v-bind="number"
+                            @input="validatePurchaseAmount"
                         ></vue-number>
                         <span v-if="user.purchaseAmount && error.purchaseAmount === ''">=</span>
                         <div
@@ -221,6 +222,7 @@ export default class Saft extends Vue {
     @Prop() email!: string
     @Prop() phone!: string
     @Prop() surname!: string
+    @Prop() purchaseAmount!: number
     nameRegex = /^([^<>()|[\]\\.,;:@\\"0-9]|(\\".+\\")){2,64}$/
     emailRegex = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
@@ -485,6 +487,12 @@ export default class Saft extends Vue {
             this.error.purchaseAmount = 'Purchase amount must be at least 1000'
         else this.error.purchaseAmount = ''
     }
+    validatePurchaseAmount(value: any) {
+        const maxValue = 9999999
+        if (value > maxValue) {
+            this.user.purchaseAmount = maxValue
+        }
+    }
     get privateKeyC(): string | null {
         if (this.walletType === 'ledger') return null
         let wallet = this.wallet as SingletonWallet | MnemonicWallet
@@ -570,11 +578,14 @@ export default class Saft extends Vue {
                 })
             }
         }
+        let wallet: MnemonicWallet = this.$store.state.activeWallet
         this.submitted = true
         this.$emit('update:name', this.user.name)
         this.$emit('update:surname', this.user.surname)
         this.$emit('update:email', this.user.email)
         this.$emit('update:phone', this.user.phone)
+        this.$emit('update:purchaseAmount', this.user.purchaseAmount)
+        this.$emit('update:pchainAddress', wallet.getCurrentAddressPlatform())
         this.$emit('changestep', 3)
     }
 }
