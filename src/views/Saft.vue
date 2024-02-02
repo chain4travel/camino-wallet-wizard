@@ -578,12 +578,14 @@ export default class Saft extends Vue {
                 })
             }
         }
+        let wallet: MnemonicWallet = this.$store.state.activeWallet
         this.submitted = true
         this.$emit('update:name', this.user.name)
         this.$emit('update:surname', this.user.surname)
         this.$emit('update:email', this.user.email)
         this.$emit('update:phone', this.user.phone)
         this.$emit('update:purchaseAmount', this.user.purchaseAmount)
+        this.$emit('update:pchainAddress', wallet.getCurrentAddressPlatform())
         this.$emit('changestep', 3)
     }
 }

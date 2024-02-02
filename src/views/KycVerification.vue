@@ -83,6 +83,7 @@ export default class KycVerification extends Vue {
     @Prop() email!: string
     @Prop() phone!: string
     @Prop() purchaseAmount!: number
+    @Prop() pchainAddress!: string
     submitted: boolean = false
     walletCreated: boolean = this.verificationCompleted ? true : false
     isLoading = false
@@ -135,9 +136,11 @@ export default class KycVerification extends Vue {
                     // this.verficationCompleted = true
                     console.log('completed')
                     axios.post('http://localhost:3000/kyc', {
+                        email: `${this.email}`,
                         name: `${this.name} ${this.surname}`,
-                        purchasedAmount: `${this.formattedPurchaseAmount} CAM`,
-                        rewardAmount: `${this.formattedReward} CAM`,
+                        purchasedAmount: `${this.formattedPurchaseAmount}`,
+                        rewardAmount: `${this.formattedReward}`,
+                        pchainAddress: `${this.pchainAddress}`,
                     })
                 }
             })
