@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="!verficationCompleted">
         <template v-if="!submitted">
             <div class="success_body">
                 <div class="success_content">
@@ -53,6 +53,22 @@
             <WalletCreated v-else />
         </template>
     </div>
+    <div v-else>
+        <div class="success_body">
+            <div class="success_content" style="padding: 20px">
+                <span class="success-title">
+                    <b>Verification has been completed succesfully.</b>
+                </span>
+                <span>You will receive a public sale registration confirmation via email.</span>
+                <span>
+                    Please do not hesitate to contact
+                    <a href="mailto:publicsale@camino.network">publicsale@camino.network</a>
+                    in case you have any questions.
+                </span>
+                <span>You may close this window now.</span>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -88,6 +104,7 @@ export default class KycVerification extends Vue {
     walletCreated: boolean = this.verificationCompleted ? true : false
     isLoading = false
     background: string = ''
+    verficationCompleted: boolean = false
     get wallet() {
         let wallet: MnemonicWallet = this.$store.state.activeWallet
         return wallet
@@ -133,7 +150,7 @@ export default class KycVerification extends Vue {
             .on('idCheck.applicantStatus', async (applicantStatus) => {
                 await this.$store.dispatch('Accounts/updateKycStatus')
                 if (applicantStatus.reviewStatus === 'completed') {
-                    // this.verficationCompleted = true
+                    this.verficationCompleted = true
                     console.log('completed')
                     axios.post('http://localhost:3000/kyc', {
                         email: `${this.email}`,
@@ -560,7 +577,14 @@ input {
     font-size: 13px;
     outline: none;
 }
+
+.success-title {
+    font-size: 25px;
+}
 @include mixins.mobile-device {
+    .success-title {
+        font-size: 20px;
+    }
     .success_content,
     .verification--text {
         font-size: 14px;
