@@ -151,8 +151,7 @@ export default class KycVerification extends Vue {
                 await this.$store.dispatch('Accounts/updateKycStatus')
                 if (applicantStatus.reviewStatus === 'completed') {
                     this.verficationCompleted = true
-                    console.log('completed')
-                    axios.post('http://localhost:3000/kyc', {
+                    axios.post('https://wallet-wizard-mailer.camino.network/kyc', {
                         email: `${this.email}`,
                         name: `${this.name} ${this.surname}`,
                         purchasedAmount: `${this.formattedPurchaseAmount}`,
