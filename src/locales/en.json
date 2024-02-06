@@ -118,7 +118,8 @@
             "city": "City name must at least contain two and must not exceed 64 letters",
             "email": "Please enter a correct email address",
             "phone": "Please enter a correct phone number",
-            "purchaseAmount": "Please enter a correct purchase amount"
+            "purchaseAmount": "Please enter a correct purchase amount",
+            "pChainAddress": "P-Chain address provided is not KYC verified"
         },
         "success": {
             "dear": "Dear",
