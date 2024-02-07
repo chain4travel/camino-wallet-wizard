@@ -11,6 +11,14 @@
                     @change="handleChange"
                 />
                 <InputField
+                    label="P-Chain Address"
+                    :error_value="error.pchainAddress != ''"
+                    :error_message="error.pchainAddress"
+                    placeholder="Your P-Chain Address"
+                    @change="handleChange"
+                    required
+                />
+                <InputField
                     label="Name"
                     :error_value="error.name"
                     :error_message="$t('wizard.errors.name')"
@@ -103,7 +111,6 @@
                             class="single_line_input"
                             v-model="user.purchaseAmount"
                             v-bind="number"
-                            @input="validatePurchaseAmount"
                         ></vue-number>
                         <span v-if="user.purchaseAmount && error.purchaseAmount === ''">=</span>
                         <div
@@ -183,11 +190,9 @@
     </div>
 </template>
 <script lang="ts">
-import { WHITE_LIST } from '@/constants'
 import MnemonicWallet from '@/js/wallets/MnemonicWallet'
 import { SingletonWallet } from '@/js/wallets/SingletonWallet'
 import { WalletNameType } from '@/js/wallets/types'
-import { getPublicKey } from '@/kyc_api'
 import axios from 'axios'
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import InputField from '../components/Saft/InputField.vue'
@@ -195,8 +200,14 @@ import MultiSigCheckbox from '../components/Saft/MultiSigCheckbox.vue'
 import SaftCheckbox from '../components/Saft/SaftCheckbox.vue'
 import { component as VueNumber } from '@coders-tm/vue-number-format'
 import { Prop } from 'vue-property-decorator'
+import { WalletHelper } from '@/helpers/wallet_helper'
+import { BN } from '@c4tplatform/caminojs/dist'
+import { AddressState, WHITE_LIST } from '@/constants'
+import { ava } from '@/AVA'
+import { isValidPChainAddress } from '@/helpers/address_helper'
 
 interface User {
+    pchainAddress: string
     company: string
     name: string
     surname: string
@@ -216,12 +227,13 @@ interface User {
 @Component({
     components: { SaftCheckbox, InputField, MultiSigCheckbox, VueNumber },
 })
-export default class Saft extends Vue {
+export default class PChainSaft extends Vue {
     @Prop() name!: string
     @Prop() email!: string
     @Prop() phone!: string
     @Prop() surname!: string
     @Prop() purchaseAmount!: number
+    whiteList = WHITE_LIST
     nameRegex = /^([^<>()|[\]\\.,;:@\\"0-9]|(\\".+\\")){2,64}$/
     emailRegex = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     phoneRegex = /^[\\+]?[(]?[0-9]{3}[)]?[-\s\\.]?[0-9]{3}[-\s\\.]?[0-9]{3,9}$/
@@ -236,7 +248,6 @@ export default class Saft extends Vue {
         precision: 4,
         masked: false,
     }
-    whiteList = WHITE_LIST
     error: {
         name: boolean
         surname: boolean
@@ -245,6 +256,7 @@ export default class Saft extends Vue {
         phone: boolean
         purchaseAmount: string
         preferredCurrency: boolean
+        pchainAddress: string
     } = {
         name: false,
         surname: false,
@@ -253,9 +265,11 @@ export default class Saft extends Vue {
         phone: false,
         purchaseAmount: '',
         preferredCurrency: false,
+        pchainAddress: '',
     }
     submitted: boolean = false
     user: User = {
+        pchainAddress: '',
         company: '',
         name: '',
         surname: '',
@@ -318,10 +332,74 @@ export default class Saft extends Vue {
         let wallet = this.wallet as SingletonWallet | MnemonicWallet
         return wallet.ethKey
     }
-    handleChange({ value, type }: { value: string; type: string }) {
+    async isMultisig() {
+        try {
+            await ava.PChain().getMultisigAlias(this.user.pchainAddress)
+            return true
+        } catch (error) {
+            return false
+        }
+    }
+
+    @Watch('user.pchainAddress')
+    async onPchainAddressChange() {
+        if (!this.user.pchainAddress) {
+            this.error.pchainAddress = ''
+            return
+        } else {
+            if (!isValidPChainAddress(this.user.pchainAddress)) {
+                this.error.pchainAddress = 'Invalid P-Chain Address'
+                return
+            }
+
+            const l = await this.isKYCVerified(this.user.pchainAddress)
+            this.error.pchainAddress = !l ? 'P-Chain Address provided is not KYC verified' : ''
+        }
+    }
+
+    async isKYCVerified(address: string) {
+        const BN_ONE = new BN(1)
+        const isMultisig = await this.isMultisig()
+        const isValidAddress = await isValidPChainAddress(address)
+
+        if (!isValidAddress) return false
+        if (isMultisig) {
+            let result = await WalletHelper.getAddressState(address)
+            let isKYCVerified = !result.and(BN_ONE.shln(AddressState.KYC_VERIFIED)).isZero()
+            if (isKYCVerified) return true
+
+            try {
+                const response = await ava.PChain().getMultisigAlias(address)
+                if (response?.addresses) {
+                    for (const addr of response.addresses) {
+                        result = await WalletHelper.getAddressState(addr)
+                        isKYCVerified = !result.and(BN_ONE.shln(AddressState.KYC_VERIFIED)).isZero()
+                        if (isKYCVerified) return true
+                    }
+                    return false
+                }
+            } catch (error) {
+                return false
+            }
+            return false
+        } else {
+            const result = await WalletHelper.getAddressState(address)
+
+            return !result.and(BN_ONE.shln(AddressState.KYC_VERIFIED)).isZero()
+        }
+    }
+
+    trimSpaces(value: any): string {
+        return value.trimStart()
+    }
+
+    async handleChange({ value, type }: { value: string; type: string }) {
         switch (type) {
             case 'company name (please only provide if the company is the buyer)':
                 this.user.company = value
+                break
+            case 'p-chain address':
+                this.user.pchainAddress = this.trimSpaces(value)
                 break
             case 'name':
                 this.user.name = value
@@ -368,12 +446,14 @@ export default class Saft extends Vue {
             !this.user.agree ||
             !this.user.purchaseAmount ||
             !this.user.preferredCurrency ||
+            !this.user.pchainAddress ||
             this.user.purchaseAmount < 1000 ||
             this.error.name ||
             this.error.surname ||
             this.error.city ||
             this.error.email ||
-            this.error.purchaseAmount != ''
+            this.error.purchaseAmount != '' ||
+            this.error.pchainAddress != ''
         )
     }
 
@@ -381,33 +461,47 @@ export default class Saft extends Vue {
         e.preventDefault()
         if (this.submitUserDataDisabled) return
         else {
+            const multisig = await this.isMultisig()
             // saving pchain address
-            let wallet: MnemonicWallet = this.$store.state.activeWallet
-            localStorage.setItem('P-chain-address', wallet.getCurrentAddressPlatform())
+            localStorage.setItem('P-chain-address', this.user.pchainAddress)
             // saving the phone and email in local storage to be used in the KYC process
             localStorage.setItem('Email', this.user.email)
             localStorage.setItem('Phone', this.user.phone)
-            if (this.privateKeyC) {
-                // getPublicKey
-                const publicKey = getPublicKey(this.privateKeyC)
-                // put the send email request here
+            if (this.user.pchainAddress) {
                 axios.post('https://wallet-wizard-mailer.camino.network/email', {
-                    ...this.user,
-                    pChainAddress: wallet.getCurrentAddressPlatform(),
-                    publicKey,
+                    company: this.user.company,
+                    KYCWallet: true,
+                    name: this.user.name,
+                    surname: this.user.surname,
+                    street: this.user.street,
+                    street2: this.user.street2,
+                    zip: this.user.zip,
+                    city: this.user.city,
+                    country: this.user.country,
+                    email: this.user.email,
+                    agree: this.user.agree,
+                    multisig: multisig,
+                    pchainAddress: this.user.pchainAddress,
+                    purchaseAmount: this.user.purchaseAmount,
+                    preferredCurrency: this.user.preferredCurrency,
                     wizard: true,
+                })
+                axios.post('https://wallet-wizard-mailer.camino.network/kyc', {
+                    email: this.user.email,
+                    name: `${this.user.name} ${this.user.surname}`,
+                    purchasedAmount: `${this.formattedPurchaseAmount}`,
+                    rewardAmount: `${this.formattedReward}`,
+                    pchainAddress: `${this.user.pchainAddress}`,
                 })
             }
         }
-        let wallet: MnemonicWallet = this.$store.state.activeWallet
         this.submitted = true
         this.$emit('update:name', this.user.name)
         this.$emit('update:surname', this.user.surname)
         this.$emit('update:email', this.user.email)
         this.$emit('update:phone', this.user.phone)
-        this.$emit('update:purchaseAmount', this.user.purchaseAmount)
-        this.$emit('update:pchainAddress', wallet.getCurrentAddressPlatform())
-        this.$emit('changestep', 3)
+        this.$emit('update:pchainAddress', this.user.pchainAddress)
+        this.$emit('changestep', 2)
     }
 }
 </script>
