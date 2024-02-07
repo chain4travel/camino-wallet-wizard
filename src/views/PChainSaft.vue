@@ -172,6 +172,22 @@
 
                 <div class="form_actions">
                     <SaftCheckbox v-model="user.agree" :explain="$t('wizard.agree')" required />
+                    <div style="display: flex; flex-direction: row; width: 100%">
+                        <v-checkbox
+                            class="checkbox"
+                            v-model="termsAndConditions"
+                            style="width: max-content"
+                        />
+                        <div class="label" slot="label" style="font-size: 12px">
+                            I accept the
+                            <a
+                                href="https://camino.network/static/docs/Terms_and_Conditions_of_Use_Public_Sale_2024.pdf"
+                                target="_blank"
+                            >
+                                Terms & Conditions
+                            </a>
+                        </div>
+                    </div>
                     <v-btn
                         type="submit"
                         :disabled="submitUserDataDisabled"
@@ -241,6 +257,7 @@ export default class PChainSaft extends Vue {
     isLoading = false
     background = ''
     price = 123.45
+    termsAndConditions = false
     number = {
         decimal: '.',
         separator: ',',
@@ -447,6 +464,7 @@ export default class PChainSaft extends Vue {
             !this.user.purchaseAmount ||
             !this.user.preferredCurrency ||
             !this.user.pchainAddress ||
+            !this.termsAndConditions ||
             this.user.purchaseAmount < 1000 ||
             this.error.name ||
             this.error.surname ||
@@ -653,6 +671,11 @@ sup {
     width: 20px;
     height: 20px;
     margin-left: 5px;
+}
+
+.v-input--selection-controls {
+    padding-top: 0px !important;
+    margin-top: 0px !important;
 }
 
 @include mixins.mobile-device {
