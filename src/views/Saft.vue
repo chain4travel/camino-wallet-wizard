@@ -11,7 +11,7 @@
                     @change="handleChange"
                 />
                 <InputField
-                    label="Name"
+                    labels="Name"
                     :error_value="error.name"
                     :error_message="$t('wizard.errors.name')"
                     placeholder="John"
@@ -547,7 +547,6 @@ export default class Saft extends Vue {
             !this.user.email ||
             !this.user.agree ||
             !this.user.purchaseAmount ||
-            !this.user.preferredCurrency ||
             this.user.purchaseAmount < 1000 ||
             this.error.name ||
             this.error.surname ||
