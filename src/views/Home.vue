@@ -1,5 +1,21 @@
 <template>
-    <div class="home" v-if="!starting">
+    <div class="home" v-if="!startingCreateWallet && !startingAlreadyHaveWallet">
+        <modal ref="modal" title="Do you have a KYC verified Camino Wallet?">
+            <div class="KYC-wallet-modal">
+                <div
+                    style="
+                        display: flex;
+                        flex-direction: row;
+                        width: 100%;
+                        gap: 12px;
+                        justify-content: center;
+                    "
+                >
+                    <v-btn @click="close" class="camino-button decline-but">No</v-btn>
+                    <v-btn @click="closeWithYes" class="camino-button accept-but">Yes</v-btn>
+                </div>
+            </div>
+        </modal>
         <div class="not-mobile-friendly please_note" v-if="$isMobile()">
             <span>
                 <strong>Please note:</strong>
@@ -17,9 +33,9 @@
                         <br />
                         The following wizard will guide you through the following steps:
                         <ul>
-                            <li>Creating your Camino Network wallet</li>
+                            <li v-if="!hasKYCWallet">Creating your Camino Network wallet</li>
                             <li>Filling in your personal / company data</li>
-                            <li>
+                            <li v-if="!hasKYCWallet">
                                 KYC
                                 <small>(Know-Your-Customer) / Identity verification</small>
                             </li>
@@ -30,31 +46,21 @@
                         <br />
                         Please complete the wizard in one session. This will take no longer than 15
                         minutes.
-                        <br />
-                        <br />
-                        <span>
-                            <div class="attention">ATTENTION</div>
-                            <p>
-                                If you have an existing KYC verified Camino Wallet or have any
-                                questions, please contact
-                                <a href="mailto:publicsale@camino.network" class="presale">
-                                    publicsale@camino.network
-                                </a>
-                            </p>
-                        </span>
                     </span>
                 </div>
             </div>
-            <div style="display: flex; flex-direction: row; width: 100%">
-                <v-checkbox class="checkbox" v-model="accept" style="width: max-content" />
-                <div class="label" slot="label">
-                    I accept the
-                    <a
-                        href="https://camino.network/static/docs/Terms_and_Conditions_of_Use_Public_Sale_2024.pdf"
-                        target="_blank"
-                    >
-                        Terms & Conditions
-                    </a>
+            <div style="display: flex; flex-direction: column; width: 100%">
+                <div style="display: flex; flex-direction: row; width: 100%">
+                    <v-checkbox class="checkbox" v-model="accept" style="width: max-content" />
+                    <div class="label" slot="label">
+                        I accept the
+                        <a
+                            href="https://camino.network/static/docs/Terms_and_Conditions_of_Use_Public_Sale_2024.pdf"
+                            target="_blank"
+                        >
+                            Terms & Conditions
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -63,30 +69,58 @@
             </v-btn>
         </div>
     </div>
-    <HomeNextStep v-else />
+    <HomeNextStep v-else-if="startingCreateWallet && !startingAlreadyHaveWallet" />
+    <KYCWalletStepper v-else-if="!startingCreateWallet && startingAlreadyHaveWallet" />
 </template>
 
 <script lang="ts">
 import 'reflect-metadata'
 import { Vue, Component } from 'vue-property-decorator'
 import HomeNextStep from './HomeNextStep.vue'
+import KYCWalletStepper from './KYCWalletStepper.vue'
+import Modal from '@/components/modals/Modal.vue'
 
 @Component({
     name: 'home',
-    components: { HomeNextStep },
+    components: { HomeNextStep, KYCWalletStepper, Modal },
 })
 export default class Home extends Vue {
-    starting = false
+    startingCreateWallet = false
+    startingAlreadyHaveWallet = false
     accept = false
-    mounted() {
-        this.starting = false
-        localStorage.removeItem('Email')
-        localStorage.removeItem('Phone')
+    hasKYCWallet = false
+
+    $refs!: {
+        modal: Modal
     }
 
-    goToStepper() {
-        // go to stepper view whitout router
-        this.starting = true
+    open() {
+        this.$refs.modal.open()
+    }
+    close() {
+        this.$refs.modal.close()
+    }
+
+    mounted() {
+        this.startingCreateWallet = false
+        localStorage.removeItem('Email')
+        localStorage.removeItem('Phone')
+        this.open()
+    }
+
+    // create a function for when the user clicks the yes buttom of the modal, it shoudl set the hasKYCWallet to true and close the modal
+    closeWithYes() {
+        this.hasKYCWallet = true
+        this.close()
+    }
+
+    async goToStepper() {
+        if (this.hasKYCWallet) {
+            this.startingAlreadyHaveWallet = true
+            return
+        } else if (this.accept) {
+            this.startingCreateWallet = true
+        }
     }
 }
 </script>
@@ -167,11 +201,19 @@ export default class Home extends Vue {
         color: #fff !important;
         font-size: 1rem !important;
     }
-
-    .label {
-        font-size: 12px;
-        margin-top: 16px;
-        padding-top: 8px;
+    .decline-but {
+        background-color: #e84970 !important;
+    }
+    .accept-but {
+        background-color: #0085ff !important;
+    }
+    .camino-button {
+        height: 43px !important;
+        min-width: 100px !important;
+        border-radius: 12px !important;
+        text-transform: capitalize !important;
+        color: #fff !important;
+        font-size: 1rem !important;
     }
     .not-mobile-friendly {
         display: flex;
@@ -197,6 +239,21 @@ export default class Home extends Vue {
         color: #e84970;
         text-transform: uppercase;
         font-weight: 700;
+    }
+
+    .v-input--selection-controls {
+        margin-top: 0px;
+    }
+
+    .label {
+        font-size: 12px;
+        padding-top: 6px;
+    }
+
+    .KYC-wallet-modal {
+        padding: 30px 22px;
+        text-align: center;
+        max-width: 100%;
     }
 }
 
