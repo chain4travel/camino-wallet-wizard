@@ -108,10 +108,10 @@ export default class Home extends Vue {
         this.open()
     }
 
-    // create a function for when the user clicks the yes buttom of the modal, it shoudl set the hasKYCWallet to true and close the modal
     closeWithYes() {
         this.hasKYCWallet = true
         this.close()
+        this.startingAlreadyHaveWallet = true
     }
 
     async goToStepper() {
