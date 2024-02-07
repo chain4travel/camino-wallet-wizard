@@ -35,7 +35,7 @@
                         <span>
                             <div class="attention">ATTENTION</div>
                             <p>
-                                If you have an exiting KYC verified Camino Wallet or have any
+                                If you have an existing KYC verified Camino Wallet or have any
                                 questions, please contact
                                 <a href="mailto:publicsale@camino.network" class="presale">
                                     publicsale@camino.network
